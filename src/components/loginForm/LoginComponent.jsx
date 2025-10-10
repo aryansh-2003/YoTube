@@ -132,9 +132,9 @@ export default function LoginComponent() {
         {/* Link */}
         <p className="text-center text-xs sm:text-sm text-gray-600">
           Don’t have an account?{" "}
-          <a href="/signup" className="text-red-600 hover:underline">
+          <button onClick={() => navigate('/signup')} className="text-red-600 hover:underline">
             Sign up
-          </a>
+          </button>
         </p>
       </form>
     </div>
