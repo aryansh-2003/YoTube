@@ -6,7 +6,7 @@ export class CommentService{
     constructor(){
 
     this.instance = axios.create({
-     baseURL: 'http://localhost:8000/api/v1',
+     baseURL: 'https://youtube-backend-052x.onrender.com/api/v1',
      
      
     //  headers: {'X-Custom-Header': 'foobar'}
