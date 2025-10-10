@@ -87,9 +87,8 @@ export default function Sidebar() {
           <div className="px-3 mb-3">
             {[
               ['Home', '/Home', <Home />],
-              ['Shorts', '/Shorts', <Play />],
               ['Subscriptions', '/Subscriptions', <Users />],
-              ['You', '/You', <Video />],
+              ['Create +', '/CreatePost', <Video />],
             ].map(([name, path, icon]) => (
               <div
                 key={name}
