@@ -28,7 +28,7 @@ export default function UserVideos() {
 
 
   return (
-    <main className="flex-1 bg-gray-900 min-h-screen ml-64 pt-14">
+    <main className="flex-1 min-h-screen">
       <div className="p-6">
         {/* Category tabs */}
        <div className="flex gap-3 mb-6 overflow-x-auto scrollbar-hide scroll-smooth">

@@ -7,10 +7,7 @@ export class AuthService{
 
     this.instance = axios.create({
      baseURL: 'https://youtube-backend-052x.onrender.com/api/v1/users',
-     timeout: 10000,
-     
-    //  headers: {'X-Custom-Header': 'foobar'}
-    });
+         });
         
     }
 
@@ -47,14 +44,10 @@ export class AuthService{
 
     async registerUser(formData){
            const keysArray = Array.from(formData.values());
-    console.log(keysArray);
+    
+    console.log(keysArray,formData);
         try {
-            this.instance.post('/register',formData).then((res)=>{
-                console.log(res)
-                if(res.status === 200 || 201){
-                    this.login(res?.data?.data?.email,keysArray?.[3])
-                }
-            })
+            return this.instance.post('/register',formData)
         } catch (error) {
             return ("AuthService :: Register Error", error)
         }
@@ -97,6 +90,25 @@ export class AuthService{
     return false;
   }
 }
+
+
+ async getUserChannel({channel}){
+        try {
+             if(!channel) return null
+             const token = localStorage.getItem('token')
+             if(!token) return null
+             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+             return await this.instance.get(`/user-channel-profile/${channel}`,
+                {
+                    headers: { Authorization:`Bearer ${token}` }
+                }
+             )
+
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
 
 }

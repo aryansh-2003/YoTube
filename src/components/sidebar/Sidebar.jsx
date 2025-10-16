@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { NavLink,  } from 'react-dom'; // note: react-router-dom, not 'react-dom'
 import {
   Home,
   Play,
@@ -10,14 +11,38 @@ import {
   LogOut,
   Menu,
 } from 'lucide-react';
-import { useNavigate } from 'react-router';
 import HeaderContext from '../context/HeaderContext';
 import axios from 'axios';
+import chalchitramText from  '../../assets/chalchitramText.png'
+import chalchitram from  '../../assets/chalchitram.png'
+import { useLocation, useNavigate } from 'react-router';
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { sidebarOpen, setSidebarOpen } = useContext(HeaderContext);
-  const [active, setActive] = useState('Home');
+
+  const [active, setActive] = useState('');
+
+  const deriveActiveFromPath = (pathname) => {
+    if (pathname.startsWith('/Home')) return 'Home';
+    if (pathname.startsWith('/Subscriptions')) return 'Subscriptions';
+    if (pathname.startsWith('/CreatePost')) return 'Create +';
+    if (pathname.startsWith('/History')) return 'History';
+    if (pathname.startsWith('/Playlists')) return 'Playlists';
+    if (pathname.startsWith('/userVideos')) return 'Your videos';
+    if (pathname.startsWith('/Liked')) return 'Liked videos';
+    if (pathname.startsWith('/channel/news')) return 'News';
+    if (pathname.startsWith('/channel/amit')) return 'Amit';
+    if (pathname.startsWith('/channel/hot')) return 'HotDays';
+    // fallback
+    return '';
+  };
+
+  useEffect(() => {
+    const current = deriveActiveFromPath(location.pathname);
+    setActive(current);
+  }, [location.pathname]);
 
   const logOutHandler = async () => {
     try {
@@ -31,13 +56,38 @@ export default function Sidebar() {
   };
 
   const handleClick = (name, path) => {
-    setActive(name);
-    if (path) navigate(path);
+    if (path) {
+      navigate(path);
+      setSidebarOpen(false);  
+    }
+  };
+
+  const getHeaderBgColor = () => {
+    switch (active) {
+      case 'Home':
+        return 'bg-blue-600';
+      case 'Subscriptions':
+        return 'bg-green-600';
+      case 'Create +':
+        return 'bg-purple-600';
+      case 'History':
+      case 'Playlists':
+      case 'Your videos':
+      case 'Liked videos':
+        return 'bg-indigo-600';
+      case 'News':
+        return 'bg-red-600';
+      case 'Amit':
+        return 'bg-yellow-600';
+      case 'HotDays':
+        return 'bg-pink-600';
+      default:
+        return 'bg-gray-800';
+    }
   };
 
   return (
     <>
-      {/* Glass blur backdrop */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 md:hidden"
@@ -45,15 +95,13 @@ export default function Sidebar() {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-full text-white z-50 transition-all duration-500 ease-in-out transform 
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-        bg-black/40 backdrop-blur-md border-r border-gray-800
-        w-[70%] sm:w-[80%] md:w-[18%]`}
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+          bg-black/40 backdrop-blur-md border-r border-gray-800
+          w-[70%] sm:w-[80%] md:w-[18%]`}
       >
-        {/* Header section with menu + logo */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-black/60 backdrop-blur-md">
+        <div className={`flex items-center justify-between px-4 py-3 border-b border-gray-800 ${getHeaderBgColor()}`}>
           <div className="flex items-center gap-2">
             <button
               className="p-2 rounded-full hover:bg-gray-800"
@@ -61,29 +109,16 @@ export default function Sidebar() {
             >
               <Menu className="w-6 h-6" />
             </button>
-
-            {sidebarOpen && <div className="flex items-center gap-1">
-              <svg width="70" height="20" viewBox="0 0 90 20" className="block">
-                <g>
-                  <path
-                    d="M27.9727 3.12324C27.6435 1.89323 26.6768 0.926623 25.4468 0.597366C23.2197 2.24288e-07 14.285 0 14.285 0C14.285 0 5.35042 2.24288e-07 3.12323 0.597366C1.89323 0.926623 0.926623 1.89323 0.597366 3.12324C0 5.35042 0 10 0 10C0 10 0 14.6496 0.597366 16.8768C0.926623 18.1068 1.89323 19.0734 3.12323 19.4026C5.35042 20 14.285 20 14.285 20C14.285 20 23.2197 20 25.4468 19.4026C26.6768 19.0734 27.6435 18.1068 27.9727 16.8768C28.5701 14.6496 28.5701 10 28.5701 10C28.5701 10 28.5701 5.35042 27.9727 3.12324Z"
-                    fill="#FF0000"
-                  />
-                  <path
-                    d="M11.4253 14.2854L18.8477 10.0004L11.4253 5.71533V14.2854Z"
-                    fill="white"
-                  />
-                </g>
-              </svg>
-              <span className="text-l font-medium ml-2 hidden sm:inline">YouTube</span>
-              <span className="text-xs text-gray-300 ml-1 hidden sm:inline">IN</span>
-            </div>}
+            {sidebarOpen && (
+              <div className="flex items-center gap-1">
+                <img className='w-[30%]' src={chalchitram}></img>
+                <img className='w-[70%]' src={chalchitramText}></img>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Sidebar content scroll area */}
         <div className="py-4 overflow-y-auto scrollbar-hide">
-          {/* Main Navigation */}
           <div className="px-3 mb-3">
             {[
               ['Home', '/Home', <Home />],
@@ -108,7 +143,6 @@ export default function Sidebar() {
 
           <div className="border-t border-gray-700 my-3" />
 
-          {/* You Section */}
           <div className="px-3 mb-3">
             <div className="flex items-center gap-3 px-3 py-1 mb-2">
               <span className="text-base font-medium">You</span>
@@ -119,9 +153,6 @@ export default function Sidebar() {
               ['History', '/History', <Clock />],
               ['Playlists', '/Playlists', <Play />],
               ['Your videos', '/userVideos', <Video />],
-              ['Your movies', '/Movies', <Play />],
-              ['Your courses', '/Courses', <Play />],
-              ['Watch later', '/WatchLater', <Clock />],
               ['Liked videos', '/Liked', <ThumbsUp />],
             ].map(([name, path, icon]) => (
               <div
@@ -147,7 +178,6 @@ export default function Sidebar() {
 
           <div className="border-t border-gray-700 my-3" />
 
-          {/* Subscriptions Section */}
           <div className="px-3 mb-3">
             <div className="flex items-center gap-3 px-3 py-1 mb-2">
               <span className="text-base font-medium">Subscriptions</span>
@@ -165,7 +195,7 @@ export default function Sidebar() {
               </div>
               <span className="text-sm">News18 India</span>
               <div className="ml-auto flex items-center gap-1">
-                <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                <div className="w-2 h-2 bg-red-600 rounded-full" />
                 <span className="text-xs text-gray-400">6</span>
               </div>
             </div>

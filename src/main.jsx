@@ -29,7 +29,10 @@ import CreatePost from './pages/CreatePost.jsx'
 import UserVideos from './pages/UserVideos.jsx'
 import ChannelDashboard from './pages/ChannelDashboard.jsx'
 import EditVideoForm from './pages/EditVideoForm.jsx'
-
+import ChannelPage from './pages/ChannelPage.jsx'
+import SubscriptionPage from './pages/SubscriptionPage.jsx'
+import PlaylistPage from './pages/PlaylistPage.jsx'
+import PlaylistVideos from './pages/PlaylistVideos.jsx'
 
 
 
@@ -114,6 +117,42 @@ import EditVideoForm from './pages/EditVideoForm.jsx'
             <PrivateRoute>
               <>
                   <EditVideoForm/> 
+              </>
+            </PrivateRoute>
+        },
+        {
+          path:'/channel/:username',
+          element:
+            <PrivateRoute>
+              <>
+                  <ChannelPage/> 
+              </>
+            </PrivateRoute>
+        },
+        {
+          path:'/subscription',
+          element:
+            <PrivateRoute>
+              <>
+                  <SubscriptionPage/> 
+              </>
+            </PrivateRoute>
+        },
+        {
+          path:'/playlists',
+          element:
+            <PrivateRoute>
+              <>
+                  <PlaylistPage/> 
+              </>
+            </PrivateRoute>
+        },
+          {
+          path:'/playlistvideos/:playlistid',
+          element:
+            <PrivateRoute>
+              <>
+                  <PlaylistVideos/> 
               </>
             </PrivateRoute>
         },

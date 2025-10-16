@@ -18,3 +18,47 @@
   -ms-overflow-style: none;  /* IE/Edge */
   scrollbar-width: none;      /* Firefox */
 }
+
+
+@keyframes fall {
+  0%   { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+.sad-drop {
+  animation-name: fall;
+  animation-timing-function: cubic-bezier(.2,.8,.2,1);
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
+}
+
+
+@keyframes blast {
+  0% {
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%)
+      translate(calc(cos(var(--angle)) * var(--distance)),
+                calc(sin(var(--angle)) * var(--distance)))
+      scale(0.2);
+    opacity: 0;
+  }
+}
+
+.sad-blast {
+  animation: blast 1.5s ease-out forwards;
+  position: absolute;
+  will-change: transform, opacity;
+}
+
+/* Hide scrollbar but keep scroll functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

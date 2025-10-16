@@ -45,9 +45,10 @@ export default function CommentsSection({ onAddComment, video }) {
     if (!editingComment) return;
      commentService.updateComment({commentId: editingComment._id, content : editingComment.content}).then((res) => {
       if (res.status === 200) {
+        console.log(res)
         setComments((prev) =>
           prev.map((c) =>
-            c._id === editingComment._id ? { ...c, content: editedContent } : c
+            c._id === res?.data?.data?._id ? { ...c, content: res?.data?.data?.content } : c
           )
         );
         setEditingComment(null);

@@ -1,44 +1,76 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 import { useNavigate } from 'react-router';
-import { MoreVertical, Trash, Pencil, ListPlus, RefreshCcw } from 'lucide-react';
+import { MoreVertical, Trash, Pencil, ListPlus } from 'lucide-react';
 import CapybaraLoader from '../loader/Capybara';
 import { useSelector } from 'react-redux';
+import defaultAvatar from '../../assets/download.jpeg';
+import {timeAgo,formatVideoDuration} from '../TimeResolver.js';  
+import VideoSkeleton from '../VideoSkeleton.jsx'
+import DeleteBtn from '../DeleteBtn.jsx';
+import PlaylistOverlay from '../PlaylistOverlay.jsx';
+
 
 function Media({ loading = false, data = [] }) {
   const content = loading ? Array.from(new Array(4)) : data;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(null);
-  const userData = useSelector(state => state?.auth?.userData)
+  const [overlayopen, setoverlayopen] = useState(null);
+  const [videoid, setvideoid] = useState(null);
+  const userData = useSelector((state) => state?.auth?.userData);
 
-
-  
   const handleMenuToggle = (e, id) => {
     e.stopPropagation();
     e.preventDefault();
     setMenuOpen(menuOpen === id ? null : id);
   };
 
+  
+
   const handleMenuClick = (action, id) => {
-    console.log(`${action} clicked for video ${id}`);
+    if(action == "Update"){
+        navigate(`/editvideo/${id}`)
+    }else{
+        setvideoid(id)
+        setoverlayopen(true)
+
+    }
     setMenuOpen(null);
   };
+
+     const playlists = [
+    { id: 1, name: "My Favourites", videosCount: 12 },
+    { id: 2, name: "Watch Later", videosCount: 5 },
+    { id: 3, name: "Music Mix", videosCount: 20 },
+  ];
 
   return (
     <Grid container wrap="wrap" spacing={2}>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
+        
+      
         {content && content.length > 0 ? (
           content.map((item, index) => (
-            <button
-              key={item?._id || index}
-              onClick={() => navigate(`/video/${item._id}`)}
-              className="relative text-left"
-            >
-              <Box sx={{ width: '100%', cursor: 'pointer', position: 'relative' }}>
+            <div key={item?._id || index} className="relative text-left">
+                    {overlayopen ? <>
+                <PlaylistOverlay
+                        playlists={playlists}
+                        videoId={videoid}
+                        onClose={() => setoverlayopen(false)}
+                      />
+              </> : ""}
+              <Box
+                sx={{
+                  width: '100%',
+                  cursor: 'pointer',
+                  position: 'relative'
+                }}
+                onClick={() => item?._id && navigate(`/video/${item._id}`)}
+              >
                 {/* Thumbnail */}
                 {item ? (
                   <Box
@@ -77,7 +109,7 @@ function Media({ loading = false, data = [] }) {
                           fontWeight: 500
                         }}
                       >
-                        {item.duration}
+                        {item ? `${formatVideoDuration(item.duration)}` : ""}
                       </Box>
                     )}
                   </Box>
@@ -87,14 +119,18 @@ function Media({ loading = false, data = [] }) {
                     sx={{ width: '100%', aspectRatio: '16/9', borderRadius: '8px' }}
                   />
                 )}
-
-                {/* Video info row */}
-                <Box sx={{ display: 'flex', mt: 1.2, gap: 1.5, alignItems: 'flex-start' }}>
-                  {/* Channel avatar */}
-                  {item ? (
+              </Box>
+              <Box sx={{ display: 'flex', mt: 1.2, gap: 1.5, alignItems: 'flex-start' }}>
+                {item ? (
+                  <button
+                    className=""
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/channel/${item?.ownerInfo?.[0]?.username}`);
+                    }}
+                  >
                     <img
-                      src={item?.ownerInfo?.[0]?.avatar || '/default-avatar.png'}
-                      alt={item.channel || 'channel'}
+                      src={item?.ownerInfo?.[0]?.avatar || defaultAvatar}
                       style={{
                         width: 36,
                         height: 36,
@@ -102,100 +138,109 @@ function Media({ loading = false, data = [] }) {
                         flexShrink: 0
                       }}
                     />
+                  </button>
+                ) : (
+                  <Skeleton variant="circular" width={36} height={36} />
+                )}
+
+                {/* Text info */}
+                <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                  {item ? (
+                    <>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontSize: '0.95rem',
+                          fontWeight: 500,
+                          lineHeight: 1.4,
+                          overflow: 'hidden',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/video/${item._id}`);
+                        }}
+                      >
+                        {item.title}
+                      </Typography>
+
+                      <Typography
+                        variant="caption"
+                        sx={{ color: 'gray', display: 'block', mt: 0.5 }}
+                        className="cursor-pointer hover:text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/channel/${item?.ownerInfo?.[0]?.username}`);
+                        }}
+                      >
+                        {item?.ownerInfo?.[0]?.fullname}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: 'gray', display: 'block' }}
+                      >
+                        {item.views ? `${item.views} views` : ''}
+                        {item.createdAt ? ` •  ${timeAgo(item.createdAt)} ago` : ''}
+                      </Typography>
+                    </>
                   ) : (
-                    <Skeleton variant="circular" width={36} height={36} />
-                  )}
-
-                  {/* Text info */}
-                  <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                    {item ? (
-                      <>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            fontSize: '0.95rem',
-                            fontWeight: 500,
-                            lineHeight: 1.4,
-                            overflow: 'hidden',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical'
-                          }}
-                        >
-                          {item.title}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{ color: 'gray', display: 'block', mt: 0.5 }}
-                        >
-                          {item?.ownerInfo?.[0]?.fullname}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{ color: 'gray', display: 'block' }}
-                        >
-                          {item.views ? `${item.views} views` : ''}
-                          {item.createdAt ? ` • ${item.createdAt} ago` : ''}
-                        </Typography>
-                      </>
-                    ) : (
-                      <Box sx={{ width: '100%' }}>
-                        <Skeleton width="90%" />
-                        <Skeleton width="60%" />
-                      </Box>
-                    )}
-                  </Box>
-
-                  {/* Three-dot menu */}
-                  {item && (
-                    <div className="relative">
-                      <MoreVertical
-                        size={18}
-                        className="cursor-pointer text-gray-500 hover:text-black"
-                        onClick={(e) => handleMenuToggle(e, item._id)}
-                      />
-
-                      {menuOpen === item._id && (
-                        <div
-                          className="absolute right-0 mt-1 bg-black shadow-lg rounded-lg   z-50"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {content?.[index]?.owner === userData._id &&
-                          <>
-                          <button
-                            onClick={() => handleMenuClick('Delete', item._id)}
-                            className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-orange-500 w-full text-left"
-                          >
-                            <Trash size={16} />
-                            <h1 className='text-[12px]'>Delete</h1>
-                          </button>
-                          <button
-                            onClick={() => handleMenuClick('Update', item._id)}
-                            className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-orange-500 w-full text-left"
-                          >
-                            <Pencil size={16} />
-                              <h1 className='text-[12px]'>Update</h1>
-                          </button>
-                          </>
-                          }
-                          <button
-                            onClick={() => handleMenuClick('Add to Playlist', item._id)}
-                            className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-orange-500 w-full text-left"
-                          >
-                            <ListPlus size={25} />
-                           <h1 className='text-[12px]'>Add to Playlist</h1> 
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    <Box sx={{ width: '100%' }}>
+                      <Skeleton width="90%" />
+                      <Skeleton width="60%" />
+                    </Box>
                   )}
                 </Box>
+
+                {item && (
+                  <div className="relative">
+                    <MoreVertical
+                      size={18}
+                      className="cursor-pointer text-gray-500 hover:text-black"
+                      onClick={(e) => handleMenuToggle(e, item._id)}
+                    />
+
+                    {menuOpen === item._id && (
+                      <div
+                        className="absolute right-0 mt-1 bg-black shadow-lg rounded-lg z-50"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {content?.[index]?.owner === userData._id && (
+                          <>
+                            <div
+                              className="flex items-center gap-2  text-sm hover:bg-orange-500 w-full text-left"
+                            >
+                        
+                              <DeleteBtn videoId={content?.[index]?._id}/>
+                              <h1 className="text-[12px]">Delete</h1>
+                            </div>
+                            <button
+                              onClick={() => handleMenuClick('Update', item._id)}
+                              className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-orange-500 w-full text-left"
+                            >
+                              <Pencil size={16} />
+                              <h1 className="text-[12px]">Update</h1>
+                            </button>
+                          </>
+                        )}
+                        <button
+                          onClick={() => handleMenuClick('Add to Playlist', item._id)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-orange-500 w-full text-left"
+                        >
+                          <ListPlus size={25} />
+                          <h1 className="text-[12px]">Add to Playlist</h1>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </Box>
-            </button>
+            </div>
           ))
         ) : (
-          <div className='absolute w-full  top-0 bottom-0 right-0 left-0 '>
-          <CapybaraLoader />
+          <div className="w-full fixed h-screen">
+            <VideoSkeleton/>
           </div>
         )}
       </div>

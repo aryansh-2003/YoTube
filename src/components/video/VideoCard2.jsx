@@ -1,5 +1,6 @@
 import React from "react";
 import { MoreVertical } from "lucide-react";
+import { formatVideoDuration , timeAgo } from "../TimeResolver";
 
 export default function VideoCard({ video }) {
   return (
@@ -11,13 +12,11 @@ export default function VideoCard({ video }) {
           alt={video.title}
           className="w-full h-44 sm:h-40 object-cover rounded-xl"
         />
-        {/* Video duration (bottom-right like YouTube) */}
         <span className="absolute bottom-1 right-1 bg-black/80 text-xs px-1.5 py-0.5 rounded">
-          {video.duration || "12:34"}
+          {video ? `${formatVideoDuration(video.duration)}` : ""}
         </span>
       </div>
 
-      {/* Details */}
       <div className="flex flex-col justify-between sm:py-1 sm:px-1 flex-1">
         <div className="flex justify-between">
           <h3 className="font-semibold text-base sm:text-lg leading-snug line-clamp-2">
@@ -31,7 +30,7 @@ export default function VideoCard({ video }) {
           <span className="mx-1">•</span>
           <span>{video.views} views</span>
           <span className="mx-1">•</span>
-          <span>{video.time || "2 days ago"}</span>
+          <span>{video ? `${timeAgo(video.createdAt)}` : ""}</span>
         </div>
 
         {video.description && (

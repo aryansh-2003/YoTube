@@ -19,7 +19,6 @@ export default function SignUpComponent() {
 
   const submitHandler = async (data) => {
     if (data){
-        console.log(data.FullName)
            const formData = new FormData();
             formData.append("fullname", data.FullName);
             formData.append("email", data.email);
@@ -28,11 +27,15 @@ export default function SignUpComponent() {
             formData.append("avatar", data.avatar[0]);
             formData.append("coverImage", data.coverImage[0]);
 
-            console.log(...formData)
-
         authService.registerUser(formData).then((res)=>{
-            console.log(res.status)
-            navigate('/')
+            console.log(res)
+            if(res.status === 200 || 201){
+               navigate('/')
+            }else if(res.status === 409){
+              setError("User already exist")
+            }else{
+              setError("Something is wrong!!")
+            }
         }).catch((error)=>{console.log(error)})
     }
   };

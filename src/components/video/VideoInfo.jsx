@@ -4,11 +4,12 @@ import DisplayPic from '../DisplayPic'
 import {useSelector} from 'react-redux'
 import { useNavigate } from "react-router";
 import videoService from '../../../Service/video'
+import LikeButton from '../Like'
+import DeleteBtn from '../DeleteBtn'
 
 
 export default function VideoInfo({ videoData }) {
   const [isLiked, setIsLiked] = useState(false);
-  const [isDisliked, setIsDisliked] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const navigate = useNavigate()
@@ -21,10 +22,10 @@ export default function VideoInfo({ videoData }) {
   useEffect(() => {
     if(!videoData) return
     setPublishStatus(videoData?.isPublished)
+    setIsLiked(videoData?.isLiked)
   },[videoData])
   
   const publishStatusHandler = () =>{
-  
     videoService.changePublishStatus({id:videoData._id,status : !publishStatus}).then((res)=>{
       setPublishStatus(!publishStatus)
     })
@@ -56,32 +57,20 @@ export default function VideoInfo({ videoData }) {
         </div>
         
         <div className="flex items-center space-x-2 w-full">
-          <div className="flex bg-gray-800/50 rounded-full backdrop-blur-sm">
-            <button 
-              onClick={() => {
-                setIsLiked(!isLiked);
-                if (isDisliked) setIsDisliked(false);
-              }}
-              className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-l-full hover:bg-gray-700/50 transition-colors ${
-                isLiked ? 'text-blue-400' : 'text-white'
-              }`}
-            >
-              <ThumbsUp size={16} />
-              <span className="text-sm hidden sm:inline">{videoData?.likes || 0}</span>
-            </button>
-            <div className="w-px bg-gray-600"></div>
-            <button 
-              onClick={() => {
-                setIsDisliked(!isDisliked);
-                if (isLiked) setIsLiked(false);
-              }}
-              className={`px-3 sm:px-4 py-2 rounded-r-full hover:bg-gray-700/50 transition-colors ${
-                isDisliked ? 'text-red-400' : 'text-white'
-              }`}
-            >
-              <ThumbsDown size={16} />
-            </button>
+          <div className="flex bg-gray-800/50 rounded-full p-2 backdrop-blur-sm">
+  
+              {/* <LikeButton
+                liked={isLiked}
+                videoId={videoData?._id}
+                totalLikes = {videoData ? videoData.totalLikes : 0}
+                videoData = {videoData}
+             />  */}
           </div>
+
+          
+              <LikeButton
+                videoInfo = {videoData}
+             /> 
           
           <button className="flex items-center space-x-2 bg-gray-800/50 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full hover:bg-gray-700/50 transition-colors">
             <Share size={16} />
@@ -95,9 +84,8 @@ export default function VideoInfo({ videoData }) {
               {
           isAuthor &&
           <>
-            <button className="bg-gray-800/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-700/50 transition-colors">
-            <Trash size={16} />
-          </button>
+
+          <DeleteBtn videoId ={videoData ? videoData._id : ""}/>
 
           <button onClick={() => navigate(`/editvideo/${videoData._id}`)} className="bg-gray-800/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-700/50 transition-colors">
             <Pencil size={16} />

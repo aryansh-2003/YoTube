@@ -46,7 +46,7 @@ export default function LoginComponent() {
   };
   console.log(error)
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4 sm:p-6">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p- sm:p-6">
      
         <div className="absolute top-40 z-200 text-center w-full">
           <h1 className="text-red-800 text-5xl sm:text-base">{error}</h1>

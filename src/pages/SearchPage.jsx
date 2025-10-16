@@ -28,8 +28,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="p-4 relative ml-[5%]">
-      {/* Search Bar & Filter Button */}
+    <div className="p-4 relative">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-white text-xl font-semibold">Search Results</h2>
         <button
@@ -41,7 +40,6 @@ export default function SearchPage() {
         </button>
       </div>
 
-      {/* Filter Popup */}
       {showFilters && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20">
           <SearchFilters
@@ -65,7 +63,6 @@ export default function SearchPage() {
       : "...Loading"}
      
 
-      {/* Overlay background when filters are open */}
       {showFilters && (
         <div
           className="fixed inset-0 bg-black/50 z-10"

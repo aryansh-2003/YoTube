@@ -74,6 +74,8 @@ export class VideoService{
         }
     }
 
+    
+
 
     async changePublishStatus({id,status}){
          try {
@@ -82,6 +84,23 @@ export class VideoService{
             })
         } catch (error) {
             return ("VideoService ::Get Single video By Id Error", error)
+        }
+    }
+
+
+        async updateVideo({id},formData){
+         try {
+            return await this.instance.patch(`/update-video/${id}`,formData)
+        } catch (error) {
+            return ("VideoService ::Update video Error", error)
+        }
+    }
+
+         async deleteVideo({id}){
+         try {
+            return await this.instance.delete(`/delete-Video/${id}`)
+        } catch (error) {
+            return ("VideoService ::Update video Error", error)
         }
     }
 

@@ -10,8 +10,8 @@ function Layout() {
   return (
     <div>
         <Header/>
-        <div className='w-full flex flex-col pt-10'>
-        <div className='ml-[3%]'>
+        <div className='w- flex flex-col pt-10'>
+        <div className=''>
         <Outlet/>
         </div>
         <Sidebar/>

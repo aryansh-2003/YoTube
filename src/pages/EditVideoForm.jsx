@@ -3,12 +3,16 @@ import { useForm } from "react-hook-form";
 import { ArrowLeft, Upload, Save } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import VideoService from "../../Service/video"; // your backend service
+import { useDispatch } from "react-redux";
+import { vdo } from "../Store/videoSlice";
+import MachineLoader from '../components/loader/MachineLoader'
 
 export default function VideoEditPage() {
   const { id } = useParams(); // videoId from URL
   const navigate = useNavigate();
   const [videoData, setVideoData] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [loader, setloader] = useState(false);
 
   const {
     register,
@@ -16,13 +20,15 @@ export default function VideoEditPage() {
     reset,
     formState: { isSubmitting },
   } = useForm();
+  const dispatch = useDispatch()
 
   // Load video data for editing
   useEffect(() => {
     const fetchVideo = async () => {
       try {
-        const res = await VideoService.getVideoById({id:id});
-        setVideoData(res?.data);
+        const res = await VideoService.getSingleVideo({id:id});
+        console.log(res)
+        setVideoData(res?.data?.data);
         reset(res?.data);
       } catch (err) {
         console.error(err);
@@ -39,15 +45,25 @@ export default function VideoEditPage() {
 
   // Handle update submit
   const onSubmit = async (data) => {
+    setloader(true)
+    console.log(data)
     try {
+      
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("description", data.description);
-      formData.append("visibility", data.visibility);
+      formData.append("isPublished", data.visibility);
       if (data.thumbnail[0]) formData.append("thumbnail", data.thumbnail[0]);
 
-      await VideoService.updateVideo(id, formData); // PUT request
-      navigate(`/video/${id}`);
+      await VideoService.updateVideo({id:id}, formData).then((res)=>{
+        console.log(res)
+        if(res.status === 200 || 201){
+          dispatch(vdo(res?.data?.data))
+            setloader(false)
+          navigate(`/video/${res?.data?.data?._id}`)
+        }
+      })
+      // navigate(`/video/${id}`);
     } catch (err) {
       console.error("Error updating video:", err);
     }
@@ -75,7 +91,7 @@ export default function VideoEditPage() {
         {/* Video preview */}
         <div className="bg-gray-900 rounded-xl overflow-hidden shadow-md">
           <video
-            src={videoData?.videoUrl}
+            src={videoData?.videoFile}
             controls
             className="w-full rounded-xl"
           />
@@ -95,7 +111,10 @@ export default function VideoEditPage() {
               className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
             />
           </div>
-
+          <div className={`h-full z-200 top-0 bottom-0 left-0 right-0 w-full fixed ${loader ? "fixed" : "hidden"}`}>
+               <MachineLoader/>
+          </div>
+         
           <div>
             <label className="block text-sm font-medium mb-2">
               Description
@@ -115,10 +134,9 @@ export default function VideoEditPage() {
               {...register("visibility")}
               className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
             >
-              <option value="public">Public</option>
-              <option value="private">Private</option>
-              <option value="unlisted">Unlisted</option>
-            </select>
+              <option value={true}>Public</option>
+              <option value={false}>Private</option>
+              </select>
           </div>
 
           <div>

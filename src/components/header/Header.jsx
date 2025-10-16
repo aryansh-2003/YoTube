@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { Search, Mic, Plus, Bell, Menu, ArrowLeft } from 'lucide-react';
+import { Search, Mic, Plus, Bell, Menu, ArrowLeft, Cross, Camera } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import DisplayPic from '../DisplayPic';
 import HeaderContext from '../context/HeaderContext';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
+import chalchitram from '../../assets/chalchitram.png'
 
 export default function Header() {
   const userData = useSelector((state) => state.auth.userData);
@@ -30,7 +31,6 @@ export default function Header() {
       "
       style={{ willChange: 'backdrop-filter' }}
     >
-      {/* LEFT SIDE: MENU + LOGO */}
       {!mobileSearchOpen && (
         <div className="flex items-center gap-4">
           <button
@@ -41,32 +41,18 @@ export default function Header() {
             <Menu className="w-6 h-6" />
           </button>
 
-          <div className="flex items-center gap-1">
-            <svg width="90" height="20" viewBox="0 0 90 20" className="block">
-              <g>
-                <path
-                  d="M27.9727 3.12324C27.6435 1.89323 26.6768 0.926623 25.4468 0.597366C23.2197 2.24288e-07 14.285 0 14.285 0C14.285 0 5.35042 2.24288e-07 3.12323 0.597366C1.89323 0.926623 0.926623 1.89323 0.597366 3.12324C0 5.35042 0 10 0 10C0 10 0 14.6496 0.597366 16.8768C0.926623 18.1068 1.89323 19.0734 3.12323 19.4026C5.35042 20 14.285 20 14.285 20C14.285 20 23.2197 20 25.4468 19.4026C26.6768 19.0734 27.6435 18.1068 27.9727 16.8768C28.5701 14.6496 28.5701 10 28.5701 10C28.5701 10 28.5701 5.35042 27.9727 3.12324Z"
-                  fill="#FF0000"
-                />
-                <path
-                  d="M11.4253 14.2854L18.8477 10.0004L11.4253 5.71533V14.2854Z"
-                  fill="white"
-                />
-              </g>
-            </svg>
-            <span className="text-xl font-medium ml-2 hidden sm:inline">YouTube</span>
-            <span className="text-xs text-gray-300 ml-1 hidden sm:inline">IN</span>
+          <div className="flex items-center ml-2">
+            <img src={chalchitram} className='w-20'></img>
           </div>
         </div>
       )}
 
-      {/* CENTER: SEARCH BAR (desktop) or MOBILE SEARCH INPUT */}
-      <div className="flex items-center flex-1 max-w-2xl mx-2 sm:mx-8 justify-center">
-        {/* Desktop Search (glass style) */}
+      <div className="flex items-center flex-1 max-w-5xl mx-2 sm:mx-8 justify-center">
         <form
           className={`hidden sm:flex flex-1 max-w-xl transition-all duration-200 ${mobileSearchOpen ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}
           onSubmit={handleSubmit(onsubmit)}
         >
+          
           <div className="flex items-center w-full bg-white/6 backdrop-blur-md border border-white/8 rounded-full h-10 px-1">
             <input
               {...register('Text', { required: 'Please enter a search term' })}
@@ -125,12 +111,6 @@ export default function Header() {
           )}
         </div>
 
-        {/* Microphone (hidden while mobile search is open) */}
-        {!mobileSearchOpen && (
-          <button className="p-2 ml-2 sm:ml-4 hover:bg-white/6 rounded-full transition bg-transparent">
-            <Mic className="w-6 h-6" />
-          </button>
-        )}
       </div>
 
       {/* RIGHT SIDE ICONS (Hidden on mobile when search open) */}
@@ -140,8 +120,9 @@ export default function Header() {
             className="hidden sm:flex items-center gap-2 px-3 py-2 hover:bg-white/6 rounded-full transition"
             onClick={() => navigate('/createpost')}
           >
-            <Plus className="w-6 h-6" />
+            <Plus className="w- h- rounded-2xl overflow-hidden" />
             <span className="text-sm">Create</span>
+
           </button>
           <button className="p-2 hover:bg-white/6 rounded-full transition relative">
             <Bell className="w-6 h-6" />
