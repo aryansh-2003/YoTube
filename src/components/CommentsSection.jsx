@@ -11,6 +11,7 @@ import commentService from "../../Service/comment";
 import DisplayPic from "../components/DisplayPic";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
+import {timeAgo} from './TimeResolver'
 
 export default function CommentsSection({ onAddComment, video }) {
   const [newComment, setNewComment] = useState("");
@@ -29,13 +30,14 @@ export default function CommentsSection({ onAddComment, video }) {
     commentService.getComment({ videoId: video._id }).then((res) => {
       setComments(res?.data?.data || []);
     });
-  }, [video]);
+  }, [video, comments]);
 
   const onSubmit = (data) => {
     commentService.addComment(video._id, data?.content).then((res) => {
       if (res.status === 200) {
-        setComments((prev) => [res?.data?.data, ...prev]);
-        setNewComment("");
+        console.log(res?.data?.data)
+        setComments((prev) => [res?.data?.data,...prev]);
+        // setNewComment("");
         setShowCommentInput(false);
       }
     });
@@ -89,11 +91,10 @@ export default function CommentsSection({ onAddComment, video }) {
         </div>
       </div>
 
-      {/* Add Comment */}
       <div className="space-y-4">
         <div className="flex space-x-3">
           <img
-            src="/api/placeholder/32/32"
+            src={userData ? userData?.avatar : ""}
             alt="Your avatar"
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
           />
@@ -150,7 +151,7 @@ export default function CommentsSection({ onAddComment, video }) {
                         {comment?.ownerInfo?.[0]?.fullname}
                       </span>
                       <span className="text-xs text-gray-400">
-                        {comment?.createdAt}
+                        {comment ? timeAgo(comment?.createdAt) : ""}
                       </span>
                     </div>
                     <p className="text-sm leading-relaxed mt-1">

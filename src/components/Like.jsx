@@ -6,8 +6,6 @@ export default function LikeButton({ liked, videoId, totalLikes, videoInfo }) {
   const [likes, setLikes] = useState(totalLikes || 0);
   const [heartBursts, setHeartBursts] = useState([]);
   const buttonRef = useRef(null);
-  console.log(videoId)
-  // Sync props / videoInfo into internal state when videoInfo changes
   useEffect(() => {
     if (!videoInfo) return;
     setIsLiked(videoInfo.isLiked);
@@ -65,19 +63,12 @@ export default function LikeButton({ liked, videoId, totalLikes, videoInfo }) {
   };
 
   const handleLike = async () => {
-    console.log("hi")
-    if (!videoId) return;
-    console.log(videoId)
+    if (!videoInfo) return;
     const currentlyLiked = isLiked;
-
     try {
-      const res = await likeService.likeVideo({ videoId });
-      console.log(res);
+      const res = await likeService.likeVideo({ videoId: videoInfo._id });
       if (res.status === 200 || res.status === 201) {
-        // Toggle the liked state
         setIsLiked(!currentlyLiked);
-
-        // Trigger animation and update count
         if (!currentlyLiked) {
           fireHeartBurst();
           setLikes(prev => prev + 1);

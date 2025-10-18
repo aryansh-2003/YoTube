@@ -74,7 +74,6 @@ function Section({ section }) {
 
   return (
     <div className="mb-8">
-      {/* Header Row */}
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-2xl font-semibold">{section.title}</h2>
         <div className="flex gap-2">
@@ -93,7 +92,6 @@ function Section({ section }) {
         </div>
       </div>
 
-      {/* Horizontal Scroll Section */}
       <div
         ref={scrollRef}
         className="flex space-x-4 overflow-x-scroll no-scrollbar scroll-smooth"

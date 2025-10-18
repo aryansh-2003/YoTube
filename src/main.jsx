@@ -33,6 +33,7 @@ import ChannelPage from './pages/ChannelPage.jsx'
 import SubscriptionPage from './pages/SubscriptionPage.jsx'
 import PlaylistPage from './pages/PlaylistPage.jsx'
 import PlaylistVideos from './pages/PlaylistVideos.jsx'
+import LikedVideos from './pages/LikedVideos.jsx'
 
 
 
@@ -153,6 +154,15 @@ import PlaylistVideos from './pages/PlaylistVideos.jsx'
             <PrivateRoute>
               <>
                   <PlaylistVideos/> 
+              </>
+            </PrivateRoute>
+        },
+         {
+          path:'/liked-videos',
+          element:
+            <PrivateRoute>
+              <>
+                  <LikedVideos/> 
               </>
             </PrivateRoute>
         },

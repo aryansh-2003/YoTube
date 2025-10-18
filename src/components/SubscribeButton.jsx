@@ -1,11 +1,16 @@
-import { useState } from "react";
-import subscriptionService from "../../../Service/subscription";
+import { useEffect, useState } from "react";
+import subscriptionService from "../../Service/subscription";
 
-export default function SubscribeButton({ isSubscribed: initial = false, id }) {
-  const [isSubscribed, setIsSubscribed] = useState(initial);
+export default function SubscribeButton({ isSubscribed, id }) {
+  const [Subscribed, setIsSubscribed] = useState(isSubscribed);
+
+  useEffect(() => {
+    if(!isSubscribed) return
+    setIsSubscribed(isSubscribed)
+  },[isSubscribed])
+
   const [sadBursts, setSadBursts] = useState([]);
 
-  // Fireworks: Confetti burst using canvas-confetti
   const fireConfetti = async () => {
     const confetti = (await import("canvas-confetti")).default;
 
@@ -60,28 +65,28 @@ export default function SubscribeButton({ isSubscribed: initial = false, id }) {
   };
 
   const handleSubscribe = async () => {
-    const next = !isSubscribed;
+    const next = !Subscribed;
     setIsSubscribed(next);
     if (next) {
       fireConfetti();
     } else {
       fireSadBlast();
     }
-    subscriptionService.subscribeto({ subscribetoid: id }).then(() => {});
+    subscriptionService.subscribeto({ subscribetoid: id }).then((res) => {});
   };
 
   return (
     <div className="relative inline-block">
       <button
         onClick={handleSubscribe}
-        aria-pressed={isSubscribed}
+        aria-pressed={Subscribed}
         className={`relative z-30 px-6 py-2 rounded-full font-semibold transition-transform transform active:scale-95 shadow-lg flex items-center gap-2 ${
-          isSubscribed
+          Subscribed
             ? "bg-gray-200 text-black hover:bg-gray-300"
             : "bg-red-600 text-white hover:bg-red-700"
         }`}
       >
-        {isSubscribed ? "Subscribed" : "Subscribe"}
+        {Subscribed ? "Subscribed" : "Subscribe"}
       </button>
 
       {/* Full-screen emoji explosion */}

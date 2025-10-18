@@ -24,7 +24,6 @@ export default function SearchPage() {
     setFilters(data);
     console.log("Applied filters:", data);
     setShowFilters(false);
-    // TODO: call API with filters
   };
 
   return (

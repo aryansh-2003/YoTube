@@ -18,7 +18,7 @@ export default function ChannelDashboard() {
           <img
             src={userData.coverImage}
             alt="cover"
-            className="w-full h-full rounded-3xl object-cover"
+            className="w-50 h-50 rounded-3xl object-cover"
           />
         ) : (
           <div className="w-full h-full rounded-3xl bg-gray-800" />

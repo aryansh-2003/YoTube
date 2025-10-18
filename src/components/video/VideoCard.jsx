@@ -50,7 +50,7 @@ function Media({ loading = false, data = [] }) {
 
   return (
     <Grid container wrap="wrap" spacing={2}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full mb-15">
         
       
         {content && content.length > 0 ? (
@@ -130,7 +130,7 @@ function Media({ loading = false, data = [] }) {
                     }}
                   >
                     <img
-                      src={item?.ownerInfo?.[0]?.avatar || defaultAvatar}
+                      src={item?.ownerInfo?.[0]?.avatar ? item?.ownerInfo?.[0]?.avatar : defaultAvatar}
                       style={{
                         width: 36,
                         height: 36,
@@ -143,7 +143,6 @@ function Media({ loading = false, data = [] }) {
                   <Skeleton variant="circular" width={36} height={36} />
                 )}
 
-                {/* Text info */}
                 <Box sx={{ flex: 1, overflow: 'hidden' }}>
                   {item ? (
                     <>

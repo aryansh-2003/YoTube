@@ -31,7 +31,7 @@ export default function Sidebar() {
     if (pathname.startsWith('/History')) return 'History';
     if (pathname.startsWith('/Playlists')) return 'Playlists';
     if (pathname.startsWith('/userVideos')) return 'Your videos';
-    if (pathname.startsWith('/Liked')) return 'Liked videos';
+    if (pathname.startsWith('/liked-videos')) return 'Liked videos';
     if (pathname.startsWith('/channel/news')) return 'News';
     if (pathname.startsWith('/channel/amit')) return 'Amit';
     if (pathname.startsWith('/channel/hot')) return 'HotDays';
@@ -153,7 +153,7 @@ export default function Sidebar() {
               ['History', '/History', <Clock />],
               ['Playlists', '/Playlists', <Play />],
               ['Your videos', '/userVideos', <Video />],
-              ['Liked videos', '/Liked', <ThumbsUp />],
+              ['Liked videos', '/liked-videos', <ThumbsUp />],
             ].map(([name, path, icon]) => (
               <div
                 key={name}

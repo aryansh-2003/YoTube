@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import {timeAgo,formatVideoDuration} from '../TimeResolver.js';  
 import videoService from '../../../Service/video'
+import { useNavigate } from 'react-router';
 
 export default function SidebarVideos({ query, onVideoClick }){
 
   const [videos,setvideos] = useState()
-  console.log(query)
+  const navigate = useNavigate()
+  
   useEffect(() => {
     if(!query) return
-    videoService.getAllVideos({query: query}).then((res) => {
+    videoService.getAllVideos({query: query.split("-")?.[0]}).then((res) => {
       if(res.status === 200 || 201){
         setvideos(res?.data?.data)
       }
@@ -24,7 +26,7 @@ export default function SidebarVideos({ query, onVideoClick }){
       {videos?.map((video) => (
         <div 
           key={video._id} 
-          onClick={() => onVideoClick(video)}
+          onClick={() => navigate(`/video/${video._id}`)}
           className="flex space-x-3 cursor-pointer hover:bg-gray-800/30 p-2 rounded-lg transition-all duration-200 group"
         >
           <div className="relative flex-shrink-0">
@@ -48,7 +50,7 @@ export default function SidebarVideos({ query, onVideoClick }){
               {video ? video?.ownerInfo?.[0]?.username : ""}
             </p>
             <div className="text-gray-400 text-xs space-x-1">
-              <span>{video.views}</span>
+              <span>views : {video.views}</span>
               <span>•</span>
               <span>{video ? `${timeAgo(video.createdAt)}` : "0"}</span>
             </div>

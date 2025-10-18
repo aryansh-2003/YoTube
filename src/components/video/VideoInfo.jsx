@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Play, Pause, Volume2, VolumeX, Maximize, Settings, MoreHorizontal, ThumbsUp, ThumbsDown, Share, Download, Flag, SkipBack, SkipForward, Repeat, Shuffle, Menu, Search, Bell, User, Trash, Pencil, Shell } from 'lucide-react';
 import DisplayPic from '../DisplayPic'
 import {useSelector} from 'react-redux'
@@ -6,9 +6,11 @@ import { useNavigate } from "react-router";
 import videoService from '../../../Service/video'
 import LikeButton from '../Like'
 import DeleteBtn from '../DeleteBtn'
+import SubscribeButton from "../SubscribeButton";
 
 
 export default function VideoInfo({ videoData }) {
+
   const [isLiked, setIsLiked] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -23,6 +25,7 @@ export default function VideoInfo({ videoData }) {
     if(!videoData) return
     setPublishStatus(videoData?.isPublished)
     setIsLiked(videoData?.isLiked)
+    setIsSubscribed(videoData?.ownerInfo?.[0]?.isSubscribed)
   },[videoData])
   
   const publishStatusHandler = () =>{
@@ -41,30 +44,14 @@ export default function VideoInfo({ videoData }) {
         <div className="flex items-center space-x-4">
           <DisplayPic children={videoData?.ownerInfo?.[0]}/>
           <div className="flex-1">
-            <p className="font-semibold text-sm sm:text-base">{videoData?.ownerInfo?.[0]?.username}</p>
+            <p className="font-semibold w-full text-sm sm:text-base">{videoData?.ownerInfo?.[0]?.fullname}</p>
             <p className="text-xs sm:text-sm text-gray-400">{videoData?.channel?.subscribers}</p>
           </div>
-          <button
-            onClick={() => setIsSubscribed(!isSubscribed)}
-            className={`px-4 py-2 rounded-full font-medium text-sm transition-all ${
-              isSubscribed 
-                ? 'bg-gray-700 text-white hover:bg-gray-600' 
-                : 'bg-white text-black hover:bg-gray-200'
-            }`}
-          >
-            {isSubscribed ? 'Subscribed' : 'Subscribe'}
-          </button>
+          <SubscribeButton isSubscribed={isSubscribed} id={videoData?.ownerInfo?.[0]?._id}/>
         </div>
         
         <div className="flex items-center space-x-2 w-full">
           <div className="flex bg-gray-800/50 rounded-full p-2 backdrop-blur-sm">
-  
-              {/* <LikeButton
-                liked={isLiked}
-                videoId={videoData?._id}
-                totalLikes = {videoData ? videoData.totalLikes : 0}
-                videoData = {videoData}
-             />  */}
           </div>
 
           

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import VideoCard from '../components/video/VideoCard'
-import videoService from '../../Service/video'
+import authService from '../../Service/auth'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -12,15 +12,11 @@ export default function History() {
   const userData = useSelector(state => state.auth.userData)
   
   useEffect(()=>{
-    if(!userData) return
-    Promise.all(
-      userData?.watchHistory.map((id)=>{
-        return videoService.getSingleVideo({id:id})
+      authService.getUserHistory().then((res) => {
+        if(res.status === 200 || 201){
+          setvideos(res?.data?.data)
+        }
       })
-  ) .then((response)=>{
-    const allvideos = response.map((res) => res?.data?.data)
-    setvideos(allvideos)
-  }) 
   },[userData])
 
 
@@ -32,7 +28,7 @@ export default function History() {
        <div className="flex gap-3 mb-6 overflow-x-auto scrollbar-hide scroll-smooth">
         
       </div>
-             <VideoCard loading={false}  data={videos}/>
+             <VideoCard  data={videos}/>
         </div>
     </main>
     
