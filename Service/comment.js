@@ -28,7 +28,6 @@ export class CommentService{
 
 
     async addComment(videoId,data){
-        console.log(videoId,data)
         try {
             return await this.instance.post(`/add-comment/${videoId}`,{content:data})
         } catch (error) {

@@ -32,6 +32,15 @@ export class LikeService{
     }
 
 
+      async getLikedVideos(){
+        try {
+            return await this.instance.get(`/liked-videos`)
+        } catch (error) {
+            return ("LikeService :: Get Liked Error", error)
+        }
+    }
+
+
 
 }
 

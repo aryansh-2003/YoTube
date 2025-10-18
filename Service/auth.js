@@ -111,6 +111,23 @@ export class AuthService{
     }
 
 
+async getUserHistory(){
+        try {
+             const token = localStorage.getItem('token')
+             if(!token) return null
+             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+             return await this.instance.get('/history',
+                {
+                    headers: { Authorization:`Bearer ${token}` }
+                }
+            )
+
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 }
 
 const Service = new AuthService()
