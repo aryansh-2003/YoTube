@@ -12,6 +12,7 @@ import DisplayPic from "../components/DisplayPic";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import {timeAgo} from './TimeResolver'
+import defaultAvatar from '../assets/download.jpeg'
 
 export default function CommentsSection({ onAddComment, video }) {
   const [newComment, setNewComment] = useState("");
@@ -94,7 +95,7 @@ export default function CommentsSection({ onAddComment, video }) {
       <div className="space-y-4">
         <div className="flex space-x-3">
           <img
-            src={userData ? userData?.avatar : ""}
+            src={userData ? userData?.avatar : defaultAvatar}
             alt="Your avatar"
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
           />

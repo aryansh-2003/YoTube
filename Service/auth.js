@@ -128,8 +128,45 @@ async getUserHistory(){
         }
     }
 
+async changeAvatar(formData){
+        try {
+             const token = localStorage.getItem('token')
+             if(!token) return null
+             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+             return await this.instance.patch('/updateavatar',formData,
+                {
+                    headers: { Authorization:`Bearer ${token}` }
+                }
+            )
+
+
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+
+async changeCoverimage(formData){
+        try {
+             const token = localStorage.getItem('token')
+             if(!token) return null
+             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+             return await this.instance.patch('/updatecover-image',formData,
+                {
+                    headers: { Authorization:`Bearer ${token}` }
+                }
+
+            )
+
+
+        } catch (error) {
+            console.log(error)
+        }
+    
+
 }
 
+}
 const Service = new AuthService()
 
 

@@ -32,6 +32,16 @@ export class DashboardService{
         }
     }
 
+        async getDashboard(){
+        try {
+            return await this.instance.get(`/dashboard`)
+        } catch (error) {
+            return ("VideoService :: Login Error", error)
+        }
+    }
+
+    
+
 
 
 }

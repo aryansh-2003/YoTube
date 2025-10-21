@@ -17,7 +17,6 @@ export default function UserVideos() {
 
 
   useEffect(()=>{
-    console.log(userData)
     if(!userData) return
       dashboardService.getChannelVideos(userData._id).then((res)=>{
         console.log(res)

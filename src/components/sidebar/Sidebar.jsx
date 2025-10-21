@@ -10,6 +10,7 @@ import {
   ChevronRight,
   LogOut,
   Menu,
+  User2,
 } from 'lucide-react';
 import HeaderContext from '../context/HeaderContext';
 import axios from 'axios';
@@ -154,6 +155,7 @@ export default function Sidebar() {
               ['Playlists', '/Playlists', <Play />],
               ['Your videos', '/userVideos', <Video />],
               ['Liked videos', '/liked-videos', <ThumbsUp />],
+              ['Profile', '/channeldashboard', <User2 />],
             ].map(([name, path, icon]) => (
               <div
                 key={name}

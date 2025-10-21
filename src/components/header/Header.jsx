@@ -131,6 +131,7 @@ export default function Header() {
             </span>
           </button>
           <button className="rounded-full flex flex-col items-center ml-2">
+            <button className=' absolute z-200 h-full w-10' onClick={() => navigate('/channeldashboard')}> </button>
             <DisplayPic children={userData} />
           </button>
         </div>
