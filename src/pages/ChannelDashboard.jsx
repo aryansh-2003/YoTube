@@ -5,7 +5,6 @@ import defaultAvatar from "../assets/download.jpeg";
 import defaultCover from "../assets/defaultCover.jpg";
 import dashboardService from "../../Service/dashboard";
 import authService from "../../Service/auth";
-import videoService from "../../Service/video";
 import VideoCard from '../components/video/VideoCard'
 
 
@@ -31,7 +30,6 @@ export default function ChannelDashboard() {
       }
     });
     dashboardService.getChannelVideos(userData._id).then((res)=>{
-        console.log(res)
         setvideos(res?.data?.data)
       })
   }, [userData]);
@@ -66,12 +64,10 @@ export default function ChannelDashboard() {
      if(avatarFile){
           formData.append("avatar",avatarFile)
           authService.changeAvatar(formData).then((res) => {
-            console.log(res)
           })
       }else{
           formData.append("coverImage",coverFile)
           authService.changeCoverimage(formData).then((res) => {
-            console.log(res)
           })
       }
   }
@@ -123,14 +119,14 @@ export default function ChannelDashboard() {
           <h1 className="text-2xl font-bold mt-15">
             {userData?.fullname || "Full Name"}
           </h1>
-          <span className="text-gray-400 text-sm">
+          <span className="text-white text-sm">
             @{userData?.username || "username"} •{" "}
-            {dashboardData ? dashboardData.totalSubscribers : 0} subscribers •{" "}
-            {dashboardData ? dashboardData.totalVideos : 0} videos
-            {userData?.username || "username"} •{" "}
-            {dashboardData ? dashboardData.totalVideoViews : 0} Total Video Views •{" "}
-            {dashboardData ? dashboardData.totalLikes : 0} Total Video Likes •{" "}
-            {dashboardData ? dashboardData.totalTweet : 0} Total Tweet •{" "}
+           Total subscribers : {dashboardData ? dashboardData.totalSubscribers : 0} •{" "}
+           Total videos : {dashboardData ? dashboardData.totalVideos : 0}  •{" "}
+           Total Video Views : {dashboardData ? dashboardData.totalVideoViews : 0} • {" "}
+            Total Video Likes : {dashboardData ? dashboardData.totalLikes : 0}  •{" "}
+            Total Playlist : {dashboardData ? dashboardData.totalPlaylist : 0}  • {" "}
+           Total Tweet : {dashboardData ? dashboardData.totalTweet : 0}  {" "}
           </span>
           <p className="text-gray-300 text-sm mt-1 max-w-xl">
             {userData?.bio || "This channel is about tech and small tips ..."}
