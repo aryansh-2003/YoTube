@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router';
 import { login } from './Store/authSlice';
 import {useDispatch, useSelector} from 'react-redux'
 import { ReactLenis, useLenis } from 'lenis/react'
+import { SpeedInsights } from '@vercel/speed-insights/react';
+
 
 
 
@@ -34,6 +36,7 @@ export default function App() {
   return (
     <>
     <ReactLenis root />
+    <SpeedInsights />
     <Layout AuthStatus={AuthStatus}/>
     </>
     
