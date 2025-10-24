@@ -240,13 +240,13 @@ export default function ChannelDashboard() {
             <div className="flex flex-wrap gap-2 mt-3">
               <button
                 className="px-3 py-1.5 text-sm sm:text-base bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-md shadow hover:from-sky-600 hover:to-indigo-700 transition flex-1 sm:flex-none text-center"
-                onClick={() => navigate(`/channel/customize/${userData?._id}`)}
+                onClick={() => navigate(`/under-construction`)}
               >
                 Customize channel
               </button>
               <button
                 className="px-3 py-1.5 text-sm sm:text-base bg-white/6 text-white rounded-md border border-white/8 hover:bg-white/8 transition flex-1 sm:flex-none text-center"
-                onClick={() => navigate("/manage-videos")}
+                onClick={() => navigate("/under-construction")}
               >
                 Manage videos
               </button>
@@ -423,7 +423,7 @@ export default function ChannelDashboard() {
                     </div>
 
                     <div className="mt-3">
-                      <button onClick={() => navigate("/manage-videos")} className="w-full px-3 py-2 bg-sky-600 rounded-md text-white hover:bg-sky-700 transition">
+                      <button onClick={() => navigate("/under-construction")} className="w-full px-3 py-2 bg-sky-600 rounded-md text-white hover:bg-sky-700 transition">
                         View all videos
                       </button>
                     </div>

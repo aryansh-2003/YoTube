@@ -22,6 +22,8 @@ import PlaylistPage from './pages/PlaylistPage.jsx'
 import PlaylistVideos from './pages/PlaylistVideos.jsx'
 import LikedVideos from './pages/LikedVideos.jsx'
 import UserSubscriberPage from './pages/UserSubscriberPage.jsx'
+import NotFound from './pages/NotFound.jsx'
+
 
 
 
@@ -160,6 +162,15 @@ import UserSubscriberPage from './pages/UserSubscriberPage.jsx'
             <PrivateRoute>
               <>
                   <UserSubscriberPage/> 
+              </>
+            </PrivateRoute>
+        },
+        {
+          path:'/under-construction',
+          element:
+            <PrivateRoute>
+              <>
+                  <NotFound/> 
               </>
             </PrivateRoute>
         },
