@@ -20,13 +20,8 @@ import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 
 /**
- * ChannelDashboard (modernized)
- * - Blends sleek dark + clean light motifs
- * - Improved error/loading handling
- * - Subtle motion with framer-motion
- * - All original state names, imports and logic preserved
+ * ChannelDashboard (modernized + responsive tweaks)
  */
-
 export default function ChannelDashboard() {
   const userData = useSelector((state) => state.auth.userData);
   const { sidebarOpen } = useContext(HeaderContext);
@@ -65,7 +60,6 @@ export default function ChannelDashboard() {
         if (dashRes?.status === 200 || dashRes?.status === 201) {
           setDashboardData(dashRes?.data?.data || null);
         } else {
-          // non-fatal: still try to show what's available
           setDashboardData(dashRes?.data?.data || null);
         }
 
@@ -110,7 +104,6 @@ export default function ChannelDashboard() {
     setEnlargedImage(null);
   };
 
-  // Save avatar/cover changes with better error handling
   const handleSaveChanges = async () => {
     try {
       setLoading(true);
@@ -131,14 +124,12 @@ export default function ChannelDashboard() {
         setCoverFile(null);
       }
 
-      // refresh dashboard data after changes
       try {
         const res = await dashboardService.getDashboard();
         if (res?.status === 200 || res?.status === 201) {
           setDashboardData(res?.data?.data || dashboardData);
         }
       } catch (refreshErr) {
-        // non-fatal
         console.warn("Refresh after save failed:", refreshErr);
       }
     } catch (err) {
@@ -149,7 +140,6 @@ export default function ChannelDashboard() {
     }
   };
 
-  // === chart data preparation (keeps your original logic) ===
   const prepareWeeklyChart = () => {
     if (dashboardData?.weeklyViews && Array.isArray(dashboardData.weeklyViews)) {
       return dashboardData.weeklyViews.map((d) => ({
@@ -179,14 +169,13 @@ export default function ChannelDashboard() {
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 6);
 
-  // small helper for safely formatting numbers
   const fmt = (v) => (typeof v === "number" ? v.toLocaleString() : v ?? 0);
 
   return (
     <main className="pt-4">
       {/* Top error / retry */}
       {error && (
-        <div className="px-6">
+        <div className="px-4 sm:px-6">
           <div className="bg-red-600/10 border border-red-600/20 text-red-300 rounded-md p-3 flex items-center justify-between">
             <div className="text-sm">{error}</div>
             <div className="flex gap-2">
@@ -194,7 +183,6 @@ export default function ChannelDashboard() {
                 onClick={() => {
                   setError("");
                   setLoading(true);
-                  // trigger reload by toggling userData (or call the same load again)
                   dashboardService.getDashboard().then(res => {
                     if (res?.status === 200 || res?.status === 201) setDashboardData(res?.data?.data || null);
                     setLoading(false);
@@ -210,27 +198,23 @@ export default function ChannelDashboard() {
       )}
 
       {/* COVER IMAGE */}
-      <div className="w-full rounded-2xl h-48 bg-gradient-to-r from-zinc-900 to-white/2 relative overflow-hidden mx-6">
+      <div className="w-full rounded-2xl overflow-hidden mx-4 sm:mx-6 lg:mx-6 h-32 sm:h-44 lg:h-48 relative">
         <img
           src={previewCover || userData?.coverImage || defaultCover}
           alt="cover"
-          className="w-full h-full object-cover rounded-2xl transition-transform duration-300 transform hover:scale-105 cursor-pointer"
-          onClick={() =>
-            handleImageClick(previewCover || userData?.coverImage || defaultCover)
-          }
+          className="w-full h-full object-cover transition-transform duration-300 transform hover:scale-105 cursor-pointer"
+          onClick={() => handleImageClick(previewCover || userData?.coverImage || defaultCover)}
         />
       </div>
 
       {/* PROFILE ROW */}
-      <div className="px-6 flex flex-col md:flex-row items-start md:items-center gap-4 -mt-14 relative">
+      <div className="px-4 sm:px-6 flex flex-col md:flex-row items-start md:items-center gap-4 -mt-10 md:-mt-14 relative">
         <div className="flex items-start gap-4">
           <motion.div
             layout
             whileHover={{ scale: 1.02 }}
-            className="w-28 h-28 rounded-full overflow-hidden border-4 border-white/6 shadow-lg cursor-pointer"
-            onClick={() =>
-              handleImageClick(previewAvatar || userData?.avatar || defaultAvatar)
-            }
+            className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-4 border-white/6 shadow-lg cursor-pointer"
+            onClick={() => handleImageClick(previewAvatar || userData?.avatar || defaultAvatar)}
           >
             <img
               className="w-full h-full object-cover"
@@ -239,13 +223,11 @@ export default function ChannelDashboard() {
             />
           </motion.div>
 
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-bold text-white">
-              {userData?.fullname || "Full Name"}
-            </h1>
-            <div className="text-sm text-gray-300 mt-1">
+          <div className="flex flex-col flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">{userData?.fullname || "Full Name"}</h1>
+            <div className="text-sm text-gray-300 mt-1 flex flex-col sm:flex-row gap-1 sm:gap-2">
               <span className="text-gray-400">@{userData?.username || "username"}</span>
-              <span className="mx-2 text-zinc-500">•</span>
+              <span className="hidden sm:inline mx-2 text-zinc-500">•</span>
               <span className="text-gray-300">
                 Subscribers: <span className="font-semibold text-white">{fmt(dashboardData?.totalSubscribers)}</span>
               </span>
@@ -255,21 +237,20 @@ export default function ChannelDashboard() {
               {userData?.bio || "This channel is about tech and small tips ..."}
             </p>
 
-            <div className="flex gap-3 mt-3">
+            <div className="flex flex-wrap gap-2 mt-3">
               <button
-                className="px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-md shadow hover:from-sky-600 hover:to-indigo-700 transition"
+                className="px-3 py-1.5 text-sm sm:text-base bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-md shadow hover:from-sky-600 hover:to-indigo-700 transition flex-1 sm:flex-none text-center"
                 onClick={() => navigate(`/channel/customize/${userData?._id}`)}
               >
                 Customize channel
               </button>
               <button
-                className="px-4 py-2 bg-white/6 text-white rounded-md border border-white/8 hover:bg-white/8 transition"
+                className="px-3 py-1.5 text-sm sm:text-base bg-white/6 text-white rounded-md border border-white/8 hover:bg-white/8 transition flex-1 sm:flex-none text-center"
                 onClick={() => navigate("/manage-videos")}
               >
                 Manage videos
               </button>
-
-              <label className="px-4 py-2 bg-white/6 rounded-md cursor-pointer text-sm flex items-center gap-2 border border-white/8 hover:bg-white/8 transition">
+              <label className="px-3 py-1.5 text-sm sm:text-base bg-white/6 rounded-md cursor-pointer border border-white/8 hover:bg-white/8 transition flex-1 sm:flex-none text-center">
                 Change Cover
                 <input
                   id="coverFileInput"
@@ -279,8 +260,7 @@ export default function ChannelDashboard() {
                   onChange={(e) => handleFileChange(e, "cover")}
                 />
               </label>
-
-              <label className="px-4 py-2 bg-white/6 rounded-md cursor-pointer text-sm flex items-center gap-2 border border-white/8 hover:bg-white/8 transition">
+              <label className="px-3 py-1.5 text-sm sm:text-base bg-white/6 rounded-md cursor-pointer border border-white/8 hover:bg-white/8 transition flex-1 sm:flex-none text-center">
                 Change DP
                 <input
                   type="file"
@@ -293,7 +273,7 @@ export default function ChannelDashboard() {
               {(previewAvatar || previewCover) && (
                 <button
                   onClick={handleSaveChanges}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition"
+                  className="px-3 py-1.5 text-sm sm:text-base bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition flex-1 sm:flex-none text-center"
                 >
                   Save Changes
                 </button>
@@ -304,8 +284,8 @@ export default function ChannelDashboard() {
       </div>
 
       {/* TABS */}
-      <div className="mt-6 border-b border-white/6 px-6">
-        <div className="flex gap-6 text-gray-400 text-sm font-medium">
+      <div className="mt-6 border-b border-white/6 px-4 sm:px-6 overflow-x-auto">
+        <div className="flex gap-4 sm:gap-6 text-gray-400 text-sm font-medium whitespace-nowrap">
           <button
             onClick={() => setActiveTab("home")}
             className={`pb-3 transition-all ${activeTab === "home" ? "border-b-2 border-sky-500 text-white" : "hover:text-white"}`}
@@ -334,10 +314,9 @@ export default function ChannelDashboard() {
       </div>
 
       {/* CONTENT */}
-      <div className="px-6 py-6 text-white">
+      <div className="px-4 sm:px-6 py-6 text-white">
         {loading ? (
           <div className="space-y-4">
-            {/* simple skeletons */}
             <div className="h-6 bg-gradient-to-r from-white/6 to-white/4 rounded w-48 animate-pulse" />
             <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -351,7 +330,6 @@ export default function ChannelDashboard() {
             {/* HOME */}
             {activeTab === "home" && (
               <section className="space-y-6">
-                {/* KPI row (minimal, clickable) */}
                 <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
                   {[
                     { label: "Subscribers", value: dashboardData?.totalSubscribers ?? 0, path: `/user-subscriber/${userData?._id}` },
@@ -367,7 +345,6 @@ export default function ChannelDashboard() {
                       whileHover={{ translateY: -4 }}
                       className="relative rounded-2xl p-4 bg-gradient-to-br from-white/3 to-white/6 border border-white/6"
                     >
-                      {/* make clickable if path present */}
                       {kpi.path && (
                         <button
                           aria-label={`open ${kpi.label}`}
@@ -383,7 +360,6 @@ export default function ChannelDashboard() {
                   ))}
                 </div>
 
-                {/* Chart + Recent */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <motion.div layout className="lg:col-span-2 rounded-2xl p-4 bg-gradient-to-br from-white/3 to-white/6 border border-white/6">
                     <div className="flex items-center justify-between mb-3">
@@ -454,7 +430,6 @@ export default function ChannelDashboard() {
                   </motion.div>
                 </div>
 
-                {/* small stats row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="rounded-2xl p-4 bg-gradient-to-br from-white/3 to-white/6 border border-white/6">
                     <div className="text-sm text-gray-300">Avg watch time</div>
