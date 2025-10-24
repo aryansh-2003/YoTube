@@ -4,10 +4,9 @@ import { useForm } from "react-hook-form";
 import PlaylistCard from "../components/PlaylistCard";
 import playlistService from "../../Service/playlist";
 
-
 export default function PlaylistPage() {
   const [isOpen, setIsOpen] = useState(false);
-  const [playList, setPlayList] = useState()
+  const [playList, setPlayList] = useState([]);
 
   const {
     register,
@@ -16,74 +15,65 @@ export default function PlaylistPage() {
     formState: { errors },
   } = useForm();
 
-
   useEffect(() => {
     playlistService.getUserPlaylist().then((res) => {
-      console.log(res)
-      if(res.status === 200 || 201) {
-        setPlayList(res?.data?.data)
+      if (res.status === 200 || res.status === 201) {
+        setPlayList(res?.data?.data || []);
       }
-    })
-  },[isOpen])
-
-
+    });
+  }, [isOpen]);
 
   const onSubmit = (data) => {
-    console.log( data.name,data.description);
-    const formData = new FormData()
-    formData.append("name",data.name)
-    formData.append("description",data.description)
-    playlistService.createPlaylist({name:data.name,description:data.description}).then((res)=>{
-      if(res.status === 200 || 201){
-           reset();
+    playlistService
+      .createPlaylist({ name: data.name, description: data.description })
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          reset();
           setIsOpen(false);
-      }
-    })
-    
- 
+        }
+      });
   };
 
   return (
-    <main className="flex-1 bg-black pt-2 min-h-screen text-white">
-      <div className=" pl-5 flex gap-4 flex-wrap">
+    <main className="flex-1 bg-black min-h-screen text-white py-6 px-4">
+      <div className="flex flex-wrap gap-6 items-start">
         {/* Create Playlist Button */}
         <div
-          className="w-[20%]  mt-5 bg-gray-800 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition"
+          className="w-40 h-40 bg-gray-800 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition-transform transform hover:scale-105 shadow-lg"
           onClick={() => setIsOpen(true)}
         >
-          <Plus className="w-8 h-8 mb-2" />
+          <Plus className="w-10 h-10 mb-2 text-white" />
           <span className="text-sm font-medium">Create Playlist</span>
         </div>
 
-        {/* Example placeholder playlists */}
-         <div className="flex flex-wrap gap-6 justify-center sm:justify-start p-4">
-        {playList ? 
-        <>
-        {playList.map((p, i) => (
-          <PlaylistCard key={i} {...p} />
-        ))}
-        </> : "...No playlist yet Create Your one now"}
-        </div>
-      
+        {/* Playlist Cards */}
+        {playList.length > 0 ? (
+          <div className="flex flex-wrap gap-6">
+            {playList.map((p, i) => (
+              <PlaylistCard key={i} {...p} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-400 mt-6">No playlist yet. Create one now!</p>
+        )}
       </div>
 
       {/* Modal */}
       {isOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm z-50">
-          <div className="bg-gray-900 p-6 rounded-xl w-[90%] max-w-md shadow-lg relative">
+          <div className="bg-gray-900 p-6 rounded-2xl w-full max-w-md shadow-2xl relative">
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-3 right-3 text-gray-400 hover:text-white"
+              className="absolute top-4 right-4 text-gray-400 hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
-            <h2 className="text-2xl font-bold mb-4 text-center">
+            <h2 className="text-2xl font-bold mb-4 text-center text-white">
               Create Playlist
             </h2>
 
-            {/* ✅ Form using React Hook Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-              {/* Title Input */}
+              {/* Playlist Name */}
               <div>
                 <input
                   type="text"
@@ -98,7 +88,7 @@ export default function PlaylistPage() {
                 )}
               </div>
 
-              {/* Description Input */}
+              {/* Playlist Description */}
               <div>
                 <textarea
                   placeholder="Description"
@@ -109,15 +99,13 @@ export default function PlaylistPage() {
                   }`}
                 ></textarea>
                 {errors.description && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.description.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
                 )}
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-transform transform hover:scale-[1.02]"
               >
                 Create
               </button>
@@ -125,9 +113,6 @@ export default function PlaylistPage() {
           </div>
         </div>
       )}
-
-      {/* Playlist cards below */}
-    
     </main>
   );
 }

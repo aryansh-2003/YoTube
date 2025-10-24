@@ -1,39 +1,27 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import { BrowserRouter } from 'react-router'
-import React, { useState, useMemo, useEffect } from 'react'
-import Header from './components/header/Header'
-import Sidebar from './components/sidebar/Sidebar'
 import  Home  from '../src/pages/Home'
-import VideoCard from './components/video/VideoCard'
 import WatchPage from './pages/WatchPage'
 import Login from './pages/Login'
 import { BrowserRouter as Router, Routes, Route, createBrowserRouter, RouterProvider} from 'react-router'
-import Layout  from './layout/Layout'
 import { Provider } from 'react-redux'
 import store from './Store/Store'
-import VideoPlayer from './components/video/VideoPlayer'
-import SearchFilters  from './components/Filter'
 import SearchPage from './pages/SearchPage'
-import authService from '../Service/auth'
-import { login } from './Store/authSlice'
 import PrivateRoute from './middleware/PrivateRoute'
 import History from './pages/History.jsx'
-import SidebarVideos from './components/video/SidebarVideos.jsx'
-import CommentsSection from './components/CommentsSection.jsx'
 import HeaderContextProvider from './components/context/HeaderContextProvider.jsx'
 import SignUp from './pages/SignUp.jsx'
 import CreatePost from './pages/CreatePost.jsx'
 import UserVideos from './pages/UserVideos.jsx'
-import ChannelDashboard from './pages/ChannelDashboard.jsx'
+import ChannelDashboard from './components/ChannelDashboard.jsx'
 import EditVideoForm from './pages/EditVideoForm.jsx'
 import ChannelPage from './pages/ChannelPage.jsx'
 import SubscriptionPage from './pages/SubscriptionPage.jsx'
 import PlaylistPage from './pages/PlaylistPage.jsx'
 import PlaylistVideos from './pages/PlaylistVideos.jsx'
 import LikedVideos from './pages/LikedVideos.jsx'
+import UserSubscriberPage from './pages/UserSubscriberPage.jsx'
 
 
 
@@ -163,6 +151,15 @@ import LikedVideos from './pages/LikedVideos.jsx'
             <PrivateRoute>
               <>
                   <LikedVideos/> 
+              </>
+            </PrivateRoute>
+        },
+        {
+          path:'/user-subscriber/:userId',
+          element:
+            <PrivateRoute>
+              <>
+                  <UserSubscriberPage/> 
               </>
             </PrivateRoute>
         },

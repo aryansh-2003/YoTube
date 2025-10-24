@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { NavLink,  } from 'react-dom'; // note: react-router-dom, not 'react-dom'
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router";
 import {
   Home,
   Play,
@@ -11,221 +11,196 @@ import {
   LogOut,
   Menu,
   User2,
-} from 'lucide-react';
-import HeaderContext from '../context/HeaderContext';
-import axios from 'axios';
-import chalchitramText from  '../../assets/chalchitramText.png'
-import chalchitram from  '../../assets/chalchitram.png'
-import { useLocation, useNavigate } from 'react-router';
+} from "lucide-react";
+import HeaderContext from "../context/HeaderContext";
+import axios from "axios";
+import chalchitramText from "../../assets/chalchitramText.png";
+import chalchitram from "../../assets/chalchitram.png";
+import { useSelector } from "react-redux";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { sidebarOpen, setSidebarOpen } = useContext(HeaderContext);
+  const userData = useSelector((state) => state?.auth?.userData);
+  const [active, setActive] = useState("");
 
-  const [active, setActive] = useState('');
-
+  // Detect active route
   const deriveActiveFromPath = (pathname) => {
-    if (pathname.startsWith('/Home')) return 'Home';
-    if (pathname.startsWith('/Subscriptions')) return 'Subscriptions';
-    if (pathname.startsWith('/CreatePost')) return 'Create +';
-    if (pathname.startsWith('/History')) return 'History';
-    if (pathname.startsWith('/Playlists')) return 'Playlists';
-    if (pathname.startsWith('/userVideos')) return 'Your videos';
-    if (pathname.startsWith('/liked-videos')) return 'Liked videos';
-    if (pathname.startsWith('/channel/news')) return 'News';
-    if (pathname.startsWith('/channel/amit')) return 'Amit';
-    if (pathname.startsWith('/channel/hot')) return 'HotDays';
-    // fallback
-    return '';
+    if (pathname.startsWith("/Home")) return "Home";
+    if (pathname.startsWith("/Subscriptions")) return "Subscriptions";
+    if (pathname.startsWith("/CreatePost")) return "Create +";
+    if (pathname.startsWith("/History")) return "History";
+    if (pathname.startsWith("/Playlists")) return "Playlists";
+    if (pathname.startsWith("/userVideos")) return "Your videos";
+    if (pathname.startsWith("/liked-videos")) return "Liked videos";
+    if (pathname.startsWith("/channel/news")) return "News";
+    if (pathname.startsWith("/channel/amit")) return "Amit";
+    if (pathname.startsWith("/channel/hot")) return "HotDays";
+    return "";
   };
 
   useEffect(() => {
-    const current = deriveActiveFromPath(location.pathname);
-    setActive(current);
+    setActive(deriveActiveFromPath(location.pathname));
   }, [location.pathname]);
-
-  const logOutHandler = async () => {
-    try {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      delete axios.defaults.headers.common['Authorization'];
-      navigate('/');
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   const handleClick = (name, path) => {
     if (path) {
       navigate(path);
-      setSidebarOpen(false);  
+      setSidebarOpen(false);
     }
   };
 
-  const getHeaderBgColor = () => {
-    switch (active) {
-      case 'Home':
-        return 'bg-blue-600';
-      case 'Subscriptions':
-        return 'bg-green-600';
-      case 'Create +':
-        return 'bg-purple-600';
-      case 'History':
-      case 'Playlists':
-      case 'Your videos':
-      case 'Liked videos':
-        return 'bg-indigo-600';
-      case 'News':
-        return 'bg-red-600';
-      case 'Amit':
-        return 'bg-yellow-600';
-      case 'HotDays':
-        return 'bg-pink-600';
-      default:
-        return 'bg-gray-800';
+  const logOutHandler = async () => {
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      delete axios.defaults.headers.common["Authorization"];
+      navigate("/");
+    } catch (err) {
+      console.error(err);
     }
   };
 
   return (
     <>
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full text-white z-50 transition-all duration-500 ease-in-out transform 
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-          bg-black/40 backdrop-blur-md border-r border-gray-800
-          w-[70%] sm:w-[80%] md:w-[18%]`}
+        className={`fixed top-0 left-0 h-full z-50 text-white transition-all duration-500 ease-in-out transform
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        bg-gradient-to-b from-[#111111]/90 to-[#1c1c1c]/90 backdrop-blur-xl border-r border-white/10
+        w-[75%] sm:w-[60%] md:w-[18%] shadow-[0_0_20px_rgba(255,80,80,0.15)]`}
       >
-        <div className={`flex items-center justify-between px-4 py-3 border-b border-gray-800 ${getHeaderBgColor()}`}>
-          <div className="flex items-center gap-2">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-4 border-b border-white/10 bg-white/5">
+          <div className="flex items-center gap-3">
             <button
-              className="p-2 rounded-full hover:bg-gray-800"
               onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 rounded-full hover:bg-white/10 transition"
             >
               <Menu className="w-6 h-6" />
             </button>
             {sidebarOpen && (
               <div className="flex items-center gap-1">
-                <img className='w-[30%]' src={chalchitram}></img>
-                <img className='w-[70%]' src={chalchitramText}></img>
+                <img src={chalchitram} alt="logo" className="w-8 h-8" />
+                <img src={chalchitramText} alt="text" className="h-6" />
               </div>
             )}
           </div>
         </div>
 
-        <div className="py-4 overflow-y-auto scrollbar-hide">
-          <div className="px-3 mb-3">
+        {/* Scrollable Content */}
+        <div className="py-5 overflow-y-auto scrollbar-hide h-[calc(100%-64px)] px-3">
+          {/* Top Links */}
+          <div className="space-y-2 mb-6">
             {[
-              ['Home', '/Home', <Home />],
-              ['Subscriptions', '/Subscriptions', <Users />],
-              ['Create +', '/CreatePost', <Video />],
+              ["Home", "/Home", <Home />],
+              ["Subscriptions", "/subscription", <Users />],
+              ["Create +", "/CreatePost", <Video />],
             ].map(([name, path, icon]) => (
               <div
                 key={name}
                 onClick={() => handleClick(name, path)}
-                className={`flex items-center gap-6 px-3 py-2 rounded-lg cursor-pointer ${
-                  active === name ? 'bg-gray-800' : 'hover:bg-gray-800'
+                className={`flex items-center gap-4 px-4 py-2 rounded-xl cursor-pointer transition-all duration-200
+                ${
+                  active === name
+                    ? "bg-gradient-to-r from-pink-600 to-red-500 shadow-[0_0_15px_rgba(255,100,100,0.3)]"
+                    : "hover:bg-white/10"
                 }`}
               >
-                {React.cloneElement(icon, { className: 'w-6 h-6' })}
-                <span className="text-sm">{name}</span>
-                {name === 'Subscriptions' && (
-                  <div className="ml-auto w-2 h-2 bg-blue-500 rounded-full" />
-                )}
+                {React.cloneElement(icon, { className: "w-5 h-5" })}
+                <span className="text-sm font-medium tracking-wide">{name}</span>
               </div>
             ))}
           </div>
 
-          <div className="border-t border-gray-700 my-3" />
+          <div className="border-t border-white/10 my-4" />
 
-          <div className="px-3 mb-3">
-            <div className="flex items-center gap-3 px-3 py-1 mb-2">
-              <span className="text-base font-medium">You</span>
+          {/* User Section */}
+          <div className="space-y-2 mb-6">
+            <div className="flex items-center gap-2 px-4 py-1 mb-2">
+              <span className="text-base font-semibold text-gray-300">You</span>
               <ChevronRight className="w-4 h-4" />
             </div>
 
             {[
-              ['History', '/History', <Clock />],
-              ['Playlists', '/Playlists', <Play />],
-              ['Your videos', '/userVideos', <Video />],
-              ['Liked videos', '/liked-videos', <ThumbsUp />],
-              ['Profile', '/channeldashboard', <User2 />],
+              ["History", "/History", <Clock />],
+              ["Playlists", "/Playlists", <Play />],
+              ["Your videos", "/userVideos", <Video />],
+              ["Liked videos", "/liked-videos", <ThumbsUp />],
+              ["Profile", "/channeldashboard", <User2 />],
             ].map(([name, path, icon]) => (
               <div
                 key={name}
                 onClick={() => handleClick(name, path)}
-                className={`flex items-center gap-6 px-3 py-2 rounded-lg cursor-pointer ${
-                  active === name ? 'bg-gray-800' : 'hover:bg-gray-800'
+                className={`flex items-center gap-4 px-4 py-2 rounded-xl cursor-pointer transition-all
+                ${
+                  active === name
+                    ? "bg-gradient-to-r from-red-600 to-pink-600 shadow-[0_0_15px_rgba(255,100,100,0.25)]"
+                    : "hover:bg-white/10"
                 }`}
               >
-                {React.cloneElement(icon, { className: 'w-6 h-6' })}
-                <span className="text-sm">{name}</span>
+                {React.cloneElement(icon, { className: "w-5 h-5" })}
+                <span className="text-sm font-medium tracking-wide">{name}</span>
               </div>
             ))}
 
             <div
               onClick={logOutHandler}
-              className="flex items-center gap-6 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-800"
+              className="flex items-center gap-4 px-4 py-2 rounded-xl cursor-pointer hover:bg-red-600/20 text-red-400 transition"
             >
-              <LogOut className="w-6 h-6" />
-              <span className="text-sm">Logout</span>
+              <LogOut className="w-5 h-5" />
+              <span className="text-sm font-medium">Logout</span>
             </div>
           </div>
 
-          <div className="border-t border-gray-700 my-3" />
+          <div className="border-t border-white/10 my-4" />
 
-          <div className="px-3 mb-3">
-            <div className="flex items-center gap-3 px-3 py-1 mb-2">
-              <span className="text-base font-medium">Subscriptions</span>
+          {/* Subscriptions */}
+          <div>
+            <div className="flex items-center gap-2 px-4 py-1 mb-2">
+              <span className="text-base font-semibold text-gray-300">
+                Subscriptions
+              </span>
               <ChevronRight className="w-4 h-4" />
             </div>
 
-            <div
-              onClick={() => handleClick('News', '/channel/news')}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer ${
-                active === 'News' ? 'bg-gray-800' : 'hover:bg-gray-800'
-              }`}
-            >
-              <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                N
-              </div>
-              <span className="text-sm">News18 India</span>
-              <div className="ml-auto flex items-center gap-1">
-                <div className="w-2 h-2 bg-red-600 rounded-full" />
-                <span className="text-xs text-gray-400">6</span>
-              </div>
-            </div>
+            {[
+              ["News", "/channel/news", "N", "bg-red-600", "6"],
+              ["Amit", "/channel/amit", "A", "bg-yellow-500"],
+              ["HotDays", "/channel/hot", "H", "bg-blue-500", "30°C"],
+            ].map(([name, path, letter, color, badge]) => (
+              <div
+                key={name}
+                onClick={() => handleClick(name, path)}
+                className={`flex items-center gap-4 px-4 py-2 rounded-xl cursor-pointer transition-all duration-200
+                ${
+                  active === name
+                    ? "bg-gradient-to-r from-pink-600 to-red-600 shadow-[0_0_15px_rgba(255,80,80,0.3)]"
+                    : "hover:bg-white/10"
+                }`}
+              >
+                <div
+                  className={`w-8 h-8 ${color} rounded-full flex items-center justify-center text-xs font-bold text-white`}
+                >
+                  {letter}
+                </div>
+                <span className="text-sm font-medium tracking-wide">{name}</span>
 
-            <div
-              onClick={() => handleClick('Amit', '/channel/amit')}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer ${
-                active === 'Amit' ? 'bg-gray-800' : 'hover:bg-gray-800'
-              }`}
-            >
-              <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                A
+                {badge && (
+                  <span className="ml-auto text-xs text-gray-400 font-medium">
+                    {badge}
+                  </span>
+                )}
               </div>
-              <span className="text-sm">Amit Bhadana</span>
-            </div>
-
-            <div
-              onClick={() => handleClick('HotDays', '/channel/hot')}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer ${
-                active === 'HotDays' ? 'bg-gray-800' : 'hover:bg-gray-800'
-              }`}
-            >
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                H
-              </div>
-              <span className="text-sm">Hot days ahead</span>
-              <span className="ml-auto text-xs text-gray-400">30°C</span>
-            </div>
+            ))}
           </div>
         </div>
       </aside>

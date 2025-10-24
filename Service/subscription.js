@@ -32,6 +32,23 @@ export class SubscriptionService{
     }
 
 
+    async getUserSubscribers({id}){
+        try {
+            return await this.instance.get(`/get-subscribers/${id}`)
+        } catch (error) {
+            return ("SubscribeService :: Get user subscriber Error", error)
+        }
+    }
+
+    async getUserSubscription(){
+        try {
+            return await this.instance.get(`/get-subscribed-channel`)
+        } catch (error) {
+            return ("SubscribeService :: Get user Subscription Error", error)
+        }
+    }
+
+
 
 }
 
