@@ -198,7 +198,7 @@ export default function ChannelDashboard() {
       )}
 
       {/* COVER IMAGE */}
-      <div className="w-full rounded-2xl overflow-hidden mx-4 sm:mx-6 lg:mx-6 h-32 sm:h-44 lg:h-48 relative">
+      <div className="w-full rounded-2xl overflow-hidden mx-4 sm:mx-2 sm:mr-3 lg:mx-6 h-32 sm:h-44 lg:h-48 relative">
         <img
           src={previewCover || userData?.coverImage || defaultCover}
           alt="cover"
