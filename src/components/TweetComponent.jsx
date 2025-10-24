@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MessageCircle, Heart, Repeat2, Share2, X, Plus } from "lucide-react";
 import defaultAvatar from "../../src/assets/download.jpeg";
-import tweetService from '../../Service/tweet';
+import tweetService from '../../Service/tweet.js';
 import { useSelector } from "react-redux";
 
 export default function TweetSection() {
