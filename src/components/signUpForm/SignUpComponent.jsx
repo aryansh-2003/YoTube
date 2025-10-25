@@ -18,7 +18,7 @@ export default function SignUpComponent() {
   const navigate = useNavigate();
 
   const submitHandler = async (data) => {
-    try {
+
       const formData = new FormData();
       formData.append("fullname", data.FullName);
       formData.append("email", data.email);
@@ -27,20 +27,19 @@ export default function SignUpComponent() {
       formData.append("avatar", data.avatar[0]);
       formData.append("coverImage", data.coverImage[0]);
 
-      const res = await authService.registerUser(formData);
-
-      if (res.status === 200 || res.status === 201) {
-        navigate("/");
-      } else if (res.status === 409) {
-        setError("User already exists 😞");
-      } else {
-        setError("Something went wrong. Please try again later.");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Unable to connect. Please check your internet connection.");
+      authService.registerUser(formData).then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            navigate("/");
+          }
+      }).catch((err) => {
+        console.error(err.status);
+         if (err.status === 409) {
+            setError("User already exists with email or username 😞");
+          } else {
+            setError("Something went wrong. Please try again later.");
+          }
+      })
     }
-  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 p-6">
