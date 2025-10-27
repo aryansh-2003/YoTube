@@ -1,49 +1,85 @@
-import React from "react";
-import { MoreVertical } from "lucide-react";
-import { formatVideoDuration , timeAgo } from "../TimeResolver";
-import {useNavigate} from 'react-router'
+import React, { useState, useRef, useEffect } from "react";
+import { MoreVertical, Pencil, ListPlus, Trash2 } from "lucide-react";
+import PropTypes from "prop-types";
 
-export default function VideoCard({ video }) {
-  const navigate = useNavigate()
+export default function VideoCard({ video, onUpdate, onDelete, onAddToPlaylist }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  const handleToggle = (e) => {
+    e.stopPropagation();  // prevent parent card click
+    setMenuOpen(prev => !prev);
+  };
+
+  const handleAction = (action) => {
+    setMenuOpen(false);
+    if (!video?._id) return;
+    if (action === "update") onUpdate(video._id);
+    if (action === "delete") onDelete(video._id);
+    if (action === "playlist") onAddToPlaylist(video._id);
+  };
+
+  useEffect(() => {
+    const hideMenu = (ev) => {
+      if (menuRef.current && !menuRef.current.contains(ev.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", hideMenu);
+    return () => {
+      document.removeEventListener("mousedown", hideMenu);
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col sm:flex-row gap-3 p-2 text-white rounded-lg cursor-pointer hover:bg-neutral-800/40 transition">
-      {/* Thumbnail */}
-      <div className="w-full sm:w-72 relative rounded-xl overflow-hidden">
-        <button className="w-full h-screen absolute" onClick={() => video?._id && navigate(`/video/${video._id}`)}>        </button>
-        <img
-          src={video.thumbnail}
-          alt={video.title}
-          className="w-full sm:h-40 object-cover rounded-xl"
-        />
-        <span className="absolute bottom-1 right-1 bg-black/80 text-xs px-1.5 py-0.5 rounded">
-          {video ? `${formatVideoDuration(video.duration)}` : ""}
-        </span>
-      </div>
-
-      <div className="flex flex-col justify-between sm:py-1 sm:px-1 flex-1">
-        <div className="flex justify-between">
-          <h3 className="font-semibold text-base sm:text-lg leading-snug line-clamp-2">
-          <button className="w-full h- " onClick={() => video?._id && navigate(`/video/${video._id}`)}>        
-            {video.title}
-            </button>
-          </h3>
-          <MoreVertical size={18} className="text-gray-400 hidden sm:block" />
+    <div
+      className="relative p-4 bg-[#111] rounded-lg text-white cursor-pointer"
+      onClick={() => {
+        if (video?._id) {
+          // navigate logic (if you have navigate) or other action
+        }
+      }}
+    >
+      <div className="flex justify-between items-start">
+        <h3 className="font-semibold">{video?.title || "Untitled"}</h3>
+        <div ref={menuRef} className="relative">
+          <MoreVertical
+            size={20}
+            className="text-gray-400 hover:text-orange-400"
+            onClick={handleToggle}
+          />
+          {menuOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-[#1f1f1f] border border-white/10 shadow-lg rounded-md z-50">
+              <button
+                className="flex items-center gap-2 text-sm text-gray-200 px-3 py-2 w-full text-left hover:bg-orange-600/20"
+                onClick={() => handleAction("update")}
+              >
+                <Pencil size={16} /> Update Video
+              </button>
+              <button
+                className="flex items-center gap-2 text-sm text-gray-200 px-3 py-2 w-full text-left hover:bg-red-600/20"
+                onClick={() => handleAction("delete")}
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+              <button
+                className="flex items-center gap-2 text-sm text-gray-200 px-3 py-2 w-full text-left hover:bg-blue-600/20"
+                onClick={() => handleAction("playlist")}
+              >
+                <ListPlus size={16} /> Add to Playlist
+              </button>
+            </div>
+          )}
         </div>
-
-        <div className="text-sm text-gray-400 mt-1">
-          <span className="hover:text-gray-200">{video.ownerInfo?.[0]?.fullname}</span>
-          <span className="mx-1">•</span>
-          <span>{video.views} views</span>
-          <span className="mx-1">•</span>
-          <span>{video ? `${timeAgo(video.createdAt)}` : ""}</span>
-        </div>
-
-        {video.description && (
-          <p className="text-sm text-gray-400 mt-2 line-clamp-2">
-            {video.description}
-          </p>
-        )}
       </div>
+      {/* Could show thumbnail, views, etc here */}
     </div>
   );
 }
+
+VideoCard.propTypes = {
+  video: PropTypes.object.isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onAddToPlaylist: PropTypes.func.isRequired,
+};

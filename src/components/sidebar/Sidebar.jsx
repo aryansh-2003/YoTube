@@ -16,6 +16,7 @@ import HeaderContext from "../context/HeaderContext";
 import axios from "axios";
 import chalchitramText from "../../assets/chalchitramText.png";
 import chalchitram from "../../assets/chalchitram.png";
+import subscriptionService from '../../../Service/subscription'
 import { useSelector } from "react-redux";
 
 export default function Sidebar() {
@@ -24,7 +25,18 @@ export default function Sidebar() {
   const { sidebarOpen, setSidebarOpen } = useContext(HeaderContext);
   const userData = useSelector((state) => state?.auth?.userData);
   const [active, setActive] = useState("");
+  const [subscriptions,setSubscriptions] = useState()
 
+  useEffect(() => {
+    if(!userData) return
+      subscriptionService.getUserSubscription().then((res) => {
+        console.log(res)
+        if(res.status === 200){
+          setSubscriptions(res?.data?.data)
+        }
+      });
+  } ,[userData])
+  console.log(subscriptions)
   // Detect active route
   const deriveActiveFromPath = (pathname) => {
     if (pathname.startsWith("/Home")) return "Home";
@@ -73,7 +85,7 @@ export default function Sidebar() {
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full z-50 text-white transition-all duration-500 ease-in-out transform
+        className={`fixed top-0 left-0 h-full z-100 text-white transition-all duration-500 ease-in-out transform
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         bg-gradient-to-b from-[#111111]/90 to-[#1c1c1c]/90 backdrop-blur-xl border-r border-white/10
         w-[75%] sm:w-[60%] md:w-[18%] shadow-[0_0_20px_rgba(255,80,80,0.15)]`}
@@ -172,35 +184,25 @@ export default function Sidebar() {
               <ChevronRight className="w-4 h-4" />
             </div>
 
-            {[
-              ["News", "/channel/news", "N", "bg-red-600", "6"],
-              ["Amit", "/channel/amit", "A", "bg-yellow-500"],
-              ["HotDays", "/channel/hot", "H", "bg-blue-500", "30°C"],
-            ].map(([name, path, letter, color, badge]) => (
+            {subscriptions ? subscriptions.map((subscriber) => (
               <div
-                key={name}
-                onClick={() => handleClick(name, path)}
+                key={subscriber.channelInfo?.[0]?.fullname}
+                onClick={() => handleClick(subscriber.channelInfo?.[0]?.fullname, "channel/"+subscriber.channelInfo?.[0]?.username)}
                 className={`flex items-center gap-4 px-4 py-2 rounded-xl cursor-pointer transition-all duration-200
                 ${
-                  active === name
+                  active === subscriber.channelInfo?.[0]?.fullname
                     ? "bg-gradient-to-r from-pink-600 to-red-600 shadow-[0_0_15px_rgba(255,80,80,0.3)]"
                     : "hover:bg-white/10"
                 }`}
               >
                 <div
-                  className={`w-8 h-8 ${color} rounded-full flex items-center justify-center text-xs font-bold text-white`}
+                  className={`w-8 h-8 text-2xl text-red-700 rounded-full flex items-center justify-center font-bold `}
                 >
-                  {letter}
+                  {subscriber.channelInfo?.[0]?.fullname.trim("")?.[0]}
                 </div>
-                <span className="text-sm font-medium tracking-wide">{name}</span>
-
-                {badge && (
-                  <span className="ml-auto text-xs text-gray-400 font-medium">
-                    {badge}
-                  </span>
-                )}
+                <span className="text-sm font-medium tracking-wide">{subscriber.channelInfo?.[0]?.fullname}</span>
               </div>
-            ))}
+            )): ""}
           </div>
         </div>
       </aside>

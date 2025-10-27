@@ -72,3 +72,19 @@
   animation: gradientBackground 5s ease infinite;
 }
 
+/* Blur effect for main content when sidebar is open */
+.blurred {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.3s ease-in-out;
+}
+
+/* Hide scrollbar globally in sidebar */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Settings, MoreHorizontal, ThumbsUp, ThumbsDown, Share, Download, Flag, SkipBack, SkipForward, Repeat, Shuffle, Menu, Search, Bell, User } from 'lucide-react';
 import VideoService  from '../../../Service/video';
@@ -117,7 +116,36 @@ export default function VideoPlayer({ onVideoEnd ,videoInfo,currentVideo}){
   };
 
   return (
-    <div className="relative bg-black rounded-xl overflow-hidden group w-full">
+    <div className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-2xl overflow-hidden group w-full shadow-2xl border border-orange-500/20">
+      {/* Anime decorative elements */}
+      <div className="absolute top-2 right-2 text-2xl opacity-30 pointer-events-none z-10">🍥</div>
+      <div className="absolute bottom-20 left-2 text-xl opacity-20 pointer-events-none z-10">⚡</div>
+      
+      <style>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          width: 12px;
+          height: 12px;
+          background: linear-gradient(135deg, #f97316, #ec4899);
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 0 8px rgba(249, 115, 22, 0.5);
+        }
+        .slider::-moz-range-thumb {
+          width: 12px;
+          height: 12px;
+          background: linear-gradient(135deg, #f97316, #ec4899);
+          border-radius: 50%;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 0 8px rgba(249, 115, 22, 0.5);
+        }
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
+          50% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.6); }
+        }
+      `}</style>
+
       <video
         ref={videoRef}
         className="w-full h-full aspect-video object-contain"
@@ -135,74 +163,84 @@ export default function VideoPlayer({ onVideoEnd ,videoInfo,currentVideo}){
         }}
       />
       
-      {/* Play Button Overlay */}
+      {/* Play Button Overlay - Anime Style */}
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <button
-            onClick={togglePlay}
-            className="bg-red-600 hover:bg-red-700 text-white rounded-full p-4 transition-all transform hover:scale-110"
-          >
-            <Play size={32} fill="currentColor" />
-          </button>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
+            <button
+              onClick={togglePlay}
+              className="relative bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white rounded-full p-4 transition-all transform hover:scale-110 shadow-lg border-2 border-orange-400/50"
+              style={{ animation: 'pulse-glow 2s infinite' }}
+            >
+              <Play size={28} fill="currentColor" />
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Video Controls */}
+      {/* Video Controls - Anime Themed */}
       <div 
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/50 to-transparent transition-opacity duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950 via-slate-900/95 to-transparent transition-opacity duration-300 ${
           showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
         }`}
         onMouseEnter={() => setShowControls(true)}
         onMouseLeave={() => setShowControls(false)}
       >
-        {/* Progress Bar */}
-        <div className="px-4 pb-2">
+        {/* Progress Bar - Anime Style */}
+        <div className="px-3 pb-2">
           <div 
             ref={progressRef}
-            className="relative h-1 bg-gray-600 rounded-full cursor-pointer hover:h-2 transition-all group"
+            className="relative h-1 bg-slate-700/50 rounded-full cursor-pointer hover:h-1.5 transition-all group backdrop-blur-sm"
             onClick={handleProgressClick}
           >
             {/* Buffer Bar */}
             <div 
-              className="absolute top-0 left-0 h-full bg-gray-400 rounded-full"
+              className="absolute top-0 left-0 h-full bg-slate-600/60 rounded-full"
               style={{ width: `${(bufferedTime / duration) * 100 || 0}%` }}
             />
-            {/* Progress Bar */}
+            {/* Progress Bar - Gradient */}
             <div 
-              className="absolute top-0 left-0 h-full bg-red-600 rounded-full"
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-full shadow-lg"
               style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
             />
             {/* Progress Handle */}
             <div 
-              className="absolute top-1/2 transform -translate-y-1/2 w-3 h-3 bg-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-1/2 transform -translate-y-1/2 w-3 h-3 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg border-2 border-white/30"
               style={{ left: `${(currentTime / duration) * 100 || 0}%`, marginLeft: '-6px' }}
             />
           </div>
         </div>
         
-        <div className="flex items-center justify-between px-4 pb-4">
-          <div className="flex items-center space-x-3">
-            <button onClick={togglePlay} className="text-white hover:text-gray-300 transition-colors">
-              {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+        <div className="flex items-center justify-between px-3 pb-3">
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={togglePlay} 
+              className="text-white hover:text-orange-400 transition-colors p-1.5 hover:bg-slate-800/50 rounded-lg"
+            >
+              {isPlaying ? <Pause size={18} /> : <Play size={18} />}
             </button>
             
             <button 
               onClick={() => skipTime(-10)} 
-              className="text-white hover:text-gray-300 transition-colors hidden sm:block"
+              className="text-white hover:text-orange-400 transition-colors hidden sm:block p-1.5 hover:bg-slate-800/50 rounded-lg"
             >
-              <SkipBack size={18} />
+              <SkipBack size={16} />
             </button>
             
             <button 
               onClick={() => skipTime(10)} 
-              className="text-white hover:text-gray-300 transition-colors hidden sm:block"
+              className="text-white hover:text-orange-400 transition-colors hidden sm:block p-1.5 hover:bg-slate-800/50 rounded-lg"
             >
-              <SkipForward size={18} />
+              <SkipForward size={16} />
             </button>
             
             <div className="flex items-center space-x-2 group">
-              <button onClick={toggleMute} className="text-white hover:text-gray-300 transition-colors">
-                {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              <button 
+                onClick={toggleMute} 
+                className="text-white hover:text-orange-400 transition-colors p-1.5 hover:bg-slate-800/50 rounded-lg"
+              >
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
               </button>
               <div className="w-0 group-hover:w-16 transition-all duration-200 overflow-hidden">
                 <input
@@ -211,34 +249,34 @@ export default function VideoPlayer({ onVideoEnd ,videoInfo,currentVideo}){
                   max="100"
                   value={isMuted ? 0 : volume * 100}
                   onChange={handleVolumeChange}
-                  className="w-16 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+                  className="w-16 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer slider"
                 />
               </div>
             </div>
             
-            <span className="text-white text-sm hidden sm:block">
+            <span className="text-white text-xs hidden sm:block font-semibold px-2 py-1 bg-slate-800/50 rounded-lg border border-orange-500/20">
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1.5">
             <div className="relative">
               <button 
                 onClick={() => setShowSettings(!showSettings)}
-                className="text-white hover:text-gray-300 transition-colors hidden sm:block"
+                className="text-white hover:text-orange-400 transition-colors hidden sm:block p-1.5 hover:bg-slate-800/50 rounded-lg"
               >
-                <Settings size={18} />
+                <Settings size={16} />
               </button>
               
               {showSettings && (
-                <div className="absolute bottom-full right-0 mb-2 bg-black/90 rounded-lg p-2 min-w-32">
-                  <div className="text-white text-xs mb-2">Playback Speed</div>
+                <div className="absolute bottom-full right-0 mb-2 bg-gradient-to-br from-slate-900 to-slate-800 border border-orange-500/30 rounded-xl p-2 min-w-32 shadow-xl backdrop-blur-md">
+                  <div className="text-orange-400 text-xs mb-2 font-bold">Playback Speed</div>
                   {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((rate) => (
                     <button
                       key={rate}
                       onClick={() => changePlaybackRate(rate)}
-                      className={`block w-full text-left px-2 py-1 text-xs hover:bg-gray-700 rounded ${
-                        playbackRate === rate ? 'text-red-500' : 'text-white'
+                      className={`block w-full text-left px-2 py-1 text-xs hover:bg-slate-800/80 rounded-lg transition-colors ${
+                        playbackRate === rate ? 'text-orange-400 font-bold bg-slate-800/50' : 'text-white'
                       }`}
                     >
                       {rate}x {rate === 1 && '(Normal)'}
@@ -250,9 +288,9 @@ export default function VideoPlayer({ onVideoEnd ,videoInfo,currentVideo}){
             
             <button 
               onClick={() => videoRef.current.requestFullscreen()}
-              className="text-white hover:text-gray-300 transition-colors"
+              className="text-white hover:text-orange-400 transition-colors p-1.5 hover:bg-slate-800/50 rounded-lg"
             >
-              <Maximize size={18} />
+              <Maximize size={16} />
             </button>
           </div>
         </div>

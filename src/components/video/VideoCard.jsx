@@ -20,7 +20,6 @@ function Media({ loading = false, data = [] }) {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [videoId, setVideoId] = useState(null);
   const userData = useSelector((state) => state?.auth?.userData);
-
   const handleMenuToggle = (e, id) => {
     e.stopPropagation();
     e.preventDefault();
@@ -44,7 +43,7 @@ function Media({ loading = false, data = [] }) {
   ];
 
   return (
-    <Grid container spacing={3} className="relative">
+    <Grid container spacing={3} className="w-full">  {/* ensure full width */}
       {overlayOpen && (
         <PlaylistOverlay
           playlists={playlists}
@@ -53,7 +52,7 @@ function Media({ loading = false, data = [] }) {
         />
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full mb-12">
         {content && content.length > 0 ? (
           content.map((item, index) => {
             const owner = item?.ownerInfo?.[0] || {};
@@ -62,15 +61,15 @@ function Media({ loading = false, data = [] }) {
             return (
               <div
                 key={item?._id || index}
-                className="relative group flex flex-col transition-transform duration-300 hover:scale-[1.04]"
+                className="relative group flex p-1 flex-col transition-transform duration-300 hover:scale-[1.04]"
               >
                 {/* Colorful animated glow */}
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 z-0">
+                <div className="absolute inset-0  opacity-0 group-hover:opacity-60 transition-opacity duration-500 z-0">
                   <div className="absolute inset-0 bg-gradient-to-tr from-pink-500 via-orange-400 to-purple-500 blur-3xl animate-gradientBackground"></div>
                 </div>
 
                 {/* Card container */}
-                <div className="relative rounded-2xl bg-[#1b1b1b] border border-white/10 shadow-lg z-10 overflow-hidden">
+                <div className="relative backdrop-blur-3xl bg-black  shadow-lg z-10 overflow-hidden">
                   {/* Thumbnail */}
                   <div
                     className="relative w-full aspect-video overflow-hidden cursor-pointer"
@@ -169,7 +168,7 @@ function Media({ loading = false, data = [] }) {
 
                         {menuOpen === item._id && (
                           <div
-                            className="absolute right-0 mt-2 bg-[#1f1f1f]/90 backdrop-blur-md border border-white/10 shadow-lg rounded-xl z-50 overflow-hidden animate-fadeIn"
+                            className="absolute right-0 mt-2 bg-[#1f1f1f]/90 backdrop-blur-md border border-white/10 shadow-lg rounded-xl z-50 overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {isOwner && (
@@ -179,7 +178,7 @@ function Media({ loading = false, data = [] }) {
                                   <span className="text-xs">Delete</span>
                                 </div>
                                 <button
-                                  onClick={() => handleMenuClick('Update', item._id)}
+                                  onClick={() => handleMenuClick('Update', item.__id)}
                                   className="flex items-center gap-2 text-sm hover:bg-orange-600/40 px-3 py-2 text-gray-200 w-full text-left transition-all"
                                 >
                                   <Pencil size={16} />
@@ -220,7 +219,7 @@ Media.propTypes = {
 
 export default function VideoCard({ data, loading = false }) {
   return (
-    <Box sx={{ overflow: 'hidden', p: 3 }}>
+    <Box sx={{ p: 0, width: '100%' }}>  {/* removed padding and ensure full width */}
       <Media loading={loading} data={data} />
     </Box>
   );
