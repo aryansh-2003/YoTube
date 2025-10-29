@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import ChannelCover from "../components/userProfile/ChannelCover";
 import ChannelInfo from "../components/userProfile/ChannelInfo";
 import Tabs from "../components/userProfile/Tabs";
@@ -8,6 +8,7 @@ import dashboardService from "../../Service/dashboard.js";
 
 export default function ChannelPage() {
   const { username } = useParams();
+  const navigate = useNavigate();
   const [channel, setChannel] = useState(null);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ export default function ChannelPage() {
         if (mounted) setVideos(vids?.data?.data || []);
       } catch (err) {
         console.error("Error loading channel:", err);
-        setError("Something went wrong while loading this channel 😔");
+        setError("Unable to load channel");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -47,104 +48,119 @@ export default function ChannelPage() {
     };
   }, [username]);
 
-  // --- Loading Spinner ---
-  if (loading)
+  const handleVideoClick = (videoId) => {
+    navigate(`/video/${videoId}`);
+  };
+
+  if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black">
+      <div className="flex justify-center items-center min-h-screen bg-[#0a0a0a]">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-          <span className="absolute inset-0 flex items-center justify-center text-sm text-purple-400 font-medium">
-            Loading...
-          </span>
+          <div className="w-12 h-12 border-2 border-white/20 border-t-white/60 rounded-full animate-spin"></div>
         </div>
       </div>
     );
+  }
 
-  // --- Error or Missing Channel ---
-  if (error || !channel)
+  if (error || !channel) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-black text-red-400 text-lg">
-        {error || "Channel not found 😔"}
+      <div className="flex justify-center items-center min-h-screen bg-[#0a0a0a] text-white/60 text-base">
+        {error || "Channel not found"}
       </div>
     );
+  }
 
   return (
-    <div className="bg-gradient-to-b from-black via-zinc-950 to-black text-white min-h-screen overflow-hidden">
-      {/* Channel Header */}
-      <ChannelCover coverImage={channel.coverImage} />
-      <ChannelInfo channel={channel} />
-      <Tabs />
+    <div className="relative bg-[#0a0a0a] text-white min-h-screen overflow-hidden">
+      {/* Sophisticated ambient background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-neutral-900/50 via-[#0a0a0a] to-neutral-900/30"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/10 via-transparent to-transparent"></div>
+      </div>
 
-      {/* --- Sleek Channel Stats Bar --- */}
-      <section className="relative py-10 px-6 md:px-12 border-b border-zinc-800/40">
-        <div className="flex flex-wrap items-center justify-center md:justify-start gap-5 text-sm md:text-base font-light tracking-wide text-gray-300">
-          <span className="flex items-center gap-2 hover:text-purple-400 transition-all">
-            👥 <span>{channel.subscriberCount?.toLocaleString() || "0"} Subscribers</span>
-          </span>
-          <span className="hidden md:block text-zinc-600">•</span>
-          <span className="flex items-center gap-2 hover:text-indigo-400 transition-all">
-            👁️ <span>{channel.viewCount?.toLocaleString() || "0"} Views</span>
-          </span>
-          <span className="hidden md:block text-zinc-600">•</span>
-          <span className="flex items-center gap-2 hover:text-pink-400 transition-all">
-            📹 <span>{videos.length} Videos</span>
-          </span>
-          <span className="hidden md:block text-zinc-600">•</span>
-          <span className="flex items-center gap-2 hover:text-yellow-400 transition-all">
-            📅 <span>Joined {new Date(channel.createdAt).toLocaleDateString()}</span>
-          </span>
-        </div>
-      </section>
+      {/* Subtle grain texture */}
+      <div className="fixed inset-0 opacity-[0.015] pointer-events-none z-10 mix-blend-soft-light" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+      }}></div>
 
-      {/* --- Latest Uploads --- */}
-      <section className="px-6 md:px-12 py-12">
-        <div className="flex justify-between items-center mb-10 text-center md:text-left">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-wide">
-            {channel.fullname.toUpperCase()}{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
-              Latest Uploads
+      {/* Content */}
+      <div className="relative z-20">
+        <ChannelCover coverImage={channel.coverImage} />
+        <ChannelInfo channel={channel} />
+        <Tabs />
+
+        {/* Channel Stats */}
+        <section className="px-6 md:px-12 py-8 border-b border-white/5">
+          <div className="flex flex-wrap items-center gap-6 text-sm text-white/50">
+            <span className="flex items-center gap-2">
+              <span className="font-medium text-white/70">{channel.subscriberCount?.toLocaleString() || "0"}</span>
+              <span>Subscribers</span>
             </span>
-          </h2>
-        </div>
-
-        {videos.length > 0 ? (
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {videos.map((video) => (
-              <div
-                key={video._id}
-                className="group relative bg-zinc-900/40 border border-zinc-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-purple-600/30 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={video.thumbnail}
-                    alt={video.title}
-                    className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <span className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-                    {video.duration || "00:00"}
-                  </span>
-                </div>
-
-                <div className="p-6">
-                  <h3 className="font-semibold text-xl mb-2 group-hover:text-purple-400 transition-colors line-clamp-2">
-                    {video.title}
-                  </h3>
-                  <p className="text-gray-400 text-sm mb-3">
-                    {video.views?.toLocaleString()} views • {video.uploadedAt}
-                  </p>
-                  <p className="text-gray-500 text-sm line-clamp-3 leading-relaxed">
-                    {video.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+            <span className="text-white/20">•</span>
+            <span className="flex items-center gap-2">
+              <span className="font-medium text-white/70">{channel.viewCount?.toLocaleString() || "0"}</span>
+              <span>Views</span>
+            </span>
+            <span className="text-white/20">•</span>
+            <span className="flex items-center gap-2">
+              <span className="font-medium text-white/70">{videos.length}</span>
+              <span>Videos</span>
+            </span>
+            <span className="text-white/20">•</span>
+            <span>Joined {new Date(channel.createdAt).toLocaleDateString()}</span>
           </div>
-        ) : (
-          <div className="text-center text-gray-500 py-20 text-lg italic">
-            No videos uploaded yet.
+        </section>
+
+        {/* Videos Section */}
+        <section className="px-6 md:px-12 py-12">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium text-white/90">Latest Uploads</h2>
           </div>
-        )}
-      </section>
+
+          {videos.length > 0 ? (
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {videos.map((video) => (
+                <div
+                  key={video._id}
+                  onClick={() => handleVideoClick(video._id)}
+                  className="group cursor-pointer"
+                >
+                  {/* Thumbnail */}
+                  <div className="relative overflow-hidden rounded-lg bg-white/5 border border-white/5 mb-3">
+                    <div className="aspect-video">
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    {video.duration && (
+                      <span className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded backdrop-blur-sm">
+                        {video.duration}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Video Info */}
+                  <div className="space-y-1">
+                    <h3 className="font-medium text-white/90 text-sm line-clamp-2 leading-snug group-hover:text-white">
+                      {video.title}
+                    </h3>
+                    <p className="text-white/50 text-xs">
+                      {video.views?.toLocaleString() || "0"} views
+                      {video.uploadedAt && ` • ${video.uploadedAt}`}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-white/40 py-20 text-sm">
+              No videos uploaded yet
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import authService from "../../../Service/auth";
 import { useNavigate } from "react-router";
@@ -7,6 +7,89 @@ import { login } from "../../Store/authSlice";
 import chalchitram from "../../assets/chalchitram.png";
 import chalChitramText from "../../assets/chalchitramText.png";
 import { motion } from "framer-motion";
+
+// Memoized animation variants
+const fadeInUp = {
+  initial: { opacity: 0, y: 30, scale: 0.9 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+};
+
+const fadeInDown = {
+  initial: { opacity: 0, y: -30, scale: 0.8 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+};
+
+const fadeInLeft = {
+  initial: { opacity: 0, x: -20 },
+  animate: { opacity: 1, x: 0 },
+};
+
+// Memoized background components
+const SharinganCircle = React.memo(() => (
+  <motion.div
+    animate={{ rotate: 360 }}
+    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+    className="absolute top-20 right-20 w-32 h-32 border-4 border-red-500/30 rounded-full"
+    style={{
+      background: "radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%)",
+    }}
+  >
+    <div className="absolute inset-4 border-4 border-red-400/40 rounded-full"></div>
+    <div className="absolute inset-8 border-4 border-red-300/50 rounded-full"></div>
+  </motion.div>
+));
+
+const DemonSlayerPattern = React.memo(() => (
+  <motion.div
+    animate={{ rotate: -360 }}
+    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+    className="absolute bottom-20 left-20 w-40 h-40"
+  >
+    <div className="absolute inset-0 bg-gradient-conic from-green-500/20 via-black/20 to-green-500/20 rounded-full"></div>
+  </motion.div>
+));
+
+const FloatingWeapon = React.memo(({ emoji, className, delay = 0, duration = 3 }) => (
+  <motion.div
+    animate={{ y: [0, -10, 0] }}
+    transition={{ duration, repeat: Infinity, ease: "easeInOut", delay }}
+    className={className}
+  >
+    {emoji}
+  </motion.div>
+));
+
+const GlowingOrb = React.memo(({ className }) => (
+  <div className={className}></div>
+));
+
+const SakuraPetal = React.memo(({ index, windowWidth, windowHeight }) => {
+  const initialX = useMemo(() => Math.random() * windowWidth, [windowWidth]);
+  const targetX = useMemo(() => Math.random() * windowWidth, [windowWidth]);
+  const duration = useMemo(() => 10 + Math.random() * 5, []);
+
+  return (
+    <motion.div
+      initial={{ y: -20, x: initialX, opacity: 0 }}
+      animate={{
+        y: windowHeight + 20,
+        x: targetX,
+        opacity: [0, 1, 1, 0],
+        rotate: 360,
+      }}
+      transition={{
+        duration,
+        repeat: Infinity,
+        delay: index * 1.5,
+        ease: "linear",
+      }}
+      className="absolute w-3 h-3 bg-pink-300/60 rounded-full"
+      style={{
+        clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
+      }}
+    />
+  );
+});
 
 export default function LoginComponent() {
   const {
@@ -18,6 +101,12 @@ export default function LoginComponent() {
   const dispatch = useDispatch();
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  // Memoize window dimensions
+  const dimensions = useMemo(() => ({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1920,
+    height: typeof window !== 'undefined' ? window.innerHeight : 1080,
+  }), []);
 
   const submitHandler = async (data) => {
     if (data) {
@@ -47,78 +136,37 @@ export default function LoginComponent() {
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950 text-white relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Sharingan-inspired circles */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-20 right-20 w-32 h-32 border-4 border-red-500/30 rounded-full"
-          style={{
-            background: "radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%)",
-          }}
-        >
-          <div className="absolute inset-4 border-4 border-red-400/40 rounded-full"></div>
-          <div className="absolute inset-8 border-4 border-red-300/50 rounded-full"></div>
-        </motion.div>
-
-        {/* Demon Slayer pattern */}
-        <motion.div
-          animate={{ rotate: -360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-20 left-20 w-40 h-40"
-        >
-          <div className="absolute inset-0 bg-gradient-conic from-green-500/20 via-black/20 to-green-500/20 rounded-full"></div>
-        </motion.div>
+        <SharinganCircle />
+        <DemonSlayerPattern />
 
         {/* Floating sakura petals */}
         {[...Array(8)].map((_, i) => (
-          <motion.div
+          <SakuraPetal
             key={i}
-            initial={{ y: -20, x: Math.random() * window.innerWidth, opacity: 0 }}
-            animate={{
-              y: window.innerHeight + 20,
-              x: Math.random() * window.innerWidth,
-              opacity: [0, 1, 1, 0],
-              rotate: 360,
-            }}
-            transition={{
-              duration: 10 + Math.random() * 5,
-              repeat: Infinity,
-              delay: i * 1.5,
-              ease: "linear",
-            }}
-            className="absolute w-3 h-3 bg-pink-300/60 rounded-full"
-            style={{
-              clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
-            }}
+            index={i}
+            windowWidth={dimensions.width}
+            windowHeight={dimensions.height}
           />
         ))}
 
-        {/* Kunai decoration */}
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        <FloatingWeapon
+          emoji="⚔️"
           className="absolute top-40 left-10 text-6xl opacity-20 rotate-45"
-        >
-          ⚔️
-        </motion.div>
-
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+        <FloatingWeapon
+          emoji="🗡️"
           className="absolute bottom-40 right-10 text-5xl opacity-20 -rotate-45"
-        >
-          🗡️
-        </motion.div>
+          delay={1}
+          duration={3.5}
+        />
 
-        {/* Glowing orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 blur-[120px] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/20 blur-[100px] rounded-full animate-pulse"></div>
+        <GlowingOrb className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 blur-[120px] rounded-full animate-pulse" />
+        <GlowingOrb className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/20 blur-[100px] rounded-full animate-pulse" />
       </div>
 
-      {/* Floating brand logo with anime effect */}
+      {/* Floating brand logo */}
       <motion.div
-        initial={{ opacity: 0, y: -30, scale: 0.8 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        {...fadeInDown}
         transition={{ duration: 1, type: "spring", bounce: 0.4 }}
         className="absolute top-8 flex flex-col items-center gap-2"
       >
@@ -139,7 +187,7 @@ export default function LoginComponent() {
         />
       </motion.div>
 
-      {/* Error banner with anime style */}
+      {/* Error banner */}
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -20, scale: 0.9 }}
@@ -156,10 +204,9 @@ export default function LoginComponent() {
         </motion.div>
       )}
 
-      {/* Main Form with anime-style design */}
+      {/* Main Form */}
       <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        {...fadeInUp}
         transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
         className="w-[90%] sm:w-[420px] relative z-10"
       >
@@ -182,7 +229,7 @@ export default function LoginComponent() {
             ></motion.div>
           </div>
 
-          {/* Title with anime font style */}
+          {/* Title */}
           <div className="relative text-center space-y-1">
             <motion.h2
               initial={{ opacity: 0, y: -10 }}
@@ -201,11 +248,7 @@ export default function LoginComponent() {
           </div>
 
           {/* Email Field */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-          >
+          <motion.div {...fadeInLeft} transition={{ delay: 0.3 }}>
             <label
               htmlFor="email"
               className="block text-sm font-bold text-cyan-300 mb-2 tracking-wide"
@@ -243,11 +286,7 @@ export default function LoginComponent() {
           </motion.div>
 
           {/* Password Field */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-          >
+          <motion.div {...fadeInLeft} transition={{ delay: 0.4 }}>
             <label
               htmlFor="password"
               className="block text-sm font-bold text-cyan-300 mb-2 tracking-wide"
@@ -342,7 +381,7 @@ export default function LoginComponent() {
         </form>
       </motion.div>
 
-      {/* Character silhouettes (decorative) */}
+      {/* Character silhouettes */}
       <motion.div
         animate={{ y: [0, -10, 0], opacity: [0.1, 0.2, 0.1] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}

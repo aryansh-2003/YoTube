@@ -1,113 +1,134 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import subscriptionService from "../../Service/subscription";
+import { Bell } from "lucide-react";
 
 export default function SubscribeButton({ isSubscribed, id }) {
   const [Subscribed, setIsSubscribed] = useState(isSubscribed);
+  const [particles, setParticles] = useState([]);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
-    if(!isSubscribed) return
-    setIsSubscribed(isSubscribed)
-  },[isSubscribed])
+    if (isSubscribed) setIsSubscribed(isSubscribed);
+  }, [isSubscribed]);
 
-  const [sadBursts, setSadBursts] = useState([]);
+  const createParticles = (isSubscribe) => {
+    if (!buttonRef.current) return;
+    
+    const rect = buttonRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const particleCount = 12;
+    
+    const newParticles = Array.from({ length: particleCount }).map((_, i) => {
+      const angle = (Math.PI * 2 * i) / particleCount;
+      const distance = 60 + Math.random() * 40;
+      const size = 3 + Math.random() * 3;
+      
+      return {
+        id: `${Date.now()}-${i}`,
+        x: centerX,
+        y: centerY,
+        targetX: centerX + Math.cos(angle) * distance,
+        targetY: centerY + Math.sin(angle) * distance,
+        size,
+        duration: 800 + Math.random() * 400,
+        delay: Math.random() * 100,
+        isSubscribe,
+      };
+    });
 
-  const fireConfetti = async () => {
-    const confetti = (await import("canvas-confetti")).default;
-
-    const duration = 1800;
-    const animationEnd = Date.now() + duration;
-    const defaults = {
-      startVelocity: 35,
-      ticks: 400,
-      zIndex: 2000,
-    };
-
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) return clearInterval(interval);
-      const particleCount = Math.floor(60 * (timeLeft / duration)) + 10;
-      confetti({
-        ...defaults,
-        particleCount,
-        spread: 120,
-        origin: { x: Math.random(), y: Math.random() * 0.6 },
-      });
-    }, 220);
-
-    setTimeout(() => {
-      confetti({
-        ...defaults,
-        particleCount: 300,
-        spread: 170,
-        origin: { x: 0.5, y: 0.35 },
-      });
-    }, duration - 220);
-  };
-
-  // Sad emojis explosion (exact same behavior as fireworks but with emojis)
-  const fireSadBlast = () => {
-    const particleCount = 40;
-    const newParticles = Array.from({ length: particleCount }).map((_, i) => ({
-      id: `${Date.now()}-${i}`,
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      emoji: Math.random() > 0.5 ? "😢" : "💧",
-      angle: Math.random() * 2 * Math.PI,
-      distance: 100 + Math.random() * 250,
-      size: 24 + Math.random() * 16,
-    }));
-
-    setSadBursts(newParticles);
-
-    setTimeout(() => {
-      setSadBursts([]);
-    }, 1800);
+    setParticles(newParticles);
+    setTimeout(() => setParticles([]), 1500);
   };
 
   const handleSubscribe = async () => {
     const next = !Subscribed;
     setIsSubscribed(next);
-    if (next) {
-      fireConfetti();
-    } else {
-      fireSadBlast();
-    }
-    subscriptionService.subscribeto({ subscribetoid: id }).then((res) => {});
+    createParticles(next);
+    subscriptionService.subscribeto({ subscribetoid: id }).then(() => {});
   };
 
   return (
     <div className="relative inline-block">
       <button
+        ref={buttonRef}
         onClick={handleSubscribe}
         aria-pressed={Subscribed}
-        className={`relative z-30 px-6 py-2 rounded-full font-semibold transition-transform transform active:scale-95 shadow-lg flex items-center gap-2 ${
+        aria-label={Subscribed ? "Unsubscribe" : "Subscribe"}
+        className={`relative z-30 flex items-center gap-2.5 px-4 py-2 rounded-lg font-medium border backdrop-blur-sm ${
           Subscribed
-            ? "bg-gray-200 text-black hover:bg-gray-300"
-            : "bg-red-600 text-white hover:bg-red-700"
+            ? "bg-white/5 text-white border-white/10"
+            : "bg-white/[0.02] text-white/70 border-white/[0.06] hover:bg-white/[0.04] hover:border-white/10"
         }`}
       >
-        {Subscribed ? "Subscribed" : "Subscribe"}
+        {/* Bell Icon */}
+        <Bell
+          className={`w-5 h-5 ${
+            Subscribed ? "stroke-white" : "stroke-current"
+          }`}
+          strokeWidth="1.5"
+        />
+
+        {/* Text */}
+        <span className="text-sm">
+          {Subscribed ? "Subscribed" : "Subscribe"}
+        </span>
+
+        {/* Status Indicator */}
+        <span
+          className={`text-sm px-2 py-0.5 rounded ${
+            Subscribed
+              ? "bg-white/10 text-white"
+              : "bg-white/5 text-white/60"
+          }`}
+        >
+          {Subscribed ? "✓" : "+"}
+        </span>
       </button>
 
-      {/* Full-screen emoji explosion */}
-      <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
-        {sadBursts.map((particle) => (
-          <span
+      {/* Particle system */}
+      <div className="pointer-events-none fixed inset-0 z-[9999]">
+        {particles.map((particle) => (
+          <div
             key={particle.id}
-            className="absolute text-2xl sad-blast"
+            className="absolute rounded-full particle-fade"
             style={{
               left: `${particle.x}px`,
               top: `${particle.y}px`,
-              fontSize: `${particle.size}px`,
-              transform: `translate(-50%, -50%)`,
-              "--angle": particle.angle,
-              "--distance": `${particle.distance}px`,
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              backgroundColor: particle.isSubscribe ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)',
+              "--target-x": `${particle.targetX - particle.x}px`,
+              "--target-y": `${particle.targetY - particle.y}px`,
+              "--duration": `${particle.duration}ms`,
+              "--delay": `${particle.delay}ms`,
             }}
-          >
-            {particle.emoji}
-          </span>
+          />
         ))}
       </div>
+
+      <style jsx>{`
+        @keyframes particleFade {
+          0% {
+            transform: translate(-50%, -50%) translate(0, 0) scale(0);
+            opacity: 0;
+          }
+          20% {
+            opacity: 1;
+          }
+          100% {
+            transform: translate(-50%, -50%) translate(var(--target-x), var(--target-y)) scale(1);
+            opacity: 0;
+          }
+        }
+
+        .particle-fade {
+          animation: particleFade var(--duration) ease-out forwards;
+          animation-delay: var(--delay);
+          will-change: transform, opacity;
+        }
+      `}</style>
     </div>
   );
 }

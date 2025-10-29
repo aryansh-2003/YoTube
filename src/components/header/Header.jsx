@@ -6,6 +6,7 @@ import HeaderContext from '../context/HeaderContext';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import chalchitram from '../../assets/chalchitram.png';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header() {
   const userData = useSelector((state) => state.auth.userData);
@@ -21,130 +22,304 @@ export default function Header() {
   };
 
   return (
-    <header className="flex items-center justify-between w-full px-4 sm:px-6 py-2 h-16 fixed top-0 left-0 right-0 z-50 border-b-2 border-amber-400/30 shadow-2xl overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%)',
-        boxShadow: '0 8px 32px 0 rgba(255, 107, 0, 0.2), inset 0 1px 0 0 rgba(255, 215, 0, 0.1)',
-        willChange: 'backdrop-filter'
-      }}>
+    <header className="flex items-center justify-between w-full px-4 sm:px-6 py-3 h-16 fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5">
       
-      {/* Animated Background Effects */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }}></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s' }}></div>
+      {/* Animated ambient glows */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          animate={{
+            x: [0, 100, 0],
+            opacity: [0.03, 0.08, 0.03],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-0 right-1/4 w-96 h-96 bg-violet-500/5 rounded-full blur-[100px]"
+        ></motion.div>
+        <motion.div
+          animate={{
+            x: [0, -80, 0],
+            opacity: [0.02, 0.06, 0.02],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2,
+          }}
+          className="absolute top-0 left-1/4 w-80 h-80 bg-cyan-500/5 rounded-full blur-[120px]"
+        ></motion.div>
       </div>
 
-      {/* Decorative Border Lines */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-300/50 to-transparent"></div>
-      
       {/* LEFT: Menu & Logo */}
-      {!mobileSearchOpen && (
-        <div className="flex items-center gap-4 z-10 relative">
-          <button
-            className="p-2.5 bg-gradient-to-br from-orange-500/20 to-red-600/20 hover:from-orange-500/40 hover:to-red-600/40 rounded-lg border border-amber-400/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-orange-500/50 group"
-            onClick={() => setSidebarOpen((prev) => !prev)}
-            aria-label="toggle menu"
+      <AnimatePresence mode="wait">
+        {!mobileSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center gap-4 z-10 relative"
           >
-            <Menu className="w-6 h-6 text-amber-300 group-hover:text-amber-200 transition-colors" />
-          </button>
-          <div className="flex items-center relative">
-            <div className="absolute -inset-2 bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 rounded-lg opacity-30 blur-sm group-hover:opacity-50 transition-opacity"></div>
-            <img src={chalchitram} className="w-20 relative z-10 drop-shadow-2xl" alt="Logo" style={{ filter: 'drop-shadow(0 0 10px rgba(255, 165, 0, 0.6))' }} />
-          </div>
-        </div>
-      )}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="p-2 bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-white/10 rounded-lg transition-all relative group"
+              onClick={() => setSidebarOpen((prev) => !prev)}
+              aria-label="toggle menu"
+            >
+              <Menu className="w-5 h-5 text-white/70 group-hover:text-white/90 transition-colors" />
+              <motion.div
+                className="absolute inset-0 rounded-lg bg-white/5"
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+              />
+            </motion.button>
+            
+            <motion.div
+              className="flex items-center"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <motion.img
+                src={chalchitram}
+                className="w-20"
+                alt="Logo"
+                animate={{
+                  filter: [
+                    "drop-shadow(0 0 2px rgba(139, 92, 246, 0.3))",
+                    "drop-shadow(0 0 8px rgba(139, 92, 246, 0.5))",
+                    "drop-shadow(0 0 2px rgba(139, 92, 246, 0.3))",
+                  ],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* CENTER: Search */}
       <div className="flex items-center flex-1 max-w-5xl mx-2 sm:mx-8 justify-center z-10">
         {/* Desktop Search */}
-        <form
-          className={`hidden sm:flex flex-1 max-w-xl transition-all duration-300 ${mobileSearchOpen ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}
+        <motion.form
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: mobileSearchOpen ? 0.3 : 1, y: 0 }}
+          className={`hidden sm:flex flex-1 max-w-xl ${mobileSearchOpen ? 'pointer-events-none' : ''}`}
           onSubmit={handleSubmit(onsubmit)}
         >
-          <div className="flex items-center w-full bg-gradient-to-r from-indigo-900/40 via-purple-900/40 to-indigo-900/40 backdrop-blur-xl border-2 border-amber-400/40 rounded-full h-11 px-1 shadow-lg hover:shadow-amber-400/30 transition-all duration-300 hover:border-amber-400/60 group relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-amber-400/10 to-orange-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="flex items-center w-full bg-white/[0.02] backdrop-blur-sm border border-white/10 rounded-lg h-10 px-1 hover:border-white/15 group transition-all relative overflow-hidden">
+            {/* Subtle shimmer effect on hover */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "100%" }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+            />
+            
             <input
               {...register('Text', { required: 'Please enter a search term' })}
               type="text"
-              placeholder="Search the shinobi world..."
-              className="flex-1 px-4 py-2 bg-transparent focus:outline-none text-amber-50 placeholder-amber-200/60 rounded-full relative z-10 font-medium"
-              style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.3)' }}
+              placeholder="Search..."
+              className="flex-1 px-4 py-2 bg-transparent focus:outline-none text-white/90 placeholder-white/40 rounded-lg relative z-10"
             />
-            <button type="submit" className="px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/30 to-red-500/30 hover:from-orange-500/50 hover:to-red-500/50 transition-all duration-300 mr-1 hover:scale-105 relative z-10" aria-label="search">
-              <Search className="w-5 h-5 text-amber-300" />
-            </button>
+            <motion.button
+              type="submit"
+              className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 mr-1 relative z-10"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label="search"
+            >
+              <Search className="w-4 h-4 text-white/70" />
+            </motion.button>
           </div>
-        </form>
+        </motion.form>
 
         {/* Mobile Search */}
         <div className="sm:hidden flex items-center w-full justify-end">
-          {!mobileSearchOpen ? (
-            <button
-              className="p-2.5 bg-gradient-to-br from-orange-500/20 to-red-600/20 hover:from-orange-500/40 hover:to-red-600/40 rounded-lg border border-amber-400/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-orange-500/50"
-              onClick={() => setMobileSearchOpen(true)}
-              aria-label="open search"
-            >
-              <Search className="w-6 h-6 text-amber-300" />
-            </button>
-          ) : (
-            <form className="flex items-center w-full transition-all duration-300" onSubmit={handleSubmit(onsubmit)}>
-              <button
-                type="button"
-                className="p-2 mr-2 bg-gradient-to-br from-orange-500/20 to-red-600/20 hover:from-orange-500/40 hover:to-red-600/40 rounded-lg border border-amber-400/30 transition-all duration-300"
-                onClick={() => setMobileSearchOpen(false)}
-                aria-label="close search"
+          <AnimatePresence mode="wait">
+            {!mobileSearchOpen ? (
+              <motion.button
+                key="search-btn"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2 bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-white/10 rounded-lg"
+                onClick={() => setMobileSearchOpen(true)}
+                aria-label="open search"
               >
-                <ArrowLeft className="w-6 h-6 text-amber-300" />
-              </button>
-              <div className="flex items-center w-full bg-gradient-to-r from-indigo-900/40 via-purple-900/40 to-indigo-900/40 backdrop-blur-xl border-2 border-amber-400/40 rounded-full h-11 px-2 shadow-lg">
-                <input
-                  {...register('Text', { required: 'Please enter a search term' })}
-                  type="text"
-                  placeholder="Search..."
-                  className="flex-1 px-2 py-2 bg-transparent focus:outline-none text-amber-50 placeholder-amber-200/60 font-medium"
-                  autoFocus
-                  style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.3)' }}
-                />
-                <button type="submit" className="ml-2 p-2 rounded-full bg-gradient-to-r from-orange-500/30 to-red-500/30 hover:from-orange-500/50 hover:to-red-500/50 transition-all duration-300" aria-label="search-submit">
-                  <Search className="w-5 h-5 text-amber-300" />
-                </button>
-              </div>
-            </form>
-          )}
+                <Search className="w-5 h-5 text-white/70" />
+              </motion.button>
+            ) : (
+              <motion.form
+                key="search-form"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="flex items-center w-full"
+                onSubmit={handleSubmit(onsubmit)}
+              >
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-2 mr-2 bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-white/10 rounded-lg"
+                  onClick={() => setMobileSearchOpen(false)}
+                  aria-label="close search"
+                >
+                  <ArrowLeft className="w-5 h-5 text-white/70" />
+                </motion.button>
+                <div className="flex items-center w-full bg-white/[0.02] backdrop-blur-sm border border-white/10 rounded-lg h-10 px-2">
+                  <input
+                    {...register('Text', { required: 'Please enter a search term' })}
+                    type="text"
+                    placeholder="Search..."
+                    className="flex-1 px-2 py-2 bg-transparent focus:outline-none text-white/90 placeholder-white/40"
+                    autoFocus
+                  />
+                  <motion.button
+                    type="submit"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="ml-2 p-2 rounded-md bg-white/5 hover:bg-white/10"
+                    aria-label="search-submit"
+                  >
+                    <Search className="w-4 h-4 text-white/70" />
+                  </motion.button>
+                </div>
+              </motion.form>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
       {/* RIGHT: Icons */}
-      {!mobileSearchOpen && (
-        <div className="flex items-center gap-2 z-10">
-          <button
-            className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-500/30 via-red-500/30 to-pink-500/30 hover:from-orange-500/50 hover:via-red-500/50 hover:to-pink-500/50 rounded-full border border-amber-400/40 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/50 group relative overflow-hidden"
-            onClick={() => navigate('/createpost')}
+      <AnimatePresence mode="wait">
+        {!mobileSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center gap-2 z-10"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-400/0 via-amber-300/20 to-orange-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-            <Plus className="w-5 h-5 text-amber-200 relative z-10" />
-            <span className="text-sm text-amber-100 font-semibold relative z-10" style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}>Create</span>
-          </button>
-          
-          <button className="p-2.5 bg-gradient-to-br from-orange-500/20 to-red-600/20 hover:from-orange-500/40 hover:to-red-600/40 rounded-lg border border-amber-400/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-orange-500/50 relative group">
-            <Bell className="w-6 h-6 text-amber-300 group-hover:text-amber-200 transition-colors" />
-            <span className="absolute -top-1 -right-1 bg-gradient-to-br from-red-500 to-red-700 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse border border-red-300/50">
-              9+
-            </span>
-          </button>
-          
-          <button 
-            onClick={() => navigate('/channeldashboard')} 
-            className="rounded-full flex flex-col items-center ml-2 relative group transition-transform duration-300 hover:scale-110"
-          >
-            <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-400 rounded-full opacity-0 group-hover:opacity-100 blur transition-opacity duration-300 animate-pulse"></div>
-            <div className="relative ring-2 ring-amber-400/50 group-hover:ring-amber-300 rounded-full transition-all duration-300">
-              <DisplayPic children={userData} />
-            </div>
-          </button>
-        </div>
-      )}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all relative group overflow-hidden"
+              onClick={() => navigate('/createpost')}
+            >
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-cyan-500/10"
+                initial={{ x: "-100%" }}
+                whileHover={{ x: "100%" }}
+                transition={{ duration: 0.5 }}
+              />
+              <Plus className="w-4 h-4 text-white/70 group-hover:text-white/90 relative z-10 transition-colors" />
+              <span className="text-sm text-white/70 group-hover:text-white/90 relative z-10 transition-colors">Create</span>
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="p-2 bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-white/10 rounded-lg relative group"
+            >
+              <motion.div
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.5, 0.8, 0.5],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute inset-0 bg-white/5 rounded-lg"
+              />
+              <Bell className="w-5 h-5 text-white/70 group-hover:text-white/90 relative z-10 transition-colors" />
+              <motion.span
+                animate={{
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute -top-1 -right-1 bg-white/90 text-[#0a0a0a] text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center"
+              >
+                9+
+              </motion.span>
+            </motion.button>
+            
+            <motion.button
+              onClick={() => navigate('/channeldashboard')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="rounded-full flex items-center ml-2 relative group"
+            >
+              {/* Rotating ring animation */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: "conic-gradient(from 0deg, transparent 0%, rgba(139, 92, 246, 0.3) 50%, transparent 100%)",
+                  padding: "2px",
+                }}
+              />
+              
+              {/* Pulsing glow effect */}
+              <motion.div
+                animate={{
+                  scale: [1, 1.15, 1],
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute inset-0 bg-violet-500/20 rounded-full blur-md"
+              />
+              
+              {/* Shimmer effect on hover */}
+              <motion.div
+                className="absolute inset-0 rounded-full overflow-hidden"
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                />
+              </motion.div>
+              
+              <div className="ring-2 ring-white/10 group-hover:ring-violet-400/40 rounded-full transition-all relative z-10">
+                <DisplayPic children={userData} />
+              </div>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

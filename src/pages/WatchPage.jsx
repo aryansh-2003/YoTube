@@ -8,6 +8,7 @@ import VideoService from "../../Service/video";
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { vdo } from "../Store/videoSlice";
+import { motion, AnimatePresence } from "framer-motion";
 
 const WatchPage = () => {
   const { sidebarOpen } = useContext(HeaderContext);
@@ -47,209 +48,275 @@ const WatchPage = () => {
   };
 
   return (
-    <div className="flex-1 min-h-screen p-2 text-white relative overflow-hidden bg-gradient-to-br from-indigo-950 via-purple-950 to-pink-950">
-      {/* Animated falling sakura petals - Behind content */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute text-pink-300 opacity-40"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `-5%`,
-              fontSize: `${Math.random() * 15 + 15}px`,
-              animation: `fall ${Math.random() * 10 + 15}s linear infinite`,
-              animationDelay: `${Math.random() * 5}s`,
-            }}
-          >
-            🌸
-          </div>
-        ))}
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={`leaf-${i}`}
-            className="absolute text-orange-400 opacity-30"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `-5%`,
-              fontSize: `${Math.random() * 12 + 12}px`,
-              animation: `fall ${Math.random() * 12 + 18}s linear infinite`,
-              animationDelay: `${Math.random() * 6}s`,
-            }}
-          >
-            🍂
-          </div>
-        ))}
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={`petal2-${i}`}
-            className="absolute text-purple-300 opacity-35"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `-5%`,
-              fontSize: `${Math.random() * 12 + 10}px`,
-              animation: `fall ${Math.random() * 14 + 16}s linear infinite`,
-              animationDelay: `${Math.random() * 7}s`,
-            }}
-          >
-            🌺
-          </div>
-        ))}
-      </div>
-
-      {/* Katana decorations */}
-      <div className="fixed top-1/4 left-5 opacity-10 pointer-events-none z-30" style={{ animation: 'rotate-slow 20s linear infinite' }}>
-        <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
-          <line x1="10" y1="90" x2="90" y2="10" stroke="#f97316" strokeWidth="3" strokeLinecap="round"/>
-          <line x1="15" y1="85" x2="85" y2="15" stroke="#ec4899" strokeWidth="2" strokeLinecap="round"/>
-          <circle cx="15" cy="85" r="5" fill="#fbbf24"/>
-        </svg>
-      </div>
-      <div className="fixed bottom-1/4 right-10 opacity-10 pointer-events-none z-30" style={{ animation: 'rotate-slow 25s linear infinite reverse' }}>
-        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-          <line x1="20" y1="10" x2="80" y2="90" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round"/>
-          <line x1="25" y1="15" x2="75" y2="85" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round"/>
-          <circle cx="20" cy="10" r="5" fill="#f472b6"/>
-        </svg>
-      </div>
-
-      {/* Demon Slayer pattern background */}
-      <div className="fixed inset-0 opacity-5 pointer-events-none z-20">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(249, 115, 22, 0.1) 35px, rgba(249, 115, 22, 0.1) 70px)`,
-        }}></div>
-      </div>
-
-      {/* Glowing orbs */}
-      <div className="fixed top-20 left-1/4 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl animate-pulse pointer-events-none z-10"></div>
-      <div className="fixed bottom-40 right-1/3 w-48 h-48 bg-pink-500/10 rounded-full blur-3xl pointer-events-none z-10" style={{ animation: 'pulse 3s ease-in-out infinite' }}></div>
-      <div className="fixed top-1/2 left-10 w-36 h-36 bg-purple-500/10 rounded-full blur-3xl pointer-events-none z-10" style={{ animation: 'pulse 4s ease-in-out infinite' }}></div>
-
-      <style>{`
-        @keyframes fall {
-          0% { 
-            transform: translateY(0) rotate(0deg);
-            opacity: 0;
-          }
-          10% { opacity: 0.6; }
-          90% { opacity: 0.6; }
-          100% { 
-            transform: translateY(100vh) rotate(360deg);
-            opacity: 0;
-          }
-        }
-        @keyframes float {
-          0%, 100% { 
-            transform: translateY(0px) rotate(-5deg);
-          }
-          50% { 
-            transform: translateY(-25px) rotate(5deg);
-          }
-        }
-        @keyframes rotate-slow {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-          0%, 100% { 
-            transform: scale(1);
-            opacity: 0.1;
-          }
-          50% { 
-            transform: scale(1.1);
-            opacity: 0.15;
-          }
-        }
-      `}</style>
-
-      <div className="relative z-10 mx-auto px-3 py-4 sm:px-4 lg:px-6 lg:py-6">
-        {/* Mobile first view */}
-        <div className="block lg:hidden space-y-6">
-          {/* Decorative top border */}
-          <div className="h-1 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full shadow-lg shadow-orange-500/50"></div>
-          
-          <VideoPlayer
-            currentVideo={currentVideo}
-            onVideoEnd={() => console.log("Video ended")}
-          />
-          
-          <VideoInfo videoData={currentVideo} />
-          
-          {/* Up Next Section - Mobile */}
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
-            <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-orange-500/30 rounded-2xl p-4 shadow-2xl">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="text-2xl animate-pulse">🔥</div>
-                <h3 className="text-white font-bold text-lg bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-                  Up Next
-                </h3>
-                <div className="text-xl">⚔️</div>
-              </div>
-              <SidebarVideos query={currentVideo?.title || ""} />
-            </div>
-          </div>
-          
-          {/* Comments Section - Mobile */}
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
-            <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-purple-500/30 rounded-2xl p-4 shadow-2xl">
-              <CommentsSection
-                video={currentVideo}
-                comments={comments}
-                onAddComment={handleAddComment}
+    <div className="flex-1 min-h-screen relative overflow-hidden bg-[#0a0a0a]">
+      {/* Sophisticated animated background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <AnimatePresence mode="wait">
+          {currentVideo?.thumbnail && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.7 }}
+              className="w-full h-full relative"
+            >
+              <motion.img 
+                src={currentVideo.thumbnail} 
+                alt="" 
+                animate={{
+                  scale: [1.1, 1.15, 1.1],
+                }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="w-full h-full object-cover opacity-[0.04] blur-3xl"
               />
-            </div>
-          </div>
-        </div>
+              <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/95 via-[#0a0a0a]/90 to-[#0a0a0a]"></div>
+              <motion.div
+                animate={{
+                  opacity: [0.3, 0.5, 0.3],
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-neutral-900/30 via-transparent to-transparent"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-        {/* Desktop / large screen */}
-        <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
-          {/* Decorative top border */}
-          <div className="lg:col-span-3 h-1 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full shadow-lg shadow-orange-500/50 mb-4"></div>
-          
-          {/* Main content area */}
-          <div className="lg:col-span-2 space-y-6">
+      {/* Animated accent glow - right side */}
+      <motion.div
+        animate={{
+          x: [0, 30, 0],
+          opacity: [0.2, 0.35, 0.2],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="fixed right-0 top-1/3 w-[600px] h-[600px] pointer-events-none hidden xl:block"
+      >
+        <div className="absolute inset-0 bg-gradient-to-bl from-violet-500/10 via-transparent to-transparent blur-[120px]"></div>
+      </motion.div>
+
+      {/* Animated accent - left side */}
+      <motion.div
+        animate={{
+          x: [0, -20, 0],
+          opacity: [0.15, 0.25, 0.15],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2,
+        }}
+        className="fixed left-0 bottom-1/4 w-[400px] h-[400px] pointer-events-none hidden xl:block"
+      >
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/8 via-transparent to-transparent blur-[100px]"></div>
+      </motion.div>
+
+      {/* Floating particles */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+            }}
+            animate={{
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+            }}
+            transition={{
+              duration: 20 + Math.random() * 10,
+              repeat: Infinity,
+              ease: "linear",
+              delay: i * 2,
+            }}
+            className="absolute w-1 h-1 bg-white/10 rounded-full blur-sm"
+          />
+        ))}
+      </div>
+
+      {/* Fine grain texture */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.015] mix-blend-soft-light" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+      }}></div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 mx-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8 max-w-[1600px]"
+      >
+        {/* Mobile view */}
+        <div className="block lg:hidden space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <VideoPlayer
               currentVideo={currentVideo}
               onVideoEnd={() => console.log("Video ended")}
             />
-            
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             <VideoInfo videoData={currentVideo} />
+          </motion.div>
+          
+          {/* Up Next - Mobile */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            whileHover={{ y: -2 }}
+            className="bg-[#151515]/40 backdrop-blur-md border border-white/[0.06] rounded-xl p-4 transition-all duration-300 hover:bg-[#151515]/50 hover:border-white/[0.08] relative group overflow-hidden"
+          >
+            {/* Hover shimmer */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "100%" }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+            />
             
-            {/* Comments Section - Desktop */}
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
-              <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-purple-500/30 rounded-2xl p-5 shadow-2xl">
+            <h3 className="text-white/60 font-medium text-[11px] mb-3 tracking-[0.1em] uppercase relative z-10">
+              Up Next
+            </h3>
+            <SidebarVideos query={currentVideo?.title || ""} />
+          </motion.div>
+          
+          {/* Comments - Mobile */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            whileHover={{ y: -2 }}
+            className="bg-[#151515]/40 backdrop-blur-md border border-white/[0.06] rounded-xl p-4 transition-all duration-300 hover:bg-[#151515]/50 hover:border-white/[0.08] relative group overflow-hidden"
+          >
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "100%" }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+            />
+            
+            <CommentsSection
+              video={currentVideo}
+              comments={comments}
+              onAddComment={handleAddComment}
+            />
+          </motion.div>
+        </div>
+
+        {/* Desktop view */}
+        <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6 xl:gap-7">
+          {/* Main content */}
+          <div className="lg:col-span-2 space-y-5">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <VideoPlayer
+                currentVideo={currentVideo}
+                onVideoEnd={() => console.log("Video ended")}
+              />
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <VideoInfo videoData={currentVideo} />
+            </motion.div>
+            
+            {/* Comments - Desktop */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              whileHover={{ y: -2 }}
+              className="bg-[#151515]/40 backdrop-blur-md border border-white/[0.06] rounded-xl p-6 transition-all duration-300 hover:bg-[#151515]/50 hover:border-white/[0.08] relative group overflow-hidden"
+            >
+              {/* Hover shimmer */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                initial={{ x: "-100%" }}
+                whileHover={{ x: "100%" }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+              />
+              
+              <div className="relative z-10">
                 <CommentsSection
                   video={currentVideo}
                   comments={comments}
                   onAddComment={handleAddComment}
                 />
               </div>
-            </div>
+            </motion.div>
           </div>
           
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-6">
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
-                <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-orange-500/30 rounded-2xl p-4 shadow-2xl">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <div className="text-xl animate-pulse">🔥</div>
-                    <h3 className="text-white font-bold text-base bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-                      Up Next
-                    </h3>
-                    <div className="text-lg">⚔️</div>
-                  </div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="sticky top-6"
+            >
+              <motion.div
+                whileHover={{ y: -2 }}
+                className="bg-[#151515]/40 backdrop-blur-md border border-white/[0.06] rounded-xl p-5 transition-all duration-300 hover:bg-[#151515]/50 hover:border-white/[0.08] relative group overflow-hidden"
+              >
+                {/* Hover shimmer */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                />
+                
+                {/* Subtle pulsing border glow */}
+                <motion.div
+                  animate={{
+                    opacity: [0, 0.3, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute inset-0 rounded-xl border border-violet-500/20 pointer-events-none"
+                />
+                
+                <h3 className="text-white/60 font-medium text-[11px] mb-4 tracking-[0.1em] uppercase relative z-10">
+                  Up Next
+                </h3>
+                <div className="relative z-10">
                   <SidebarVideos query={currentVideo?.title || ""} />
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
