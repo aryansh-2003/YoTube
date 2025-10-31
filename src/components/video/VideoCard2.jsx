@@ -8,7 +8,7 @@ export default function VideoCard({ video, onUpdate, onDelete, onAddToPlaylist }
   const menuRef = useRef(null);
   const navigate = useNavigate();
   
-
+console.log(video)
   const handleToggle = (e) => {
     e.stopPropagation();
     setMenuOpen(prev => !prev);
@@ -61,7 +61,6 @@ export default function VideoCard({ video, onUpdate, onDelete, onAddToPlaylist }
 
   return (
     <div className="group relative bg-neutral-900/50 rounded-lg overflow-hidden border border-neutral-800/50 hover:border-purple-500/30 transition-colors duration-200 cursor-pointer will-change-transform">
-
       {/* Mobile/Tablet Layout (Vertical) - Default */}
       <div className="md:hidden">
         {/* Thumbnail Section */}
@@ -131,22 +130,24 @@ export default function VideoCard({ video, onUpdate, onDelete, onAddToPlaylist }
         {/* Content Section */}
         <div className="p-3">
           <div className="flex gap-2.5">
+          <button classsname="bg-red-200 z-20 absolute w-200 h-200 " onClick={() => navigate(`/channel/${video ? video?.ownerInfo?.[0]?.username : ""}`)}>
             <img
               src={video?.ownerInfo?.[0]?.avatar}
               alt={video?.ownerInfo?.[0]?.fullname}
               loading="lazy"
               className="w-9 h-9 rounded-full flex-shrink-0 object-contain"
             />
+            </button>
             
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-white text-sm mb-0.5 line-clamp-2 leading-snug">
                 {video?.title || "Untitled"}
               </h3>
-              
+            <button classsname="bg-red-200 z-20 absolute w-200 h-200 " onClick={() => navigate(`/channel/${video ? video?.ownerInfo?.[0]?.username : ""}`)}>
               <p className="text-neutral-400 text-xs mb-1 truncate">
                 {video?.ownerInfo?.[0]?.fullname}
               </p>
-
+            </button>
               <div className="flex items-center gap-1.5 text-xs text-neutral-500">
                 <span className="flex items-center gap-0.5">
                   <Eye className="w-3 h-3" />
@@ -209,6 +210,7 @@ export default function VideoCard({ video, onUpdate, onDelete, onAddToPlaylist }
 
             {/* Channel Info */}
             <div className="flex items-center gap-2.5 mb-3">
+          <button classsname="bg-red-200 z-20 absolute w-200 h-200 " onClick={() => navigate(`/channel/${video ? video?.ownerInfo?.[0]?.username : ""}`)}>
               <img
                 src={video?.ownerInfo?.[0]?.avatar}
                 alt={video?.ownerInfo?.[0]?.fullname}
@@ -218,6 +220,7 @@ export default function VideoCard({ video, onUpdate, onDelete, onAddToPlaylist }
               <span className="text-neutral-400 text-sm truncate">
                 {video?.ownerInfo?.[0]?.fullname}
               </span>
+          </button>
             </div>
 
             {/* Description */}
