@@ -4,7 +4,7 @@ import SignUpComponent from '../components/signUpForm/SignUpComponent.jsx'
 
 function SignUp() {
   return (
-    <div><SignUpComponent/></div>
+    <div className='w-full h-full absolute z-2000 top-0'><SignUpComponent/></div>
   )
 }
 

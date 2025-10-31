@@ -34,7 +34,7 @@ export default function Home() {
   };
 
   return (
-    <main className={`relative flex-1 min-h-screen text-white overflow-hidden bg-[#0a0a0a] ${sidebarOpen ? "blur-sm" : ""}`}>
+    <main className={`relative flex- min-h-screen text-white overflow-hidden bg-[#0a0a0a] ${sidebarOpen ? "blur-sm" : ""}`}>
         {/* <Vortex
         backgroundColor="black"
         rangeY={800}
@@ -65,7 +65,7 @@ export default function Home() {
         <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-8"></div>
 
         {/* Video Grid */}
-        <div className="pt-5">
+        <div className="pt-">
           <VideoCard loading={false} data={videos ? videos?.data?.data : null} />
         </div>
 

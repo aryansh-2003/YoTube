@@ -91,20 +91,20 @@ const CreatePost = () => {
         </motion.div>
       )}
 
-      <div className="min-h-screen bg-[#0a0a0a] py-4 sm:py-6 px-4 sm:px-6 relative overflow-hidden">
+      <div className="min-h-screen bg-[#0a0a0a] py- sm:py-6 px-4 sm:px-6 relative overflow-hidden">
         {/* Vortex Background */}
         <Vortex
           backgroundColor="black"
           rangeY={800}
           particleCount={500}
           baseHue={120}
-          className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full"
+          className="flex items-center flex-col justify-center px-2 md:px-10 py- w-full h-full"
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="relative z-10 w-full max-w-4xl mx-auto pt-8 sm:pt-12"
+            className="relative z-10 w-full max-w-4xl mx-auto  mt-10"
           >
             {/* Header */}
             <div className="text-center mb-8 sm:mb-12 px-4">

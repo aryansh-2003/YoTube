@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import subscriptionService from "../../Service/subscription";
+import defaultover from '../assets/defaultCover.jpg';
+import defaultAvatar from '../assets/download.jpeg';
+
+
 
 export default function UserSubscribedChannels({ userId }) {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -75,7 +79,7 @@ export default function UserSubscribedChannels({ userId }) {
                 <img
                   src={
                     info?.coverImage ||
-                    "https://images.unsplash.com/photo-1525186402429-b4ff38bedbec?auto=format&fit=crop&w=800&q=80"
+                    defaultover
                   }
                   alt={info?.username}
                   className="w-full h-full object-cover"
@@ -90,7 +94,7 @@ export default function UserSubscribedChannels({ userId }) {
                   <img
                     src={
                       info?.avatar ||
-                      "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                      defaultAvatar
                     }
                     alt={info?.username}
                     className="w-16 h-16 rounded-full border-2 border-white/10 object-cover ring-4 ring-[#0a0a0a]"

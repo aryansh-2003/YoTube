@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import subscriptionService from "../../Service/subscription";
 import { useNavigate } from "react-router";
+import { Suspense } from 'react';
+
 
 export default function UserSubscribers({ channelId }) {
   console.log(channelId)
   const [subscribers, setSubscribers] = useState();
 
-  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate()
 
   useEffect(() => {
     if (!channelId) return;
-    setLoading(true);
-
     subscriptionService.getUserSubscribers({id:channelId})
       .then((res) => {
         console.log(res)
@@ -21,15 +21,10 @@ export default function UserSubscribers({ channelId }) {
         }
         
       })
-      .finally(() => setLoading(false));
+  
   }, [channelId]);
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center py-10">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white"></div>
-      </div>
-    );
+
 
   if (!subscribers.length)
     return (
@@ -37,7 +32,12 @@ export default function UserSubscribers({ channelId }) {
         No subscribers yet 😔
       </div>
     );
+
+    
   return (
+    <Suspense fallback={ <div className="flex justify-center items-center py-10">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white"></div>
+      </div>}>
     <div className="bg-gradient-to-b from-zinc-950 to-black text-white rounded-2xl p-6 shadow-lg border border-zinc-800">
       <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
         <i className="fa-solid fa-users text-purple-500"></i>
@@ -70,5 +70,6 @@ export default function UserSubscribers({ channelId }) {
         ))}
       </div>
     </div>
+    </Suspense>
   );
 }
