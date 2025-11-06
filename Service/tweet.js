@@ -43,9 +43,16 @@ export class TweetService{
         }
     }
 
-       async getAllTweets(){
+       async getAllTweets({page,limit}){
         try {
-            return await this.instance.get(`/home-tweets`)
+            return await this.instance.get(`/home-tweets`,{
+                   params:{
+
+                    page:page,
+                    limit:limit
+                }
+            }
+            )
         } catch (error) {
             return ("TweetService :: Tweet Error", error)
         }

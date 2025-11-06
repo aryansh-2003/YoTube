@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   User2,
+  BirdIcon,
 } from "lucide-react";
 import HeaderContext from "../context/HeaderContext";
 import axios from "axios";
@@ -30,7 +31,6 @@ export default function Sidebar() {
   useEffect(() => {
     if(!userData) return
       subscriptionService.getUserSubscription().then((res) => {
-        console.log(res)
         if(res.status === 200){
           setSubscriptions(res?.data?.data)
         }
@@ -116,6 +116,7 @@ export default function Sidebar() {
               ["Home", "/Home", <Home />],
               ["Subscriptions", "/subscription", <Users />],
               ["Create +", "/CreatePost", <Video />],
+              ["Tweets ", "/Tweets", <BirdIcon />]
             ].map(([name, path, icon]) => (
               <div
                 key={name}

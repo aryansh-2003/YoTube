@@ -24,7 +24,6 @@ export default function TweetSection() {
     const message = data.message?.trim();
     if (!message) return;
 
-    // API call
     tweetService.createTweet({ message }).then(res => {
       console.log(res);
     });
