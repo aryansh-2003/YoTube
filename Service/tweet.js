@@ -43,6 +43,14 @@ export class TweetService{
         }
     }
 
+       async getAllTweets(){
+        try {
+            return await this.instance.get(`/home-tweets`)
+        } catch (error) {
+            return ("TweetService :: Tweet Error", error)
+        }
+    }
+
 
 }
 

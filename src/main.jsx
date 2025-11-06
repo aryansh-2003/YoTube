@@ -23,6 +23,7 @@ import PlaylistVideos from './pages/PlaylistVideos.jsx'
 import LikedVideos from './pages/LikedVideos.jsx'
 import UserSubscriberPage from './pages/UserSubscriberPage.jsx'
 import NotFound from './pages/NotFound.jsx'
+import Tweets from './pages/Tweets.jsx'
 
 
 
@@ -171,6 +172,15 @@ import NotFound from './pages/NotFound.jsx'
             <PrivateRoute>
               <>
                   <NotFound/> 
+              </>
+            </PrivateRoute>
+        },
+        {
+          path:'/Tweets',
+          element:
+            <PrivateRoute>
+              <>
+                  <Tweets/> 
               </>
             </PrivateRoute>
         },

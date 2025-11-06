@@ -18,7 +18,8 @@ function PrivateRoute({children}) {
     if(!userData){
     setloading("loading")
     authService.getCurrentUser().then((userData)=>{
-      if(userData === null) {navigate('/')}
+      console.log(userData)
+      if(userData === undefined) {navigate('/')}
       dispatch(login(userData?.data?.data))
       setloading("false")
     }).catch((error)=>{console.log(error)})
