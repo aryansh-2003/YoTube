@@ -1,52 +1,56 @@
 import React, { useContext, useEffect, useState } from "react";
 import HeaderContext from "../components/context/HeaderContext";
 import TweetComponent2 from "../components/TweetComponent2";
-import { Sparkles, Plus, X } from "lucide-react";
+import { Sparkles, Plus, X, MessageSquare, Heart } from "lucide-react";
 import tweetService from "../../Service/tweet";
+import LikedTweetComponent from "../components/LikedTweets";
 
 export default function Tweets() {
   const [currentPage, setCurrentPage] = useState(1);
   const { sidebarOpen } = useContext(HeaderContext);
   const [tweets, setTweets] = useState();
+  const [userlikedTweets, setUserLikedTweets] = useState();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTweetContent, setNewTweetContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [total, setTotal] = useState();
-
-  
-
+  const [activeTab, setActiveTab] = useState("tweets"); // "tweets" or "liked"
   const tweetsPerPage = 10;
 
-    const handleCreateTweet = async () => {
+  const handleCreateTweet = async () => {
     if (!newTweetContent.trim()) return;
 
     setIsSubmitting(true);
-      tweetService.createTweet({ message:newTweetContent }).then(res => {
-      console.log(res);
-      if(res.status === 200){
-         setNewTweetContent("");
+    tweetService.createTweet({ message: newTweetContent }).then((res) => {
+      if (res.status === 200) {
+        setNewTweetContent("");
         setShowCreateModal(false);
         setIsSubmitting(false);
-
       }
-    })
+    });
   };
 
   useEffect(() => {
-    tweetService.getAllTweets({page:currentPage,limit:10}).then((res) => {
-      if (res.status === 200 || 201) {
-        setTweets(res?.data?.data?.Tweets);
-        setTotal(res?.data?.data?.totalTweets)
+    if (activeTab === "tweets") {
+      tweetService.getAllTweets({ page: currentPage, limit: 10 }).then((res) => {
+        if (res.status === 200 || 201) {
+          setTweets(res?.data?.data?.Tweets);
+          setTotal(res?.data?.data?.totalTweets);
+        }
+      });
+    } else {
+     tweetService.getAllLikedTweets().then((res) => {
+      console.log(res)
+      if(res.status === 200){
+        setUserLikedTweets(res?.data?.data)
       }
-    });
-  }, [isSubmitting,currentPage]);
+     })
+    }
+  }, [isSubmitting, currentPage, activeTab]);
 
-
-  const totalPages = total ? total : 2
+  const totalPages = total ? total : 2;
   const startIndex = (currentPage - 1) * tweetsPerPage;
   const endIndex = startIndex + tweetsPerPage;
-  // const currentTweets = allTweets.slice(startIndex, endIndex);
-
 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
@@ -54,6 +58,10 @@ export default function Tweets() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setCurrentPage(1); // Reset to first page when switching tabs
+  };
 
   return (
     <main
@@ -90,13 +98,65 @@ export default function Tweets() {
           </p>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6 border-b border-zinc-800/50">
+          <button
+            onClick={() => handleTabChange("tweets")}
+            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-all duration-200 relative ${
+              activeTab === "tweets"
+                ? "text-zinc-100"
+                : "text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>All Tweets</span>
+            {activeTab === "tweets" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-zinc-600 to-zinc-700"></div>
+            )}
+          </button>
+          <button
+            onClick={() => handleTabChange("liked")}
+            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-all duration-200 relative ${
+              activeTab === "liked"
+                ? "text-zinc-100"
+                : "text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            <Heart className="w-4 h-4" />
+            <span>Liked Tweets</span>
+            {activeTab === "liked" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-zinc-600 to-zinc-700"></div>
+            )}
+          </button>
+        </div>
+
         {/* Tweets Grid */}
         <div className="space-y-4 mb-8 items-center">
-          {tweets
-            ? tweets.map((tweet) => (
+          {activeTab === "tweets" ? (
+            tweets ? (
+              tweets.map((tweet) => (
                 <TweetComponent2 key={tweet.id} tweet={tweet} />
               ))
-            : ""}
+            ) : (
+              <div className="text-center text-zinc-500 py-12">
+                Loading tweets...
+              </div>
+            )
+          ) : userlikedTweets ? (
+            userlikedTweets.map((tweet) => (
+                <TweetComponent2 key={tweet.id} tweet={tweet} />
+            ))
+          ) : (
+            <div className="text-center text-zinc-500 py-12">
+              <Heart className="w-12 h-12 mx-auto mb-4 text-zinc-700" />
+              <p className="text-lg font-medium text-zinc-400 mb-2">
+                No liked tweets yet
+              </p>
+              <p className="text-sm">
+                Tweets you like will appear here
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Pagination */}
@@ -149,18 +209,6 @@ export default function Tweets() {
             Next
           </button>
         </div>
-
-        {/* Footer Info */}
-        {/* <div className="text-center text-sm text-zinc-500 pb-8">
-          Page{" "}
-          <span className="text-zinc-300 font-medium">{currentPage}</span> of{" "}
-          <span className="text-zinc-300 font-medium">{totalPages}</span>
-          {" • "}
-          <span className="text-zinc-600">
-            Showing {startIndex + 1}-{Math.min(endIndex, allTweets.length)} of{" "}
-            {allTweets.length} tweets
-          </span>
-        </div> */}
 
         {/* Bottom accent line */}
         <div className="h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent mb-8"></div>
