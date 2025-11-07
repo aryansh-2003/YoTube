@@ -21,8 +21,6 @@ export class TweetService{
     )
     }
 
-    
-
     async createTweet({message}){
         try {
             return await this.instance.post('/create-tweet',
@@ -53,6 +51,14 @@ export class TweetService{
                 }
             }
             )
+        } catch (error) {
+            return ("TweetService :: Tweet Error", error)
+        }
+    }
+
+          async getAllLikedTweets(){
+        try {
+            return await this.instance.get(`/liked-tweets`)
         } catch (error) {
             return ("TweetService :: Tweet Error", error)
         }
