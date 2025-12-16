@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { ThumbsUp } from "lucide-react";
+import likeservice from '../../Service/like'
 
-export default function LikeComment({ commentId, userId }) {
-  const [likes, setLikes] = useState(0);
-  const [liked, setLiked] = useState(false);
+export default function LikeComment({ commentId, userId , isLiked, totalLikes}) {
+  const [likes, setLikes] = useState(totalLikes);
+  const [liked, setLiked] = useState(isLiked);
 
   const handleLike = () => {
     if (!userId) return alert("Login to like comments");
+    likeservice.likeComment({id:commentId}).then((res) =>{
+      console.log(res)
+    })
     setLiked((prev) => !prev);
     setLikes((prev) => (liked ? prev - 1 : prev + 1));
     console.log(`Comment ${commentId} liked by ${userId}`);

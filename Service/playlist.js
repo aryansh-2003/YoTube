@@ -57,6 +57,14 @@ export class PlaylistService{
         }
     }
 
+     async deleteVideoFromPlaylist({playlistId,videoId}){
+        try {
+            return await this.instance.delete(`/remove-video/${playlistId}/${videoId}`)
+        } catch (error) {
+            return ("PlaylistService :: getting playlist Error", error)
+        }
+    }
+
 
 }
 

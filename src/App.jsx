@@ -6,6 +6,7 @@ import { login } from './Store/authSlice';
 import {useDispatch, useSelector} from 'react-redux'
 import { ReactLenis, useLenis } from 'lenis/react'
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import SplashScreen from './assets/kling_20251122_Image_to_Video_This_logo__3264_0.gif'
 
 
 
@@ -18,21 +19,39 @@ export default function App() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [AuthStatus,setAuthStatus] = useState(false)
+  const [loading,setloading] = useState(true)
+
 
 
   useEffect(()=>{
     if(!userData){
     authService.getCurrentUser().then((userData)=>{
-      if(userData == null && !location.pathname === '/signup') navigate('/')
+      if(userData == null || undefined && !location.pathname === '/signup'){ 
+        setloading(false) 
+        navigate('/')
+      }
       dispatch(login(userData?.data?.data))
+      setloading(false) 
     if(location.pathname === '/'){
+      setloading(false)
       navigate('/home')
     }
-    }).catch((error)=>{console.log(error)})
+    }).catch((error)=>{
+      console.log(error)
+      setloading(false)
+    })
   }
   },[])
 
-
+if (loading) {
+  return(
+    <>
+    <div className='relative'>
+       <img className=' w-screen h-screen' src={SplashScreen}></img>
+    </div>
+    </>
+    )
+}else{
   return (
     <>
     <ReactLenis root />
@@ -41,4 +60,5 @@ export default function App() {
     </>
     
   )
+}
 }

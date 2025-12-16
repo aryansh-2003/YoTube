@@ -38,12 +38,12 @@ export class VideoService{
     }
 
 
-     async getHomeVids(){
+     async getHomeVids(page){
         try {
             return await this.instance.get('/getHomevids',{
                 params:{
 
-                    page:1
+                    page:page
                 }
             }
             )

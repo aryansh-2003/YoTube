@@ -1,163 +1,170 @@
 import React from "react";
-import VideoCard from "./video/VideoCard";
+import VideoCard from "./video/VideoCard"; // Assuming this is your existing component
 import defaultAvatar from "../assets/download.jpeg";
-import { MessageCircle, Heart, Repeat2 } from "lucide-react";
+import { MessageSquare, Heart, Share2, ListVideo, ChevronRight } from "lucide-react";
 
+// Mock Data - Professional Placeholders
 const mockTweets = [
   {
     id: 1,
-    owner: { name: "John Doe", username: "john_doe", avatar: defaultAvatar },
-    time: "2h",
-    content: "New React video drops tomorrow! 🔥 Stay tuned! #ReactJS #WebDev",
+    owner: { name: "ChalChitram Official", username: "chalchitram", avatar: defaultAvatar },
+    time: "2h ago",
+    content: "We've just updated our Creator Studio dashboard. You can now analyze your audience retention metrics with greater precision. Check the 'Analytics' tab.",
+    stats: { likes: 1240, comments: 45 }
   },
   {
     id: 2,
-    owner: { name: "Sarah Lee", username: "sarah_lee", avatar: defaultAvatar },
-    time: "5h",
-    content: "Growth isn’t linear — but it’s worth it. 💪 #Motivation",
+    owner: { name: "Dev Community", username: "dev_community", avatar: defaultAvatar },
+    time: "5h ago",
+    content: "System maintenance scheduled for tonight at 02:00 UTC. Uploads might be paused for approximately 30 minutes.",
+    stats: { likes: 856, comments: 12 }
   },
   {
     id: 3,
-    owner: { name: "TechWave", username: "techwave_official", avatar: defaultAvatar },
-    time: "1d",
-    content: "We just hit 10K subs! ❤️ Thanks everyone! #YouTubeCreator",
+    owner: { name: "Design Hub", username: "design_hub", avatar: defaultAvatar },
+    time: "1d ago",
+    content: "New tutorial series on 'Cinematic Color Grading' drops this Friday. Don't miss it!",
+    stats: { likes: 2100, comments: 89 }
   },
 ];
 
 const mockPlaylists = [
   {
     id: 1,
-    title: "React Mastery",
-    thumbnail:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80",
+    title: "Cinematic Storytelling",
+    thumbnail: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=800&q=80",
     videosCount: 12,
+    updated: "Updated today"
   },
   {
     id: 2,
-    title: "Frontend Dev Tips",
-    thumbnail:
-      "https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=800&q=80",
+    title: "Advanced React Patterns",
+    thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80",
     videosCount: 8,
+    updated: "Updated 2 days ago"
   },
   {
     id: 3,
-    title: "Tech Talks & Podcasts",
-    thumbnail:
-      "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=800&q=80",
-    videosCount: 5,
+    title: "Filmmaking 101",
+    thumbnail: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=800&q=80",
+    videosCount: 24,
+    updated: "Updated last week"
+  },
+  {
+    id: 4,
+    title: "Tech Reviews 2025",
+    thumbnail: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=800&q=80",
+    videosCount: 15,
+    updated: "Updated yesterday"
   },
 ];
 
+// Reusable Section Header to ensure consistency
+const SectionHeader = ({ title, actionText = "View All" }) => (
+  <div className="flex justify-between items-end mb-6 border-b border-white/5 pb-2">
+    <h2 className="text-xl font-bold text-white tracking-tight">{title}</h2>
+    <button className="text-xs font-medium text-gray-500 hover:text-white transition-colors flex items-center gap-1 uppercase tracking-wider group">
+      {actionText}
+      <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+    </button>
+  </div>
+);
+
 export default function HomeSection() {
   return (
-    <div className="flex flex-col gap-14">
-      {/* 🐦 TWEETS SECTION */}
+    <div className="w-full space-y-12 pb-12">
+      
+      {/* 1. COMMUNITY UPDATES (Tweets) */}
       <section>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-            Latest Tweets
-          </h2>
-          <button className="text-sm text-purple-400 hover:text-purple-300 transition font-medium">
-            View all →
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          {mockTweets.slice(0, 5).map((tweet) => (
+        <SectionHeader title="Community Updates" />
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {mockTweets.map((tweet) => (
             <div
               key={tweet.id}
-              className="group relative rounded-2xl p-5 bg-gradient-to-br from-zinc-900/70 via-zinc-950/60 to-black/70 backdrop-blur-md border border-zinc-800 hover:border-purple-600/40 transition-all duration-300 hover:-translate-y-[2px]"
+              className="bg-[#1a1a1a] border border-[#272727] p-5 rounded-xl hover:border-white/20 transition-all duration-200 group"
             >
               <div className="flex items-start gap-3">
                 <img
-                  src={tweet.owner.avatar || defaultAvatar}
+                  src={tweet.owner.avatar}
                   alt={tweet.owner.name}
-                  className="w-10 h-10 rounded-full object-cover ring-1 ring-zinc-700 group-hover:ring-purple-500 transition-all duration-300"
+                  className="w-10 h-10 rounded-full object-cover border border-[#272727]"
                 />
-                <div className="flex flex-col w-full">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-white font-semibold text-sm sm:text-base">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-semibold text-white truncate">
                       {tweet.owner.name}
                     </span>
-                    <span className="text-gray-400 text-sm">
-                      @{tweet.owner.username}
-                    </span>
-                    <span className="text-gray-500 text-xs sm:text-sm">
-                      • {tweet.time}
-                    </span>
+                    <span className="text-xs text-gray-500">{tweet.time}</span>
                   </div>
-                  <p className="text-gray-200 text-sm sm:text-base mt-1 leading-relaxed">
+                  <p className="text-sm text-gray-300 leading-relaxed mb-4">
                     {tweet.content}
                   </p>
+                  
+                  {/* Interaction Bar */}
+                  <div className="flex items-center gap-6 pt-3 border-t border-white/5">
+                    <button className="flex items-center gap-2 text-xs text-gray-500 hover:text-[#E1AD01] transition-colors">
+                      <Heart size={14} />
+                      <span>{tweet.stats.likes}</span>
+                    </button>
+                    <button className="flex items-center gap-2 text-xs text-gray-500 hover:text-white transition-colors">
+                      <MessageSquare size={14} />
+                      <span>{tweet.stats.comments}</span>
+                    </button>
+                    <button className="flex items-center gap-2 text-xs text-gray-500 hover:text-white transition-colors ml-auto">
+                      <Share2 size={14} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex justify-between text-gray-500 text-sm mt-4 max-w-md">
-                <button className="flex items-center gap-2 hover:text-blue-400 transition">
-                  <MessageCircle size={18} />
-                  <span>12</span>
-                </button>
-                <button className="flex items-center gap-2 hover:text-green-400 transition">
-                  <Repeat2 size={18} />
-                  <span>8</span>
-                </button>
-                <button className="flex items-center gap-2 hover:text-pink-500 transition">
-                  <Heart size={18} />
-                  <span>35</span>
-                </button>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 🎥 VIDEOS SECTION */}
+      {/* 2. LATEST VIDEOS */}
       <section>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold bg-gradient-to-r from-indigo-400 to-blue-500 bg-clip-text text-transparent">
-            Latest Videos
-          </h2>
-          <button className="text-sm text-indigo-400 hover:text-indigo-300 transition font-medium">
-            View all →
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <VideoCard data={[]} /> {/* placeholder – your existing component handles video layout */}
+        <SectionHeader title="Latest Videos" />
+        {/* Uses your existing grid system from VideoCard */}
+        <div className="w-full">
+           <VideoCard data={[]} /> 
         </div>
       </section>
 
-      {/* 🎶 PLAYLIST SECTION */}
+      {/* 3. FEATURED PLAYLISTS */}
       <section>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
-            Featured Playlists
-          </h2>
-          <button className="text-sm text-pink-400 hover:text-pink-300 transition font-medium">
-            View all →
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mockPlaylists.slice(0, 6).map((playlist) => (
+        <SectionHeader title="Featured Playlists" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {mockPlaylists.map((playlist) => (
             <div
               key={playlist.id}
-              className="relative group rounded-2xl overflow-hidden shadow-lg bg-zinc-900/60 border border-zinc-800 hover:border-pink-600/40 backdrop-blur-md transition-all duration-500 hover:-translate-y-[2px]"
+              className="group cursor-pointer bg-[#0f0f0f] hover:bg-[#1a1a1a] transition-colors duration-200 rounded-xl overflow-hidden"
             >
-              <img
-                src={playlist.thumbnail}
-                alt={playlist.title}
-                className="w-full h-44 object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition"></div>
-              <div className="absolute bottom-3 left-3">
-                <h3 className="text-white font-semibold text-lg drop-shadow-md">
+              {/* Thumbnail Container */}
+              <div className="relative aspect-video rounded-xl overflow-hidden mb-3 border border-[#272727]">
+                <img
+                  src={playlist.thumbnail}
+                  alt={playlist.title}
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                />
+                
+                {/* Playlist Overlay Strip */}
+                <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center text-white border-l border-white/10">
+                    <span className="text-lg font-bold">{playlist.videosCount}</span>
+                    <ListVideo size={20} className="mt-1 opacity-70" />
+                </div>
+                
+                {/* Hover Play Icon */}
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
+              </div>
+
+              {/* Playlist Info */}
+              <div className="px-1">
+                <h3 className="text-sm font-bold text-white line-clamp-1 group-hover:text-[#E1AD01] transition-colors">
                   {playlist.title}
                 </h3>
-                <span className="text-gray-400 text-sm">
-                  {playlist.videosCount} videos
-                </span>
+                <p className="text-xs text-gray-500 mt-1">
+                   {playlist.updated} • View full playlist
+                </p>
               </div>
             </div>
           ))}

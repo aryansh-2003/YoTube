@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import HeaderContext from "./context/HeaderContext";
 import defaultAvatar from "../assets/download.jpeg";
@@ -17,23 +17,23 @@ import {
   Tooltip,
 } from "recharts";
 import { useNavigate } from "react-router";
-import { motion } from "framer-motion";
+import { Camera, Edit2, Upload, Users, Eye, PlaySquare, Heart, MessageSquare } from "lucide-react";
 
 export default function ChannelDashboard() {
   const userData = useSelector((state) => state.auth.userData);
   const { sidebarOpen } = useContext(HeaderContext);
 
-  const [enlargedImage, setEnlargedImage] = useState(null);
   const [previewAvatar, setPreviewAvatar] = useState(null);
   const [previewCover, setPreviewCover] = useState(null);
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [coverFile, setCoverFile] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
-  const [videos, setvideos] = useState(null);
+  const [videos, setVideos] = useState([]);
   const [activeTab, setActiveTab] = useState("home");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  // Hidden file inputs refs
+  const avatarInputRef = useRef(null);
+  const coverInputRef = useRef(null);
 
   useEffect(() => {
     if (!userData) {
@@ -41,531 +41,336 @@ export default function ChannelDashboard() {
       return;
     }
 
-    let mounted = true;
-    setLoading(true);
-    setError("");
-
-    const load = async () => {
+    const loadData = async () => {
+      setLoading(true);
       try {
         const [dashRes, vidsRes] = await Promise.all([
           dashboardService.getDashboard(),
           dashboardService.getChannelVideos(userData._id),
         ]);
 
-        if (!mounted) return;
-
-        if (dashRes?.status === 200 || dashRes?.status === 201) {
-          setDashboardData(dashRes?.data?.data || null);
-        } else {
-          setDashboardData(dashRes?.data?.data || null);
+        if (dashRes?.status === 200) {
+          setDashboardData(dashRes?.data?.data);
         }
-
-        setvideos(vidsRes?.data?.data || []);
+        if (vidsRes?.status === 200) {
+          setVideos(vidsRes?.data?.data || []);
+        }
       } catch (err) {
-        console.error("Dashboard load error:", err);
-        setError("Unable to load dashboard. Please try again.");
+        console.error("Error loading dashboard:", err);
       } finally {
-        if (mounted) setLoading(false);
+        setLoading(false);
       }
     };
 
-    load();
-
-    return () => {
-      mounted = false;
-    };
+    loadData();
   }, [userData]);
 
-  const handleFileChange = (e, type) => {
-    const file = e?.target?.files?.[0];
+  const handleFileChange = async (e, type) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     const url = URL.createObjectURL(file);
+    const formData = new FormData();
 
-    if (type === "avatar") {
-      setPreviewAvatar(url);
-      setAvatarFile(file);
-    } else {
-      setPreviewCover(url);
-      setCoverFile(file);
-    }
-  };
-
-  const handleImageClick = (imageUrl) => {
-    if (!imageUrl) return;
-    setEnlargedImage(imageUrl);
-  };
-
-  const closeEnlarged = (e) => {
-    e?.stopPropagation();
-    setEnlargedImage(null);
-  };
-
-  const handleSaveChanges = async () => {
     try {
-      setLoading(true);
-      setError("");
-
-      if (avatarFile) {
-        const formData = new FormData();
-        formData.append("avatar", avatarFile);
+      if (type === "avatar") {
+        setPreviewAvatar(url);
+        formData.append("avatar", file);
         await authService.changeAvatar(formData);
-        setPreviewAvatar(null);
-        setAvatarFile(null);
-      }
-      if (coverFile) {
-        const formData = new FormData();
-        formData.append("coverImage", coverFile);
+      } else {
+        setPreviewCover(url);
+        formData.append("coverImage", file);
         await authService.changeCoverimage(formData);
-        setPreviewCover(null);
-        setCoverFile(null);
       }
-
-      try {
-        const res = await dashboardService.getDashboard();
-        if (res?.status === 200 || res?.status === 201) {
-          setDashboardData(res?.data?.data || dashboardData);
-        }
-      } catch (refreshErr) {
-        console.warn("Refresh after save failed:", refreshErr);
-      }
+      // Optional: Refresh dashboard data here if needed
     } catch (err) {
-      console.error("Save changes failed:", err);
-      setError("Failed to save changes. Try again.");
-    } finally {
-      setLoading(false);
+      console.error("Upload failed", err);
     }
   };
 
-  const prepareWeeklyChart = () => {
-    if (dashboardData?.weeklyViews && Array.isArray(dashboardData.weeklyViews)) {
-      return dashboardData.weeklyViews.map((d) => ({
-        day: d.day,
-        views: d.views,
-        uploads: d.uploads ?? 0,
-      }));
+  // Chart Data Preparation
+  const chartData = React.useMemo(() => {
+    if (dashboardData?.weeklyViews?.length) {
+      return dashboardData.weeklyViews;
     }
+    // Mock data for UI visualization if API is empty
+    return [
+      { day: "Mon", views: 120 },
+      { day: "Tue", views: 200 },
+      { day: "Wed", views: 150 },
+      { day: "Thu", views: 300 },
+      { day: "Fri", views: 250 },
+      { day: "Sat", views: 400 },
+      { day: "Sun", views: 380 },
+    ];
+  }, [dashboardData]);
 
-    const total = dashboardData?.totalVideoViews ?? 0;
-    const base = Math.floor(total / 7);
-    const labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    return labels.map((l, i) => {
-      const variance = Math.round(Math.sin(i + 1) * base * 0.12);
-      return {
-        day: l,
-        views: Math.max(0, base + variance),
-        uploads: Math.round(((dashboardData?.totalVideos ?? 0) / 7) * (1 + Math.sin(i) * 0.15)),
-      };
-    });
-  };
+  const statsCards = [
+    { label: "Total Subscribers", value: dashboardData?.totalSubscribers || 0, icon: Users },
+    { label: "Total Views", value: dashboardData?.totalVideoViews || 0, icon: Eye },
+    { label: "Total Videos", value: dashboardData?.totalVideos || 0, icon: PlaySquare },
+    { label: "Total Likes", value: dashboardData?.totalLikes || 0, icon: Heart },
+  ];
 
-  const chartData = prepareWeeklyChart();
+  const fmt = (n) => (n ? n.toLocaleString() : "0");
 
-  const recentActivity = (videos || [])
-    .slice()
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 6);
-
-  const fmt = (v) => (typeof v === "number" ? v.toLocaleString() : v ?? 0);
+  if (loading) {
+    return <div className="min-h-screen bg-[#0f0f0f] text-white flex items-center justify-center">Loading Dashboard...</div>;
+  }
 
   return (
-    <main className="pt-4 relative overflow-hidden">
-      {/* Anime Background Effects */}
-      <div className="fixed inset-0 pointer-events-none opacity-20 z-0">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-orange-600 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s' }}></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-red-600 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
-        <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-amber-500 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '5s' }}></div>
-      </div>
-
-      {/* Error Banner */}
-      {error && (
-        <div className="px-4 sm:px-6 relative z-10 mb-4">
-          <div className="rounded-xl overflow-hidden border-2 border-red-500/40 p-4 flex items-center justify-between"
-            style={{
-              background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(185, 28, 28, 0.1) 100%)',
-            }}>
-            <div className="text-sm text-red-200 font-semibold">{error}</div>
-            <button
-              onClick={() => {
-                setError("");
-                setLoading(true);
-                dashboardService.getDashboard().then(res => {
-                  if (res?.status === 200 || res?.status === 201) setDashboardData(res?.data?.data || null);
-                  setLoading(false);
-                }).catch(()=> setLoading(false));
-              }}
-              className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg text-sm font-bold hover:from-red-500 hover:to-red-600 transition-all border border-red-400/30"
+    <div className="min-h-screen bg-[#0f0f0f] text-white pb-20">
+      
+      {/* --- CHANNEL HEADER --- */}
+      <div className="relative w-full">
+        {/* Cover Image */}
+        <div className="group relative w-full h-48 md:h-64 bg-[#1a1a1a] overflow-hidden">
+          <img
+            src={previewCover || userData?.coverImage || defaultCover}
+            alt="cover"
+            className="w-full h-full object-cover"
+          />
+          {/* Edit Cover Overlay */}
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <button 
+              onClick={() => coverInputRef.current.click()}
+              className="flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white px-4 py-2 rounded-full backdrop-blur-sm transition-all border border-white/20"
             >
-              Retry
+              <Camera size={18} />
+              <span className="text-sm font-medium">Change Cover</span>
             </button>
+            <input ref={coverInputRef} type="file" hidden accept="image/*" onChange={(e) => handleFileChange(e, "cover")} />
           </div>
         </div>
-      )}
 
-      {/* COVER IMAGE with anime styling */}
-      <div className="w-full rounded-2xl overflow-hidden mx-4 sm:mx-2 sm:mr-3 lg:mx-6 h-32 sm:h-44 lg:h-56 relative z-10 border-2 border-amber-400/30 shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent z-20"></div>
-        <img
-          src={previewCover || userData?.coverImage || defaultCover}
-          alt="cover"
-          className="w-full h-full object-cover transition-all duration-700 transform hover:scale-110 hover:brightness-110 cursor-pointer"
-          onClick={() => handleImageClick(previewCover || userData?.coverImage || defaultCover)}
-        />
-      </div>
-
-      {/* PROFILE ROW with anime effects */}
-      <div className="px-4 sm:px-6 flex flex-col md:flex-row items-start md:items-center gap-4 -mt-12 md:-mt-16 relative z-20">
-        <div className="flex items-start gap-4">
-          <motion.div
-            layout
-            whileHover={{ scale: 1.05 }}
-            className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 shadow-2xl cursor-pointer group"
-            style={{
-              borderColor: 'rgb(251, 191, 36)',
-              boxShadow: '0 0 30px rgba(251, 191, 36, 0.5)'
-            }}
-            onClick={() => handleImageClick(previewAvatar || userData?.avatar || defaultAvatar)}
-          >
-            <div className="absolute -inset-2 bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 rounded-full opacity-60 blur-xl group-hover:opacity-100 transition-opacity duration-500"></div>
-            <img
-              className="relative w-full h-full object-cover z-10"
-              src={previewAvatar || userData?.avatar || defaultAvatar}
-              alt="avatar"
-            />
-          </motion.div>
-
-          <div className="flex flex-col flex-1">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-100" style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.4)' }}>
-              {userData?.fullname || "Full Name"}
-            </h1>
-            <div className="text-sm text-gray-300 mt-1 flex flex-col sm:flex-row gap-1 sm:gap-2">
-              <span className="text-amber-300 font-semibold">@{userData?.username || "username"}</span>
-              <span className="hidden sm:inline mx-2 text-amber-400/40">•</span>
-              <span className="text-amber-200/80">
-                Subscribers: <span className="font-bold text-amber-300">{fmt(dashboardData?.totalSubscribers)}</span>
-              </span>
-            </div>
-
-            <p className="text-gray-300 text-sm mt-2 max-w-xl">
-              {userData?.bio || "This channel is about tech and small tips ..."}
-            </p>
-
-            <div className="flex flex-wrap gap-2 mt-4">
-              <button
-                className="px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 text-white rounded-lg shadow-lg hover:shadow-orange-500/50 hover:scale-105 transition-all border border-amber-400/40 font-bold flex-1 sm:flex-none"
-                onClick={() => navigate(`/under-construction`)}
-                style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.5)' }}
-              >
-                Customize channel
-              </button>
-              <button
-                className="px-4 py-2 text-sm sm:text-base rounded-lg border-2 border-amber-400/40 hover:border-amber-400/70 transition-all font-bold flex-1 sm:flex-none text-amber-200 hover:bg-orange-500/20"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%)'
-                }}
-                onClick={() => navigate("/under-construction")}
-              >
-                Manage videos
-              </button>
-              <label className="px-4 py-2 text-sm sm:text-base rounded-lg cursor-pointer border-2 border-amber-400/40 hover:border-amber-400/70 transition-all font-bold flex-1 sm:flex-none text-amber-200 hover:bg-orange-500/20"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%)'
-                }}>
-                Change Cover
-                <input
-                  id="coverFileInput"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleFileChange(e, "cover")}
+        {/* Channel Info Bar */}
+        <div className="max-w-[1600px] mx-auto px-6 relative">
+          <div className="flex flex-col md:flex-row items-start gap-6 -mt-12 md:-mt-8 mb-8">
+            
+            {/* Avatar */}
+            <div className="relative group shrink-0">
+              <div className="w-32 h-32 rounded-full border-4 border-[#0f0f0f] bg-[#1a1a1a] overflow-hidden relative">
+                <img
+                  src={previewAvatar || userData?.avatar || defaultAvatar}
+                  alt="avatar"
+                  className="w-full h-full object-cover"
                 />
-              </label>
-              <label className="px-4 py-2 text-sm sm:text-base rounded-lg cursor-pointer border-2 border-amber-400/40 hover:border-amber-400/70 transition-all font-bold flex-1 sm:flex-none text-amber-200 hover:bg-orange-500/20"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%)'
-                }}>
-                Change DP
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleFileChange(e, "avatar")}
-                />
-              </label>
-
-              {(previewAvatar || previewCover) && (
-                <button
-                  onClick={handleSaveChanges}
-                  className="px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white rounded-lg transition-all font-bold flex-1 sm:flex-none shadow-lg hover:shadow-emerald-500/50 border border-green-400/30"
+                {/* Edit Avatar Overlay */}
+                <div 
+                  onClick={() => avatarInputRef.current.click()}
+                  className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
                 >
-                  Save Changes
-                </button>
-              )}
+                  <Camera size={24} className="text-white" />
+                </div>
+                <input ref={avatarInputRef} type="file" hidden accept="image/*" onChange={(e) => handleFileChange(e, "avatar")} />
+              </div>
             </div>
+
+            {/* Text Info */}
+            <div className="flex-1 pt-10 md:pt-10">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold text-white">{userData?.fullname}</h1>
+                  <div className="flex items-center gap-2 text-gray-400 text-sm mt-1">
+                    <span>@{userData?.username}</span>
+                    <span>•</span>
+                    <span>{fmt(dashboardData?.totalSubscribers)} subscribers</span>
+                    <span>•</span>
+                    <span>{dashboardData?.totalVideos} videos</span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => navigate('/under-construction')}
+                    className="bg-[#272727] hover:bg-[#333] text-white px-4 py-2 rounded-full text-sm font-medium transition-colors border border-transparent hover:border-gray-600"
+                  >
+                    Customize Channel
+                  </button>
+                  <button 
+                    onClick={() => navigate('/manage-videos')}
+                    className="bg-[#E1AD01] hover:bg-[#c29401] text-black px-4 py-2 rounded-full text-sm font-bold transition-colors"
+                  >
+                    Manage Videos
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-8 border-b border-[#272727] text-sm font-medium text-gray-400 overflow-x-auto">
+            {["Home", "Videos", "Playlists", "Community"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab.toLowerCase())}
+                className={`pb-3 capitalize transition-colors whitespace-nowrap ${
+                  activeTab === tab.toLowerCase()
+                    ? "text-white border-b-2 border-[#E1AD01]"
+                    : "hover:text-gray-200"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* TABS with anime blade style */}
-      <div className="mt-6 border-b-2 border-amber-400/30 px-4 sm:px-6 overflow-x-auto relative z-10">
-        <div className="flex gap-4 sm:gap-6 text-gray-400 text-sm font-bold whitespace-nowrap">
-          {["home", "videos", "playlists", "tweets"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-3 transition-all relative uppercase tracking-wide ${
-                activeTab === tab 
-                  ? "text-amber-300 border-b-3" 
-                  : "hover:text-amber-200"
-              }`}
-            >
-              {tab}
-              {activeTab === tab && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500 shadow-lg shadow-amber-400/50 rounded-t-full"></div>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* CONTENT */}
-      <div className="px-4 sm:px-6 py-6 text-white relative z-10">
-        {loading ? (
-          <div className="space-y-4">
-            <div className="h-6 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-lg w-48 animate-pulse border border-amber-400/20" />
-            <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-24 rounded-xl bg-gradient-to-br from-orange-500/10 to-red-500/10 animate-pulse border border-amber-400/20" />
+      {/* --- DASHBOARD CONTENT --- */}
+      <div className="max-w-[1600px] mx-auto px-6 py-8">
+        
+        {/* HOME TAB - Dashboard Overview */}
+        {activeTab === "home" && (
+          <div className="space-y-6">
+            
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {statsCards.map((stat, idx) => (
+                <div key={idx} className="bg-[#1a1a1a] border border-[#272727] p-6 rounded-xl flex items-start justify-between group hover:border-white/10 transition-colors">
+                  <div>
+                    <p className="text-sm text-gray-400 font-medium mb-1">{stat.label}</p>
+                    <h3 className="text-2xl font-bold text-white">{fmt(stat.value)}</h3>
+                  </div>
+                  <div className="p-3 bg-[#252525] rounded-lg text-[#E1AD01]">
+                    <stat.icon size={20} />
+                  </div>
+                </div>
               ))}
             </div>
-            <div className="h-64 rounded-xl bg-gradient-to-br from-orange-500/10 to-red-500/10 animate-pulse border border-amber-400/20" />
-          </div>
-        ) : (
-          <>
-            {/* HOME */}
-            {activeTab === "home" && (
-              <section className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
-                  {[
-                    { label: "Subscribers", value: dashboardData?.totalSubscribers ?? 0, path: `/user-subscriber/${userData?._id}` },
-                    { label: "Videos", value: dashboardData?.totalVideos ?? 0, path: "/manage-videos" },
-                    { label: "Views", value: dashboardData?.totalVideoViews ?? 0 },
-                    { label: "Likes", value: dashboardData?.totalLikes ?? 0 },
-                    { label: "Playlists", value: dashboardData?.totalPlaylist ?? 0 },
-                    { label: "Tweets", value: dashboardData?.totalTweet ?? 0 },
-                  ].map((kpi) => (
-                    <motion.div
-                      key={kpi.label}
-                      layout
-                      whileHover={{ translateY: -4, scale: 1.02 }}
-                      className="relative rounded-xl p-5 border-2 border-amber-400/30 hover:border-amber-400/60 transition-all duration-300 overflow-hidden group cursor-pointer"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(15, 20, 25, 0.8) 0%, rgba(26, 31, 46, 0.8) 100%)',
-                      }}
-                    >
-                      <div className="absolute -inset-1 bg-gradient-to-r from-orange-600 via-red-500 to-pink-600 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500"></div>
-                      
-                      {kpi.path && (
-                        <button
-                          aria-label={`open ${kpi.label}`}
-                          onClick={() => navigate(kpi.path)}
-                          className="absolute inset-0 z-10"
-                        />
-                      )}
 
-                      <div className="relative z-20">
-                        <div className="text-xs text-amber-300/70 font-semibold uppercase tracking-wider">{kpi.label}</div>
-                        <div className="text-3xl font-bold text-amber-100 mt-1" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.3)' }}>{fmt(kpi.value)}</div>
-                        <div className="text-xs text-gray-400 mt-2">Last 7 days</div>
-                      </div>
-                      
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent"></div>
-                    </motion.div>
-                  ))}
+            {/* Main Content Grid: Chart + Recent Videos */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Analytics Chart */}
+              <div className="lg:col-span-2 bg-[#1a1a1a] border border-[#272727] rounded-xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold text-white">Channel Analytics</h3>
+                  <span className="text-xs text-gray-500 uppercase font-semibold">Last 7 Days</span>
+                </div>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" />
+                      <XAxis 
+                        dataKey="day" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#888', fontSize: 12 }} 
+                        dy={10}
+                      />
+                      <YAxis 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#888', fontSize: 12 }} 
+                      />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#0f0f0f', border: '1px solid #333', borderRadius: '8px', color: '#fff' }}
+                        cursor={{ fill: '#272727' }}
+                      />
+                      <Bar 
+                        dataKey="views" 
+                        fill="#E1AD01" 
+                        radius={[4, 4, 0, 0]} 
+                        barSize={30}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Recent Uploads List */}
+              <div className="bg-[#1a1a1a] border border-[#272727] rounded-xl p-6 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-white">Recent Uploads</h3>
+                  <button 
+                    onClick={() => navigate('/manage-videos')}
+                    className="text-xs text-[#E1AD01] font-semibold hover:underline"
+                  >
+                    VIEW ALL
+                  </button>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <motion.div layout className="lg:col-span-2 rounded-xl p-5 border-2 border-amber-400/30 overflow-hidden relative"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(15, 20, 25, 0.9) 0%, rgba(26, 31, 46, 0.9) 100%)',
-                    }}>
-                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
-                    
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-amber-100 font-bold text-lg" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.3)' }}>Weekly Activity</h3>
-                        <p className="text-sm text-amber-300/60">Views & Uploads</p>
-                      </div>
-                      <div className="text-sm text-amber-300/60">Last 7 days</div>
-                    </div>
-
-                    <div style={{ height: 240 }} className="w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData}>
-                          <CartesianGrid stroke="#fb923c40" strokeDasharray="3 3" />
-                          <XAxis dataKey="day" stroke="#fbbf24" />
-                          <YAxis stroke="#fbbf24" />
-                          <Tooltip 
-                            wrapperStyle={{ 
-                              backgroundColor: "#1a1f2e", 
-                              borderRadius: 8,
-                              border: '2px solid rgba(251, 191, 36, 0.3)'
-                            }} 
-                            contentStyle={{
-                              backgroundColor: "#0f1419",
-                              border: 'none'
-                            }}
+                <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar max-h-[300px] lg:max-h-none">
+                  {videos.length === 0 ? (
+                    <div className="text-gray-500 text-sm text-center py-10">No videos uploaded yet.</div>
+                  ) : (
+                    videos.slice(0, 5).map((video) => (
+                      <div key={video._id} className="flex gap-3 group cursor-pointer" onClick={() => navigate(`/video/${video._id}`)}>
+                        <div className="w-24 h-14 bg-black rounded-md overflow-hidden shrink-0 border border-[#272727]">
+                          <img 
+                            src={video.thumbnail} 
+                            alt={video.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                           />
-                          <Bar dataKey="views" fill="url(#colorViews)" barSize={18} radius={[6, 6, 0, 0]} />
-                          <Bar dataKey="uploads" fill="url(#colorUploads)" barSize={8} radius={[3, 3, 0, 0]} />
-                          <defs>
-                            <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#f97316" stopOpacity={1}/>
-                              <stop offset="100%" stopColor="#dc2626" stopOpacity={0.8}/>
-                            </linearGradient>
-                            <linearGradient id="colorUploads" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#fbbf24" stopOpacity={1}/>
-                              <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.8}/>
-                            </linearGradient>
-                          </defs>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    <div className="mt-3 text-sm text-amber-300/50">
-                      Chart falls back to estimated distribution if backend weekly data is not available.
-                    </div>
-                  </motion.div>
-
-                  <motion.div layout className="rounded-xl p-5 border-2 border-amber-400/30 overflow-hidden relative"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(15, 20, 25, 0.9) 0%, rgba(26, 31, 46, 0.9) 100%)',
-                    }}>
-                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
-                    
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-amber-100 font-bold text-lg" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.3)' }}>Recent Uploads</h3>
-                      <span className="text-sm text-amber-300/60">{recentActivity.length} items</span>
-                    </div>
-
-                    <div className="space-y-2 overflow-auto max-h-60 mt-4 custom-scrollbar">
-                      {recentActivity.length === 0 && (
-                        <div className="text-sm text-amber-300/50">No recent uploads</div>
-                      )}
-
-                      {recentActivity.map((v) => (
-                        <div
-                          key={v._id || v.id || v.videoFile}
-                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-orange-500/10 transition-all border border-transparent hover:border-amber-400/30 group"
-                        >
-                          <img
-                            src={v.thumbnail || defaultCover}
-                            alt={v.title || "video"}
-                            className="w-14 h-10 object-cover rounded-md cursor-pointer border border-amber-400/20 group-hover:border-amber-400/50 transition-all"
-                            onClick={() => handleImageClick(v.thumbnail || defaultCover)}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold truncate text-amber-100">{v.title || "Untitled"}</div>
-                            <div className="text-xs text-amber-300/60 truncate">{v.description || ""}</div>
-                          </div>
-                          <div className="text-xs text-amber-300/60 text-right">
-                            <div className="font-semibold">{fmt(v.views ?? 0)} views</div>
-                            <div className="text-gray-500">{v.createdAt ? new Date(v.createdAt).toLocaleDateString() : ""}</div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-white truncate group-hover:text-[#E1AD01] transition-colors">
+                            {video.title}
+                          </h4>
+                          <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                            <span>{fmt(video.views)} views</span>
+                            <span>•</span>
+                            <span>{new Date(video.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-4">
-                      <button onClick={() => navigate("/under-construction")} className="w-full px-4 py-2.5 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg text-white font-bold hover:from-orange-500 hover:to-red-500 transition-all shadow-lg hover:shadow-orange-500/30 border border-amber-400/30">
-                        View all videos
-                      </button>
-                    </div>
-                  </motion.div>
+                      </div>
+                    ))
+                  )}
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {[
-                    { label: "Avg watch time", value: "4m 12s", sub: "Estimation" },
-                    { label: "Engagement rate", value: "2.8%", sub: "Likes / Views" },
-                    { label: "New subs (7d)", value: fmt(dashboardData?.newSubscribers7d ?? 0), sub: "Compared to previous week" },
-                  ].map((stat) => (
-                    <div key={stat.label} className="rounded-xl p-5 border-2 border-amber-400/30 overflow-hidden relative"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(15, 20, 25, 0.9) 0%, rgba(26, 31, 46, 0.9) 100%)',
-                      }}>
-                      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
-                      <div className="text-sm text-amber-300/70 font-semibold">{stat.label}</div>
-                      <div className="text-2xl font-bold text-amber-100 mt-1" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.3)' }}>{stat.value}</div>
-                      <div className="text-xs text-amber-300/50 mt-1">{stat.sub}</div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* VIDEOS TAB */}
-            {activeTab === "videos" && <VideoCard data={videos ? videos : ""} />}
-
-            {/* PLAYLISTS TAB */}
-            {activeTab === "playlists" && (
-              <p className="text-amber-300/60">Playlists Section (testing placeholder)</p>
-            )}
-
-            {/* TWEETS TAB */}
-            {activeTab === "tweets" && (
-              <div>
-                <p className="text-amber-300/60 mb-4">Tweet Section (testing placeholder)</p>
-                <TweetSection />
+                
+                <button 
+                  onClick={() => navigate('/createpost')}
+                  className="w-full mt-6 py-2.5 rounded-lg border border-dashed border-[#444] text-gray-400 hover:text-white hover:border-gray-200 hover:bg-[#222] transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                >
+                  <Upload size={16} />
+                  Upload New Video
+                </button>
               </div>
-            )}
-          </>
+            </div>
+          </div>
+        )}
+
+        {/* VIDEOS TAB */}
+        {activeTab === "videos" && (
+          <div className="w-full">
+            <VideoCard data={videos} />
+          </div>
+        )}
+
+        {/* COMMUNITY TAB (Previously Tweets) */}
+        {activeTab === "community" && (
+          <div className="max-w-2xl mx-auto">
+             <TweetSection />
+          </div>
+        )}
+
+        {/* PLAYLISTS TAB Placeholder */}
+        {activeTab === "playlists" && (
+          <div className="text-center py-20 text-gray-500">
+            <h3 className="text-lg font-medium text-white mb-2">No Playlists Created</h3>
+            <p className="text-sm">Create playlists to organize your content for viewers.</p>
+          </div>
         )}
       </div>
 
-      {/* ENLARGED IMAGE VIEWER with anime styling */}
-      {enlargedImage && (
-        <div
-          className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50 transition-all"
-          style={{
-            background: 'radial-gradient(circle, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9))'
-          }}
-          onClick={closeEnlarged}
-        >
-          <div className="relative max-w-4xl w-[90%]" onClick={(e) => e.stopPropagation()}>
-            <div className="absolute -inset-2 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-2xl opacity-40 blur-2xl"></div>
-            <img
-              src={enlargedImage}
-              alt="enlarged"
-              className="relative rounded-2xl shadow-2xl object-contain max-h-[90vh] mx-auto border-4 border-amber-400/50"
-            />
-            <button
-              className="absolute -top-4 -right-4 text-white text-2xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 rounded-full w-12 h-12 flex items-center justify-center transition-all shadow-lg border-2 border-amber-400/50"
-              onClick={closeEnlarged}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-
+      {/* Global styles for this component */}
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(251, 191, 36, 0.1);
-          border-radius: 10px;
+          background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(180deg, #f97316, #dc2626);
-          border-radius: 10px;
+          background: #333;
+          border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(180deg, #fb923c, #ef4444);
+          background: #555;
         }
       `}</style>
-    </main>
+    </div>
   );
 }

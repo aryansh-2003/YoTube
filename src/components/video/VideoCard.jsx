@@ -1,11 +1,9 @@
 import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 import { useNavigate } from 'react-router';
-import { MoreVertical, Pencil, ListPlus, Play, Eye } from 'lucide-react';
+import { MoreVertical, Pencil, ListPlus, Play, CheckCircle2, PlayCircle, PlayCircleIcon } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import defaultAvatar from '../../assets/download.jpeg';
 import { timeAgo, formatVideoDuration } from '../TimeResolver.js';
@@ -54,245 +52,166 @@ function Media({ loading = false, data = [] }) {
         />
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 w-full">
+      {/* Grid Layout matches Home.js structure */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8 w-full">
         {content && content.length > 0 ? (
           content.map((item, index) => {
             const owner = item?.ownerInfo?.[0] || {};
             const isOwner = item?.owner === userData?._id;
-            const isHovered = hoveredCard === item?._id;
 
             return (
               <div
                 key={item?._id || index}
-                className="group relative animate-fade-in-scale"
-                style={{ animationDelay: `${index * 30}ms` }}
+                className="group flex flex-col gap-3 cursor-pointer"
                 onMouseEnter={() => setHoveredCard(item?._id)}
                 onMouseLeave={() => setHoveredCard(null)}
+                onClick={() => item?._id && navigate(`/video/${item._id}`)}
               >
-                {/* Glow effect background */}
-                <div className="absolute -inset-1 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500"></div>
-
-                {/* Main card */}
-                <div className="relative bg-black rounded-xl overflow-hidden transition-all duration-300 group-hover:scale-105">
-                  
-                  {/* Thumbnail container */}
-                  <div
-                    className="relative w-full aspect-video overflow-hidden cursor-pointer bg-black"
-                    onClick={() => item?._id && navigate(`/video/${item._id}`)}
-                  >
-                    {item ? (
-                      <>
-                        <img
-                          src={item.thumbnail || defaultAvatar}
-                          alt={item.title || 'video thumbnail'}
-                          onError={(e) => (e.currentTarget.src = defaultAvatar)}
-                          className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
-                        />
-                        
-                        {/* Overlay gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        
-                        {/* Play button overlay */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                          <div className="relative">
-                            <div className="relative bg-white/95 hover:bg-white rounded-full p-3 shadow-2xl transition-all duration-300 hover:scale-110">
-                              <Play className="w-5 h-5 text-black fill-black" />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Duration badge */}
-                        {item?.duration && (
-                          <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/90 text-white text-xs font-semibold rounded">
-                            {formatVideoDuration(item.duration)}
-                          </div>
-                        )}
-
-                        {/* Status indicator */}
-                        {isOwner && (
-                          <div className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 text-black text-xs font-bold rounded">
-                            YOUR VIDEO
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <Skeleton
-                        variant="rectangular"
-                        sx={{ width: '100%', height: '100%', bgcolor: '#1a1a1a' }}
+                {/* --- Thumbnail Section --- */}
+                <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-[#1a1a1a]">
+                  {item ? (
+                    <>
+                      <img
+                        src={item.thumbnail || defaultAvatar}
+                        alt={item.title || 'video thumbnail'}
+                        onError={(e) => (e.currentTarget.src = defaultAvatar)}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
+
+                      {/* Dark Overlay on Hover */}
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                      {/* "YOUR VIDEO" Badge - Matches Image (Gold/Yellow) */}
+                      {isOwner && (
+                        <div className="absolute top-2 left-2 px-2 py-1 bg-[#fbbf24] rounded-md shadow-lg z-10">
+                          <span className="text-[10px] font-extrabold text-black uppercase tracking-wider block leading-none">
+                            YOUR VIDEO
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Duration Badge - Bottom Right */}
+                      {item?.duration && (
+                        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/80 backdrop-blur-sm rounded text-xs font-medium text-white">
+                          {formatVideoDuration(item.duration)}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <Skeleton variant="rectangular" width="100%" height="100%" sx={{ bgcolor: '#262626' }} />
+                  )}
+                </div>
+
+                {/* --- Info Section --- */}
+                <div className="flex gap-3 px-1">
+                  {/* Avatar */}
+                  <div className="flex-shrink-0 pt-0.5">
+                    {item ? (
+                      <img
+                        src={owner?.avatar || defaultAvatar}
+                        alt="avatar"
+                        onError={(e) => (e.currentTarget.src = defaultAvatar)}
+                        className="w-9 h-9 rounded-full object-cover border border-white/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/channel/${owner?.username}`);
+                        }}
+                      />
+                    ) : (
+                      <Skeleton variant="circular" width={36} height={36} sx={{ bgcolor: '#262626' }} />
                     )}
                   </div>
 
-                  {/* Content section */}
-                  <div className="p-3">
-                    <div className="flex gap-3 items-start">
-                      {/* Channel avatar */}
-                      {item ? (
-                        <button
+                  {/* Text Details */}
+                  <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                    {item ? (
+                      <>
+                        {/* Title */}
+                        <h3 className="text-base font-bold text-white leading-tight line-clamp-2 group-hover:text-[#fbbf24] transition-colors">
+                          {item.title || 'Untitled Video'}
+                        </h3>
+
+                        {/* Channel Name & Verified Tick */}
+                        <div 
+                          className="flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors w-fit"
                           onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/channel/${owner?.username}`);
+                             e.stopPropagation();
+                             navigate(`/channel/${owner?.username}`);
                           }}
-                          className="flex-shrink-0"
                         >
-                          <img
-                            src={owner?.avatar || defaultAvatar}
-                            onError={(e) => (e.currentTarget.src = defaultAvatar)}
-                            alt="channel avatar"
-                            className="w-9 h-9 rounded-full object-cover"
-                          />
-                        </button>
-                      ) : (
-                        <Skeleton variant="circular" width={36} height={36} sx={{ bgcolor: '#1a1a1a' }} />
-                      )}
-
-                      {/* Video info */}
-                      <div className="flex-1 min-w-0">
-                        {item ? (
-                          <>
-                            <h3
-                              className="text-sm font-semibold text-white leading-tight line-clamp-2 mb-1 cursor-pointer hover:text-white/80 transition-colors"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/video/${item._id}`);
-                              }}
-                            >
-                              {item.title || 'Untitled'}
-                            </h3>
-
-                            <button
-                              className="text-xs text-white/60 hover:text-white/80 transition-colors text-left block mb-1"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/channel/${owner?.username}`);
-                              }}
-                            >
-                              {owner?.fullname || owner?.username || 'Unknown Channel'}
-                            </button>
-
-                            <div className="flex items-center gap-1.5 text-xs text-white/60">
-                              <div className="flex items-center gap-1">
-                                <Eye className="w-3 h-3" />
-                                <span>{item.views ? `${item.views.toLocaleString()}` : '0'} views</span>
-                              </div>
-                              {item.createdAt && (
-                                <>
-                                  <span>•</span>
-                                  <span>{timeAgo(item.createdAt)}</span>
-                                </>
-                              )}
-                            </div>
-                          </>
-                        ) : (
-                          <Box sx={{ width: '100%' }}>
-                            <Skeleton width="100%" height={16} sx={{ mb: 0.5, bgcolor: '#1a1a1a' }} />
-                            <Skeleton width="70%" height={14} sx={{ mb: 0.5, bgcolor: '#1a1a1a' }} />
-                            <Skeleton width="50%" height={12} sx={{ bgcolor: '#1a1a1a' }} />
-                          </Box>
-                        )}
-                      </div>
-
-                      {/* Options menu */}
-                      {item && (
-                        <div className="relative flex-shrink-0">
-                          <button
-                            onClick={(e) => handleMenuToggle(e, item._id)}
-                            className="p-1.5 rounded-full hover:bg-white/10 transition-all duration-200"
-                          >
-                            <MoreVertical
-                              size={16}
-                              className="text-white/60 hover:text-white transition-colors"
-                            />
-                          </button>
-
-                          {menuOpen === item._id && (
-                            <>
-                              {/* Backdrop */}
-                              <div
-                                className="fixed inset-0 z-40"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setMenuOpen(null);
-                                }}
-                              ></div>
-
-                              {/* Menu */}
-                              <div
-                                className="absolute right-0 mt-2 w-48 bg-neutral-900 border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden animate-scale-in"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {isOwner && (
-                                  <>
-                                    <button className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-all duration-200">
-                                      <DeleteBtn videoId={item._id} />
-                                      <span>Delete Video</span>
-                                    </button>
-                                    <button
-                                      onClick={() => handleMenuClick('Update', item._id)}
-                                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-all duration-200"
-                                    >
-                                      <Pencil size={16} />
-                                      <span>Edit Video</span>
-                                    </button>
-                                  </>
-                                )}
-                                <button
-                                  onClick={() => handleMenuClick('Add to Playlist', item._id)}
-                                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-all duration-200"
-                                >
-                                  <ListPlus size={16} />
-                                  <span>Add to Playlist</span>
-                                </button>
-                              </div>
-                            </>
-                          )}
+                          <span>{owner?.fullname || owner?.username || 'Unknown'}</span>
+                          {/* Verified Tick Icon */}
+                          <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10" />
                         </div>
+
+                        {/* Views & Date */}
+                        <div className="text-xs text-gray-500 font-medium">
+                          {item.views ? `${item.views.toLocaleString()} views` : '0 views'}
+                          <span className="mx-1">•</span>
+                          {item.createdAt && timeAgo(item.createdAt)}
+                        </div>
+                      </>
+                    ) : (
+                      <Box sx={{ width: '100%' }}>
+                        <Skeleton width="90%" height={20} sx={{ mb: 1, bgcolor: '#262626' }} />
+                        <Skeleton width="60%" height={16} sx={{ bgcolor: '#262626' }} />
+                      </Box>
+                    )}
+                  </div>
+
+                  {/* Menu Button (Three Dots) */}
+                  {item && (
+                    <div className="relative">
+                      <button
+                        onClick={(e) => handleMenuToggle(e, item._id)}
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-white/10 transition-all"
+                      >
+                        <MoreVertical size={18} className="text-white" />
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      {menuOpen === item._id && (
+                        <>
+                          <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setMenuOpen(null); }} />
+                          <div className="absolute right-0 top-8 w-48 bg-[#1f1f1f] border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden py-1">
+                            {isOwner && (
+                              <>
+                                <button className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                                  <DeleteBtn videoId={item._id} />
+                                  <span>Delete</span>
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleMenuClick('Update', item._id); }}
+                                  className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                                >
+                                  <Pencil size={16} />
+                                  <span>Edit</span>
+                                </button>
+                              </>
+                            )}
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleMenuClick('Add to Playlist', item._id); }}
+                              className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                            >
+                              <ListPlus size={16} />
+                              <span>Save to Playlist</span>
+                            </button>
+                          </div>
+                        </>
                       )}
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             );
           })
         ) : (
-          <div className="col-span-full flex items-center justify-center py-16">
-            <VideoSkeleton count={8} />
+          /* Loading Skeletons */
+          <div className="col-span-full py-12">
+             <VideoSkeleton count={8} />
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        @keyframes fade-in-scale {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        .animate-fade-in-scale {
-          animation: fade-in-scale 0.3s ease-out forwards;
-          opacity: 0;
-        }
-
-        .animate-scale-in {
-          animation: scale-in 0.15s ease-out forwards;
-        }
-      `}</style>
     </>
   );
 }

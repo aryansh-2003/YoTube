@@ -10,7 +10,7 @@ function PrivateRoute({children}) {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [loading,setloading] = useState("false")
-  const userData = useSelector(state=>state.auth.userData)
+  const userData = useSelector(state => state.auth.userData)
 
   
   
@@ -18,8 +18,7 @@ function PrivateRoute({children}) {
     if(!userData){
     setloading("loading")
     authService.getCurrentUser().then((userData)=>{
-      console.log(userData)
-      if(userData === undefined) {navigate('/')}
+      if(userData == null || undefined) navigate('/')
       dispatch(login(userData?.data?.data))
       setloading("false")
     }).catch((error)=>{console.log(error)})

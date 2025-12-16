@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import { useNavigate } from 'react-router';
 
 
 export class AuthService{
@@ -22,6 +22,7 @@ export class AuthService{
         try {
             const data = await this.instance.post('/login',{email:email,password:password},{withCredentials:true})
             const {acessToken,refreshToken} = data?.data?.data
+            localStorage.removeItem(acessToken,refreshToken)
             localStorage.setItem('token',acessToken)
             localStorage.setItem('refreshToken',refreshToken)
             axios.defaults.headers.common['Authorization'] =   `Bearer ${acessToken}`
@@ -56,17 +57,33 @@ export class AuthService{
     async getCurrentUser(){
         try {
              const token = localStorage.getItem('token')
+            console.log(token)
              if(!token) return null
              axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-             return await this.instance.get('/current-user',
+             const response =  await this.instance.get('/current-user',
                 {
                     headers: { Authorization:`Bearer ${token}` }
                 }
             )
 
+            console.log(response,token)
+            return response
 
         } catch (error) {
-            console.log(error)
+            if(error.status === 401){
+                console.log("hello",error.status)
+                this.instance.post(`/refresh-token`,{refreshToken:localStorage.getItem('refreshToken')}).then((res) => {
+                    if(res.status == 200){
+                    console.log(res + ',' + "accessToken:" + res.data?.data?.accessToken + "," + "refreshToken:" + res.data?.data?.refreshToken)
+                    localStorage.setItem('token',res.data?.data?.accessToken)
+                    localStorage.setItem('refreshToken',res.data?.data?.refreshToken)
+                    axios.defaults.headers.common['Authorization'] =   `Bearer ${res.data?.data?.accessToken}`
+                    window.location.reload(true);
+                    }
+                })
+            }
+            // this.getCurrentUser()
+            console.log(error.status)
         }
     }
 

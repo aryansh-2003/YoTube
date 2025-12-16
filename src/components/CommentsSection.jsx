@@ -4,8 +4,7 @@ import {
   Edit3,
   Trash2,
   X,
-  Sparkles,
-  MessageCircle,
+  AlignLeft, // Used for Sort icon style
 } from "lucide-react";
 import commentService from "../../Service/comment";
 import DisplayPic from "../components/DisplayPic";
@@ -84,221 +83,204 @@ export default function CommentsSection({ onAddComment, video }) {
   };
 
   return (
-    <div className="text-white space-y-4 relative">
-      {/* Anime character decorations - floating */}
-      <div className="fixed top-20 right-4 w-16 h-16 opacity-20 pointer-events-none z-0">
-        <div className="text-6xl animate-bounce">🍥</div>
-      </div>
-      <div className="fixed bottom-32 left-4 w-16 h-16 opacity-20 pointer-events-none z-0">
-        <div className="text-6xl" style={{ animation: 'float 3s ease-in-out infinite' }}>⚔️</div>
-      </div>
-      <div className="fixed top-1/3 right-8 w-12 h-12 opacity-15 pointer-events-none z-0">
-        <div className="text-5xl" style={{ animation: 'float 4s ease-in-out infinite 1s' }}>🔥</div>
-      </div>
-
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-      `}</style>
-
-      {/* Header */}
-      <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl bg-gradient-to-r from-slate-900/90 via-slate-800/90 to-slate-900/90 backdrop-blur-md border border-orange-500/30 shadow-lg">
-        <div className="flex items-center space-x-2">
-          <MessageCircle className="w-4 h-4 text-orange-400" strokeWidth={2.5} />
-          <h3 className="text-base sm:text-lg font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
-            {comments?.length || 0} Comments
-          </h3>
-        </div>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="mt-2 sm:mt-0 bg-slate-800/80 border border-orange-500/30 text-orange-100 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-orange-400 transition-all"
-        >
-          <option value="top" className="bg-slate-900">⚡ Top</option>
-          <option value="newest" className="bg-slate-900">🔥 Newest</option>
-        </select>
-      </div>
-
-      {/* Add Comment Box */}
-      <div className="relative group">
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-pink-500/10 rounded-xl blur-md group-hover:blur-lg transition-all"></div>
-        <div className="relative flex space-x-2 bg-slate-900/80 backdrop-blur-md p-3 rounded-xl border border-orange-500/30 shadow-lg">
-          <div className="relative">
-            <img
-              src={userData ? userData?.avatar : defaultAvatar}
-              alt="User avatar"
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-orange-500/30"
-            />
-            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-gradient-to-br from-orange-400 to-red-500 rounded-full border border-slate-900"></div>
-          </div>
-          <div className="flex-1">
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <input
-                type="text"
-                onFocus={() => setShowCommentInput(true)}
-                {...register("content", { required: "Comment cannot be empty" })}
-                placeholder="Share your thoughts..."
-                className="w-full bg-transparent border-b border-orange-500/30 pb-2 focus:border-orange-400 outline-none text-sm placeholder-slate-500 transition-all"
-              />
-              {errors.content && (
-                <p className="text-red-400 text-xs mt-1">{errors.content.message}</p>
-              )}
-              {showCommentInput && (
-                <div className="flex justify-end mt-2 space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setNewComment("");
-                      setShowCommentInput(false);
-                    }}
-                    className="px-3 py-1 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-1 text-xs font-bold bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 rounded-lg transition-all shadow-md shadow-orange-500/30"
-                  >
-                    Post
-                  </button>
-                </div>
-              )}
-            </form>
-          </div>
-        </div>
-      </div>
-
-      {/* Comments List - All in one container */}
-      <div className="relative bg-slate-900/60 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-xl overflow-hidden">
-        {/* Naruto-style header decoration */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500"></div>
+    <div className="text-white w-full max-w-[1280px] mx-auto font-sans">
+      
+      {/* Header: Count and Sort */}
+      <div className="flex items-center gap-8 mb-6">
+        <h3 className="text-xl font-bold text-white">
+          {comments?.length || 0} Comments
+        </h3>
         
-        <div className="divide-y divide-slate-700/30">
-          {comments?.map((comment, index) => (
-            <div
-              key={comment._id}
-              className="relative group hover:bg-slate-800/30 transition-all p-3"
-            >
-              {/* Subtle side accent */}
-              <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-orange-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-all"></div>
-              
-              <div className="flex space-x-2.5">
-                <div className="relative flex-shrink-0">
-                  <DisplayPic className="ring-2 ring-blue-500/20" children={comment?.ownerInfo?.[0]} />
-                  {index % 3 === 0 && <div className="absolute -bottom-1 -right-1 text-xs">🍥</div>}
-                  {index % 3 === 1 && <div className="absolute -bottom-1 -right-1 text-xs">⚡</div>}
-                  {index % 3 === 2 && <div className="absolute -bottom-1 -right-1 text-xs">🔥</div>}
-                </div>
+        <div className="relative group cursor-pointer flex items-center gap-2">
+           <AlignLeft className="w-5 h-5 text-white" />
+           <span className="text-sm font-semibold text-white">Sort by</span>
+           
+           {/* Invisible Select overlaying the Sort By text to keep logic same but design clean */}
+           <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+          >
+            <option value="top">Top comments</option>
+            <option value="newest">Newest first</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Add Comment Input Section */}
+      <div className="flex gap-4 mb-8">
+        <div className="flex-shrink-0">
+          <img
+            src={userData ? userData?.avatar : defaultAvatar}
+            alt="User avatar"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+        </div>
+        <div className="flex-1">
+          <form onSubmit={handleSubmit(onSubmit)} className="relative">
+            <input
+              type="text"
+              onFocus={() => setShowCommentInput(true)}
+              {...register("content", { required: "Comment cannot be empty" })}
+              placeholder="Add a comment..."
+              autoComplete="off"
+              className="w-full bg-transparent border-b border-[#3f3f3f] pb-2 focus:border-white focus:border-b-2 outline-none text-[15px] placeholder-gray-400 transition-colors"
+            />
+            {errors.content && (
+              <p className="text-red-500 text-xs mt-1">{errors.content.message}</p>
+            )}
+            
+            {showCommentInput && (
+              <div className="flex justify-between items-center mt-3">
+                 <div className="text-gray-400 text-lg">☺</div> {/* Emoji placeholder */}
+                 <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewComment("");
+                        setShowCommentInput(false);
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-white hover:bg-[#3f3f3f] rounded-full transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 text-sm font-medium bg-[#3ea6ff] text-black hover:bg-[#65b8ff] rounded-full transition-colors disabled:bg-[#202020] disabled:text-gray-500"
+                    >
+                      Comment
+                    </button>
+                 </div>
+              </div>
+            )}
+          </form>
+        </div>
+      </div>
+
+      {/* Comments List */}
+      <div className="space-y-6">
+        {comments?.map((comment) => (
+          <div key={comment._id} className="group relative flex gap-4">
+            
+            {/* Avatar */}
+            <div className="flex-shrink-0">
+              <DisplayPic 
+                 className="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-90" 
+                 children={comment?.ownerInfo?.[0]} 
+              />
+            </div>
+            
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              {/* Metadata Row */}
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[13px] font-semibold text-white cursor-pointer hover:underline">
+                  @{comment?.ownerInfo?.[0]?.fullname?.replace(/\s+/g, '') || "User"}
+                </span>
+                <span className="text-[12px] text-gray-400">
+                  {comment ? timeAgo(comment?.createdAt) : ""}
+                </span>
+              </div>
+
+              {/* Comment Text */}
+              <p className="text-[14px] leading-5 text-white whitespace-pre-wrap mb-2">
+                {comment.content}
+              </p>
+
+              {/* Actions Row (Like, Reply, Edit menu) */}
+              <div className="flex items-center gap-2">
+                <LikeComment 
+                  commentId={comment._id} 
+                  userId={userData?._id} 
+                  isLiked={comment ? comment.isLiked : ""} 
+                  totalLikes={comment ? comment.totalLikes : ""} 
+                />
                 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-semibold text-sm bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                          {comment?.ownerInfo?.[0]?.fullname}
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          {comment ? timeAgo(comment?.createdAt) : ""}
-                        </span>
-                      </div>
-                      <p className="text-sm leading-relaxed text-slate-200">
-                        {comment.content}
-                      </p>
-                    </div>
-
-                    {/* Options Menu */}
-                    {userData?._id === comment?.owner && (
-                      <div className="relative ml-2 flex-shrink-0">
-                        <button
-                          onClick={() =>
-                            setMenuOpenId(
-                              menuOpenId === comment._id ? null : comment._id
-                            )
-                          }
-                          className="p-1.5 rounded-lg hover:bg-slate-700/50 transition-all opacity-0 group-hover:opacity-100"
-                        >
-                          <MoreHorizontal size={14} className="text-slate-400" />
-                        </button>
-                        {menuOpenId === comment._id && (
-                          <div className="absolute right-0 mt-1 w-32 bg-slate-900 border border-orange-500/30 rounded-lg shadow-xl z-10 overflow-hidden">
-                            <button
-                              onClick={() => {
-                                setEditingComment(comment);
-                                setEditedContent(comment.content);
-                                setMenuOpenId(null);
-                              }}
-                              className="flex items-center w-full px-3 py-2 text-xs text-blue-300 hover:bg-slate-800 transition-colors"
-                            >
-                              <Edit3 size={12} className="mr-2" />
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(comment._id)}
-                              className="flex items-center w-full px-3 py-2 text-xs text-red-400 hover:bg-slate-800 transition-colors"
-                            >
-                              <Trash2 size={12} className="mr-2" />
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Like Component */}
-                  <div className="mt-2">
-                    <LikeComment commentId={comment._id} userId={userData?._id} />
-                  </div>
-                </div>
+                <button className="px-3 py-1.5 rounded-full text-[12px] font-semibold text-white hover:bg-[#3f3f3f] transition-colors ml-2">
+                  Reply
+                </button>
               </div>
             </div>
-          ))}
-        </div>
+
+            {/* Options Menu (Three Dots) - Visible on Hover */}
+            {userData?._id === comment?.owner && (
+              <div className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() =>
+                    setMenuOpenId(
+                      menuOpenId === comment._id ? null : comment._id
+                    )
+                  }
+                  className="p-2 rounded-full hover:bg-[#3f3f3f] text-white"
+                >
+                  <MoreHorizontal size={20} />
+                </button>
+                
+                {/* Dropdown Menu */}
+                {menuOpenId === comment._id && (
+                  <div className="absolute right-0 mt-2 w-36 bg-[#282828] rounded-xl shadow-xl py-2 z-20 ring-1 ring-white/10">
+                    <button
+                      onClick={() => {
+                        setEditingComment(comment);
+                        setEditedContent(comment.content);
+                        setMenuOpenId(null);
+                      }}
+                      className="flex items-center w-full px-4 py-2.5 text-[14px] text-gray-200 hover:bg-[#3f3f3f] transition-colors gap-3"
+                    >
+                      <Edit3 size={16} />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(comment._id)}
+                      className="flex items-center w-full px-4 py-2.5 text-[14px] text-gray-200 hover:bg-[#3f3f3f] transition-colors gap-3"
+                    >
+                      <Trash2 size={16} />
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* Edit Comment Modal */}
       {editingComment && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="relative w-full max-w-md">
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-pink-500/20 rounded-2xl blur-xl"></div>
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#212121] w-full max-w-[600px] rounded-2xl p-6 shadow-2xl ring-1 ring-white/10 relative">
             
-            <div className="relative bg-slate-900 p-5 rounded-2xl border border-orange-500/40 shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-medium text-white">Edit comment</h2>
               <button
                 onClick={() => setEditingComment(null)}
-                className="absolute top-3 right-3 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-all"
+                className="text-gray-400 hover:bg-[#3f3f3f] p-2 rounded-full transition-colors"
               >
-                <X size={16} />
+                <X size={20} />
               </button>
-              
-              <h2 className="text-lg font-bold mb-4 bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent flex items-center">
-                <Edit3 className="mr-2 text-orange-400" size={18} />
-                Edit Comment
-              </h2>
-              
-              <textarea
-                value={editedContent}
-                onChange={(e) => setEditedContent(e.target.value)}
-                rows={3}
-                className="w-full bg-slate-800/50 border border-orange-500/30 focus:border-orange-400 rounded-xl p-3 outline-none text-sm resize-none transition-all"
-                placeholder="Write your updated comment..."
-              />
-              
-              <div className="flex justify-end space-x-2 pt-4">
-                <button
-                  onClick={() => setEditingComment(null)}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleEditSubmit}
-                  className="px-5 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg shadow-orange-500/30"
-                >
-                  Save
-                </button>
-              </div>
+            </div>
+            
+            <textarea
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              rows={4}
+              className="w-full bg-[#0f0f0f] border border-[#3f3f3f] text-white rounded-lg p-3 outline-none focus:border-[#3ea6ff] text-[15px] resize-none mb-4"
+              placeholder="Edit your comment..."
+            />
+            
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setEditingComment(null)}
+                className="px-4 py-2 rounded-full text-sm font-medium text-white hover:bg-[#3f3f3f] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                className="px-5 py-2 rounded-full text-sm font-medium bg-[#3ea6ff] text-black hover:bg-[#65b8ff] transition-colors"
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>

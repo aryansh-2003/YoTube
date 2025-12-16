@@ -39,9 +39,9 @@ export class LikeService{
             return ("LikeService :: Get Liked Error", error)
         }
     }
-    async likeComment(id){
+    async likeComment({id}){
         try {
-            return await this.instance.get(`/toggle-comment-like/${id}`)
+            return await this.instance.post(`/toggle-comment-like/${id}`)
         } catch (error) {
             return ("LikeService ::  Like comment Error", error)
         }
