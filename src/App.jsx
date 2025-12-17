@@ -21,37 +21,27 @@ export default function App() {
   const [AuthStatus,setAuthStatus] = useState(false)
   const [loading,setloading] = useState(true)
 
-
+  
 
   useEffect(()=>{
     if(!userData){
     authService.getCurrentUser().then((userData)=>{
       if(userData == null || undefined && !location.pathname === '/signup'){ 
-        setloading(false) 
         navigate('/')
       }
       dispatch(login(userData?.data?.data))
       setloading(false) 
     if(location.pathname === '/'){
-      setloading(false)
       navigate('/home')
     }
     }).catch((error)=>{
       console.log(error)
-      setloading(false)
+      
     })
   }
   },[])
 
-if (loading) {
-  return(
-    <>
-    <div className='relative'>
-       <img className=' w-screen h-screen' src={SplashScreen}></img>
-    </div>
-    </>
-    )
-}else{
+
   return (
     <>
     <ReactLenis root />
@@ -60,5 +50,4 @@ if (loading) {
     </>
     
   )
-}
 }
