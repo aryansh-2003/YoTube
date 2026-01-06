@@ -179,7 +179,7 @@ export default function Sidebar() {
           {/* Main Navigation */}
           <div className="space-y-1">
             <MenuItem name="Home" icon={Home} path="/Home" isActive={active === "Home"} />
-            <MenuItem name="Trending" icon={Flame} path="/Trending" isActive={active === "Trending"} />
+            {/* <MenuItem name="Trending" icon={Flame} path="/Trending" isActive={active === "Trending"} /> */}
             <MenuItem name="Subscriptions" icon={LayoutGrid} path="/subscription" isActive={active === "Subscriptions"} />
             <MenuItem name="Tweets" icon={Twitter} path="/Tweets" isActive={active === "Tweets"} />
           </div>
@@ -188,7 +188,7 @@ export default function Sidebar() {
 
           {/* Library Section */}
           <div className="space-y-1">
-            <MenuItem name="Library" icon={Library} path="/Library" isActive={active === "Library"} />
+            {/* <MenuItem name="Subscriptions" icon={Library} path="/subscription" isActive={active === "subscription"} /> */}
             <MenuItem name="History" icon={History} path="/History" isActive={active === "History"} />
             <MenuItem name="Liked Videos" icon={ThumbsUp} path="/liked-videos" isActive={active === "Liked Videos"} />
             <MenuItem name="Your Content" icon={Video} path="/userVideos" isActive={active === "Your Content"} />

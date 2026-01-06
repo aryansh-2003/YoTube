@@ -78,7 +78,7 @@ const WatchPage = () => {
       </div>
 
       {/* --- MAIN LAYOUT --- */}
-      <div className="relative z-10 max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="relative z-10 max-w-[1800px] mx-auto px- sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           
           {/* --- LEFT COLUMN (Player, Info, Comments) --- */}
@@ -117,7 +117,7 @@ const WatchPage = () => {
                {/* Divider before comments to match the clean look */}
               <div className="h-px w-full bg-white/10 mb-6" />
               
-              <div className="bg-transparent lg:bg-transparent">
+              <div className="bg-transparent lg:bg-transparent p-2">
                 <CommentsSection
                   video={currentVideo}
                   comments={comments}

@@ -37,17 +37,24 @@ export default function App() {
     }).catch((error)=>{
       console.log(error)
       
+    }).finally(() =>{
+      setloading(false)
+      console.log("hello")
     })
   }
   },[])
 
 
-  return (
-    <>
+if (loading) {
+  return <img src={SplashScreen} alt="Loading…" />;
+}
+
+return (
+  <>
     <ReactLenis root />
     <SpeedInsights />
-    <Layout AuthStatus={AuthStatus}/>
-    </>
-    
-  )
+    <Layout AuthStatus={AuthStatus} />
+  </>
+);
+
 }

@@ -68,7 +68,7 @@ function Media({ loading = false, data = [] }) {
                 onClick={() => item?._id && navigate(`/video/${item._id}`)}
               >
                 {/* --- Thumbnail Section --- */}
-                <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-[#1a1a1a]">
+                <div className="relative w-full aspect-video md:rounded-xl overflow-hidden bg-[#1a1a1a]">
                   {item ? (
                     <>
                       <img

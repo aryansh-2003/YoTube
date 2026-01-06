@@ -182,7 +182,7 @@ export default function VideoPlayer({ onVideoEnd, videoInfo, currentVideo }) {
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="bg-black/40 backdrop-blur-sm p-4 rounded-full border border-white/10">
-             <Play size={32} className="fill-white text-white ml-1" />
+             <Play size={20} className="text-white ml-1" />
           </div>
         </div>
       )}
@@ -240,7 +240,7 @@ export default function VideoPlayer({ onVideoEnd, videoInfo, currentVideo }) {
               </button>
 
               <button onClick={togglePlay} className="text-white hover:text-[#E1AD01] transition-colors">
-                {isPlaying ? <Pause size={28} className="fill-current" /> : <Play size={28} className="fill-current" />}
+                {isPlaying ? <Pause size={20} className="fill-current" /> : <Play size={20}  />}
               </button>
 
               <button 

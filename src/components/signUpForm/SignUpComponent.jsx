@@ -3,19 +3,64 @@ import { useForm } from "react-hook-form";
 import authService from "../../../Service/auth";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
-import { login } from "../../Store/authSlice";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+// --- ICONS ---
+
+const SparkleIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-[#ff2d46]">
+    <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+  </svg>
+);
+
+const UserIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+  </svg>
+);
+
+const AtSymbolIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 10-2.636 6.364M16.5 12V8.25" />
+  </svg>
+);
+
+const TagIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5" />
+  </svg>
+);
+
+const LockIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+  </svg>
+);
+
+const PhotoIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+  </svg>
+);
+
+const ArrowIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 ml-2">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+  </svg>
+);
 
 export default function SignUpComponent() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm();
 
   const dispatch = useDispatch();
   const [error, setError] = useState();
   const navigate = useNavigate();
+
+  const bgImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuADVNLKTIZjyJYZ8m5S9FT1MOirlDhyPdXaDlMRnslPkH3mI0qCAkHrR4iBHkfjjeU5N9MTmzpLKUHaXz6Po31tmY4Qu6nYLnL6k65H86qzYTH6aU73CIUkIrdxsF-JsVuk35w2F5ibY1bOp9njqAJqZzACZJ_MgOpGYiEjT77KjOF3hYnQX-vev8m-LwnypzHcPSNbzq1ogmcz9-9PU2wmg-zPk5hTzXGb3nAwAJDOye4w8nVtgI6EnHNrhz4a-TmoISIoCm5w_lk";
 
   const submitHandler = async (data) => {
     const formData = new FormData();
@@ -28,12 +73,12 @@ export default function SignUpComponent() {
 
     authService.registerUser(formData).then((res) => {
       if (res.status === 200 || res.status === 201) {
-        navigate("/");
+        navigate("/"); // Navigate to login
       }
     }).catch((err) => {
       console.error(err.status);
       if (err.status === 409) {
-        setError("User already exists with email or username 😞");
+        setError("User already exists with email or username");
       } else {
         setError("Something went wrong. Please try again later.");
       }
@@ -41,437 +86,197 @@ export default function SignUpComponent() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950 text-white relative overflow-hidden py-12">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Sharingan-inspired circles */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-10 right-10 w-32 h-32 border-4 border-red-500/30 rounded-full"
-          style={{
-            background: "radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%)",
-          }}
-        >
-          <div className="absolute inset-4 border-4 border-red-400/40 rounded-full"></div>
-          <div className="absolute inset-8 border-4 border-red-300/50 rounded-full"></div>
-        </motion.div>
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#050505] relative overflow-x-hidden overflow-y-auto font-sans py-16">
+      
+      {/* --- BACKGROUND IMAGE --- */}
+      <div 
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: `url(${bgImage})`,
+          filter: "brightness(0.9)" 
+        }}
+      />
+      
+      {/* --- GRADIENT OVERLAY --- */}
+      <div className="fixed inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#0c0505] z-0 pointer-events-none via-50% to-90%" />
 
-        {/* Demon Slayer pattern */}
-        <motion.div
-          animate={{ rotate: -360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-10 left-10 w-40 h-40"
-        >
-          <div className="absolute inset-0 bg-gradient-conic from-green-500/20 via-black/20 to-green-500/20 rounded-full"></div>
-        </motion.div>
-
-        {/* Floating sakura petals */}
-        {[...Array(12)].map((_, i) => (
-          <motion.div
-            key={i}
-            initial={{ y: -20, x: Math.random() * 1200, opacity: 0 }}
-            animate={{
-              y: 1000,
-              x: Math.random() * 1200,
-              opacity: [0, 1, 1, 0],
-              rotate: 360,
-            }}
-            transition={{
-              duration: 12 + Math.random() * 6,
-              repeat: Infinity,
-              delay: i * 1.2,
-              ease: "linear",
-            }}
-            className="absolute w-3 h-3 bg-pink-300/60 rounded-full"
-            style={{
-              clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
-            }}
-          />
-        ))}
-
-        {/* Kunai decorations */}
-        <motion.div
-          animate={{ y: [0, -10, 0], rotate: 45 }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-32 left-20 text-6xl opacity-20"
-        >
-          ⚔️
-        </motion.div>
-
-        <motion.div
-          animate={{ y: [0, 10, 0], rotate: -45 }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-32 right-20 text-5xl opacity-20"
-        >
-          🗡️
-        </motion.div>
-
-        {/* Lightning effect */}
-        <motion.div
-          animate={{ opacity: [0.1, 0.3, 0.1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute top-1/4 right-1/3 text-7xl"
-        >
-          ⚡
-        </motion.div>
-
-        {/* Glowing orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 blur-[120px] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/20 blur-[100px] rounded-full animate-pulse"></div>
-        <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-cyan-500/15 blur-[100px] rounded-full animate-pulse"></div>
+      {/* --- TOP LEFT ICON --- */}
+      <div className="absolute top-6 left-6 z-20">
+        <div className="w-12 h-12 rounded-2xl bg-[#140505]/60 border border-[#ff2d46]/30 flex items-center justify-center shadow-[0_0_15px_rgba(255,45,70,0.15)] backdrop-blur-sm">
+          <SparkleIcon />
+        </div>
       </div>
 
-      {/* Error banner with anime style */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="absolute top-6 z-50 text-center w-full px-4"
+      {/* --- MAIN CONTENT CONTAINER --- */}
+      <div className="relative z-10 w-full max-w-[420px] px-6 flex flex-col items-center mt-10">
+        
+        {/* HEADINGS */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-8 flex flex-col items-center"
         >
-          <div className="inline-block relative">
-            <div className="absolute inset-0 bg-red-500/30 blur-md rounded-lg"></div>
-            <p className="relative text-red-300 text-sm sm:text-base font-bold bg-gradient-to-r from-red-950/90 to-pink-950/90 backdrop-blur-md px-6 py-3 rounded-lg border-2 border-red-500/50 shadow-lg">
-              ⚠️ {error}
-            </p>
-          </div>
+          <h1 className="text-3xl font-extrabold text-white tracking-widest uppercase mb-1 drop-shadow-lg">
+            JOIN THE
+          </h1>
+          <h1 className="text-5xl font-black text-[#ff2d46] tracking-widest uppercase drop-shadow-[0_0_20px_rgba(255,45,70,0.6)]">
+            NEXUS
+          </h1>
+          <p className="text-gray-300 text-sm mt-3 font-medium tracking-wide drop-shadow-md">
+            Begin your journey, Shinobi.
+          </p>
         </motion.div>
-      )}
 
-      {/* Main Form with anime-style design */}
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
-        className="w-[90%] sm:w-[480px] relative z-10"
-      >
-        {/* Decorative corners */}
-        <div className="absolute -top-2 -left-2 w-8 h-8 border-t-4 border-l-4 border-cyan-400/80"></div>
-        <div className="absolute -top-2 -right-2 w-8 h-8 border-t-4 border-r-4 border-cyan-400/80"></div>
-        <div className="absolute -bottom-2 -left-2 w-8 h-8 border-b-4 border-l-4 border-cyan-400/80"></div>
-        <div className="absolute -bottom-2 -right-2 w-8 h-8 border-b-4 border-r-4 border-cyan-400/80"></div>
-
-        <motion.form
-          onSubmit={handleSubmit(submitHandler)}
-          className="bg-gradient-to-br from-slate-900/90 via-purple-900/80 to-indigo-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border-2 border-purple-500/30 space-y-5 relative overflow-hidden"
-        >
-          {/* Animated border glow */}
-          <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+        {/* ERROR MESSAGE */}
+        <AnimatePresence>
+          {error && (
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              className="absolute -inset-[100%] bg-gradient-conic from-cyan-500/30 via-transparent via-transparent via-transparent to-cyan-500/30"
-            ></motion.div>
-          </div>
-
-          {/* Title with anime font style */}
-          <div className="relative text-center space-y-1 mb-4">
-            <motion.h2
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-3xl font-black tracking-wider relative inline-block"
+              initial={{ opacity: 0, y: -10, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: "auto" }}
+              exit={{ opacity: 0, y: -10, height: 0 }}
+              className="w-full mb-4 overflow-hidden"
             >
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">
-                JOIN US
-              </span>
-              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
-            </motion.h2>
-            <p className="text-xs text-purple-300/80 font-semibold tracking-widest">
-              新しい冒険 • NEW ADVENTURE
-            </p>
-          </div>
+              <div className="bg-red-900/40 border border-red-500/50 rounded-lg px-4 py-2 text-center backdrop-blur-md">
+                <p className="text-red-200 text-sm font-semibold">{error}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
+        {/* FORM */}
+        <form onSubmit={handleSubmit(submitHandler)} className="w-full space-y-4">
+          
           {/* Full Name */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.25 }}
-          >
-            <label
-              htmlFor="FullName"
-              className="block text-sm font-bold text-cyan-300 mb-2 tracking-wide"
-            >
-              👤 FULL NAME
-            </label>
+          <div className="relative group">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+              <UserIcon />
+            </div>
             <input
-              id="FullName"
               type="text"
-              placeholder="Your full name"
-              className={`w-full px-4 py-2.5 rounded-lg bg-slate-950/60 text-white placeholder-gray-500 border-2 ${
-                errors.FullName
-                  ? "border-red-500 focus:border-red-400"
-                  : "border-purple-500/50 focus:border-cyan-400"
-              } focus:outline-none focus:ring-2 focus:ring-cyan-400/40 transition-all backdrop-blur-sm font-medium`}
-              {...register("FullName", { required: "Full name is required" })}
+              placeholder="Full Name"
+              className={`w-full bg-[#1e0e0e] border ${errors.FullName ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300`}
+              {...register("FullName", { required: "Full Name is required" })}
             />
-            {errors.FullName && (
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-1.5 text-xs text-red-400 font-semibold flex items-center gap-1"
-              >
-                ⚠️ {errors.FullName.message}
-              </motion.p>
-            )}
-          </motion.div>
+          </div>
 
           {/* Email */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <label
-              htmlFor="email"
-              className="block text-sm font-bold text-cyan-300 mb-2 tracking-wide"
-            >
-              📧 EMAIL ADDRESS
-            </label>
+          <div className="relative group">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+              <AtSymbolIcon />
+            </div>
             <input
-              id="email"
               type="email"
-              placeholder="your@email.com"
-              className={`w-full px-4 py-2.5 rounded-lg bg-slate-950/60 text-white placeholder-gray-500 border-2 ${
-                errors.email
-                  ? "border-red-500 focus:border-red-400"
-                  : "border-purple-500/50 focus:border-cyan-400"
-              } focus:outline-none focus:ring-2 focus:ring-cyan-400/40 transition-all backdrop-blur-sm font-medium`}
+              placeholder="Email Address"
+              className={`w-full bg-[#1e0e0e] border ${errors.email ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300`}
               {...register("email", {
                 required: "Email is required",
                 pattern: {
                   value: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
-                  message: "Enter a valid email address"
-                }
+                  message: "Invalid email",
+                },
               })}
             />
-            {errors.email && (
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-1.5 text-xs text-red-400 font-semibold flex items-center gap-1"
-              >
-                ⚠️ {errors.email.message}
-              </motion.p>
-            )}
-          </motion.div>
+          </div>
 
           {/* Username */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.35 }}
-          >
-            <label
-              htmlFor="username"
-              className="block text-sm font-bold text-cyan-300 mb-2 tracking-wide"
-            >
-              ⚡ USERNAME
-            </label>
+          <div className="relative group">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+              <TagIcon />
+            </div>
             <input
-              id="username"
               type="text"
-              placeholder="Choose a username"
-              className={`w-full px-4 py-2.5 rounded-lg bg-slate-950/60 text-white placeholder-gray-500 border-2 ${
-                errors.username
-                  ? "border-red-500 focus:border-red-400"
-                  : "border-purple-500/50 focus:border-cyan-400"
-              } focus:outline-none focus:ring-2 focus:ring-cyan-400/40 transition-all backdrop-blur-sm font-medium`}
+              placeholder="Username"
+              className={`w-full bg-[#1e0e0e] border ${errors.username ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300`}
               {...register("username", { required: "Username is required" })}
             />
-            {errors.username && (
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-1.5 text-xs text-red-400 font-semibold flex items-center gap-1"
-              >
-                ⚠️ {errors.username.message}
-              </motion.p>
-            )}
-          </motion.div>
+          </div>
 
-          {/* Avatar */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <label
-              htmlFor="avatar"
-              className="block text-sm font-bold text-cyan-300 mb-2 tracking-wide"
-            >
-              🖼️ AVATAR
-            </label>
-            <div className="relative">
-              <input
-                id="avatar"
-                type="file"
-                className={`w-full px-4 py-2.5 rounded-lg bg-slate-950/60 text-white border-2 ${
-                  errors.avatar
-                    ? "border-red-500 focus:border-red-400"
-                    : "border-purple-500/50 focus:border-cyan-400"
-                } focus:outline-none focus:ring-2 focus:ring-cyan-400/40 transition-all backdrop-blur-sm font-medium file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/20 file:text-cyan-300 hover:file:bg-cyan-500/30 file:cursor-pointer`}
-                {...register("avatar", { required: "Avatar is required" })}
-              />
+          {/* Avatar (File Input) */}
+          <div className="relative group">
+             <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+              <PhotoIcon />
             </div>
-            {errors.avatar && (
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-1.5 text-xs text-red-400 font-semibold flex items-center gap-1"
-              >
-                ⚠️ {errors.avatar.message}
-              </motion.p>
-            )}
-          </motion.div>
+            <input
+              type="file"
+              className={`w-full bg-[#1e0e0e] border ${errors.avatar ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
+              rounded-xl py-2.5 pl-12 pr-4 text-gray-400 text-sm
+              file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold 
+              file:bg-[#2a1012] file:text-[#ff2d46] hover:file:bg-[#3d1518]
+              focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300 cursor-pointer`}
+              {...register("avatar", { required: "Avatar is required" })}
+            />
+             {/* Label overlay for cleaner look if file input styling fails in some browsers, but Tailwind file: modifiers usually work well */}
+             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-600 font-bold uppercase pointer-events-none">Avatar</span>
+          </div>
 
-          {/* Cover Image */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.45 }}
-          >
-            <label
-              htmlFor="coverImage"
-              className="block text-sm font-bold text-cyan-300 mb-2 tracking-wide"
-            >
-              🌄 COVER IMAGE <span className="text-xs text-gray-400">(Optional)</span>
-            </label>
-            <div className="relative">
-              <input
-                id="coverImage"
-                type="file"
-                className="w-full px-4 py-2.5 rounded-lg bg-slate-950/60 text-white border-2 border-purple-500/50 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/40 transition-all backdrop-blur-sm font-medium file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/20 file:text-cyan-300 hover:file:bg-cyan-500/30 file:cursor-pointer"
-                {...register("coverImage")}
-              />
+          {/* Cover Image (File Input) */}
+          <div className="relative group">
+             <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+              <PhotoIcon />
             </div>
-          </motion.div>
+            <input
+              type="file"
+              className="w-full bg-[#1e0e0e] border border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40
+              rounded-xl py-2.5 pl-12 pr-4 text-gray-400 text-sm
+              file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold 
+              file:bg-[#2a1012] file:text-gray-400 hover:file:bg-[#3d1518] hover:file:text-[#ff2d46]
+              focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300 cursor-pointer"
+              {...register("coverImage")}
+            />
+             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-600 font-bold uppercase pointer-events-none">Cover (Optional)</span>
+          </div>
 
           {/* Password */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <label
-              htmlFor="password"
-              className="block text-sm font-bold text-cyan-300 mb-2 tracking-wide"
-            >
-              🔐 PASSWORD
-            </label>
+          <div className="relative group">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+              <LockIcon />
+            </div>
             <input
-              id="password"
               type="password"
-              placeholder="Create a strong password"
-              className={`w-full px-4 py-2.5 rounded-lg bg-slate-950/60 text-white placeholder-gray-500 border-2 ${
-                errors.password
-                  ? "border-red-500 focus:border-red-400"
-                  : "border-purple-500/50 focus:border-cyan-400"
-              } focus:outline-none focus:ring-2 focus:ring-cyan-400/40 transition-all backdrop-blur-sm font-medium`}
+              placeholder="Password"
+              className={`w-full bg-[#1e0e0e] border ${errors.password ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300 tracking-widest`}
               {...register("password", {
                 required: "Password is required",
-                minLength: { value: 6, message: "Must be at least 6 characters" }
+                minLength: {
+                  value: 6,
+                  message: "Min 6 characters",
+                },
               })}
             />
-            {errors.password && (
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-1.5 text-xs text-red-400 font-semibold flex items-center gap-1"
-              >
-                ⚠️ {errors.password.message}
-              </motion.p>
-            )}
-          </motion.div>
+          </div>
 
           {/* Submit Button */}
           <motion.button
-            type="submit"
-            disabled={isSubmitting}
-            whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(34, 211, 238, 0.6)" }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55 }}
-            className="w-full py-3.5 text-white font-black text-lg tracking-wider rounded-lg bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-500 hover:via-blue-500 hover:to-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/30 border border-cyan-400/30 relative overflow-hidden group mt-6"
+            disabled={isSubmitting}
+            type="submit"
+            className="w-full bg-[#ff2d46] hover:bg-[#eb263d] text-white font-bold text-sm py-4 rounded-xl shadow-[0_0_20px_rgba(255,45,70,0.3)] hover:shadow-[0_0_30px_rgba(255,45,70,0.5)] transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-4 flex items-center justify-center uppercase tracking-wider"
           >
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              {isSubmitting ? (
-                <>
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                  />
-                  CREATING...
-                </>
-              ) : (
-                <>⚡ CREATE ACCOUNT ⚡</>
-              )}
-            </span>
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
-              animate={{ x: ["-200%", "200%"] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            />
+            {isSubmitting ? "INITIATING..." : "CREATE ACCOUNT"} 
+            {!isSubmitting && <ArrowIcon />}
           </motion.button>
+        </form>
 
-          {/* Sign In Link */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="text-center relative"
-          >
-            <div className="h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent mb-3"></div>
-            <p className="text-sm text-gray-400 font-medium">
-              Already a shinobi?{" "}
-              <button
-                type="button"
-                onClick={() => navigate("/")}
-                className="text-cyan-400 hover:text-cyan-300 font-bold underline-offset-2 hover:underline transition-all ml-1"
-              >
-                Sign In →
-              </button>
-            </p>
-          </motion.div>
+        {/* --- FOOTER --- */}
+        <div className="mt-8 text-center pb-8">
+          <p className="text-gray-500 text-sm font-medium">
+            Already a Shinobi?{" "}
+            <button
+              onClick={() => navigate("/")}
+              className="text-[#ff2d46] font-bold hover:text-white transition-colors ml-1"
+            >
+              Sign In
+            </button>
+          </p>
+        </div>
 
-          {/* Decorative anime symbols */}
-          <div className="absolute top-4 right-4 text-2xl opacity-20">✨</div>
-          <div className="absolute bottom-4 left-4 text-2xl opacity-20">🌸</div>
-          <div className="absolute top-1/2 right-2 text-xl opacity-15">⚔️</div>
-        </motion.form>
-      </motion.div>
-
-      {/* Character silhouettes (decorative) */}
-      <motion.div
-        animate={{ y: [0, -10, 0], opacity: [0.1, 0.2, 0.1] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-0 left-0 text-9xl opacity-10 pointer-events-none"
-      >
-        🥷
-      </motion.div>
-      
-      <motion.div
-        animate={{ y: [0, -15, 0], opacity: [0.1, 0.2, 0.1] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute bottom-0 right-0 text-9xl opacity-10 pointer-events-none"
-      >
-        ⚔️
-      </motion.div>
-
-      {/* Floating Ramen Bowl */}
-      <motion.div
-        animate={{ 
-          y: [0, -20, 0],
-          rotate: [0, 5, -5, 0]
-        }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-20 left-1/4 text-4xl opacity-20"
-      >
-        🍜
-      </motion.div>
+      </div>
     </div>
   );
 }
