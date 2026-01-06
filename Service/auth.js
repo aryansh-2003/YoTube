@@ -46,7 +46,6 @@ export class AuthService{
     async registerUser(formData){
            const keysArray = Array.from(formData.values());
     
-    console.log(keysArray,formData);
         try {
             return this.instance.post('/register',formData)
         } catch (error) {
@@ -57,7 +56,6 @@ export class AuthService{
     async getCurrentUser(){
         try {
              const token = localStorage.getItem('token')
-            console.log(token)
              if(!token) return null
              axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
              const response =  await this.instance.get('/current-user',
@@ -66,7 +64,6 @@ export class AuthService{
                 }
             )
 
-            console.log(response,token)
             return response
 
         } catch (error) {
