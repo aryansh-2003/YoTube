@@ -57,7 +57,7 @@ export default function Sidebar() {
     if (path.includes("/Home")) setActive("Home");
     else if (path.includes("/Trending")) setActive("Trending");
     else if (path.includes("/subscription")) setActive("Subscriptions");
-    else if (path.includes("/Library")) setActive("Library");
+    else if (path.includes("/playlists")) setActive("playlists");
     else if (path.includes("/History")) setActive("History");
     else if (path.includes("/liked-videos")) setActive("Liked Videos");
     else if (path.includes("/Tweets")) setActive("Tweets");
@@ -189,7 +189,8 @@ export default function Sidebar() {
 
           {/* Library Section */}
           <div className="space-y-1">
-            <MenuItem name="Create" icon={Plus} path="/createpost" isActive={active === "Create"} />
+            <MenuItem name="Create Post" icon={Plus} path="/createpost" isActive={active === "Create"} />
+            <MenuItem name="My Playlist" icon={Library} path="/playlists" isActive={active === "playlists"} />
             <MenuItem name="History" icon={History} path="/History" isActive={active === "History"} />
             <MenuItem name="Liked Videos" icon={ThumbsUp} path="/liked-videos" isActive={active === "Liked Videos"} />
             <MenuItem name="Your Content" icon={Video} path="/userVideos" isActive={active === "Your Content"} />
