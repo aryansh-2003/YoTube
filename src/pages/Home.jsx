@@ -67,11 +67,10 @@ const HeroSection = memo(({ videos, isLoading }) => {
 
   return (
     <section 
-      className="relative w-full aspect-video md:h-[500px] rounded-3xl overflow-hidden group border border-white/5 bg-[#1a1a1a]"
+      className="relative w-full aspect-video md:h-[500px] rounded-l overflow-hidden group border border-white/5 bg-[#1a1a1a] "
       onMouseEnter={stopAutoSlide}
       onMouseLeave={startAutoSlide}
     >
-      {/* Background Image - LCP Optimized */}
       <div className="absolute inset-0">
         <img 
           key={activeVideo._id} 
@@ -83,36 +82,32 @@ const HeroSection = memo(({ videos, isLoading }) => {
           className="w-full h-full object-contain object-center transition-transform duration-700 group-hover:scale-105"
         />
         
-        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
       </div>
 
-      {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-center p-6 md:p-12 max-w-3xl z-10 pointer-events-none">
         <span className="inline-block px-3 py-1 mb-4 text-xs font-bold text-black bg-[#fbbf24] rounded-md w-fit uppercase tracking-wider">
           Featured
         </span>
         
-        <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4 text-white drop-shadow-lg line-clamp-2">
+        <h1 className="text-3xl md:text-5xl text-[7px] font-bold leading-tight mb-2 md:mb-4 text-white drop-shadow-lg line-clamp-2">
           {activeVideo.title}
         </h1>
         
-        <p className="text-gray-200 text-base md:text-lg mb-8 line-clamp-2 drop-shadow-md max-w-xl">
+        <p className="text-gray-200 text-[7px] text-base md:text-lg mb-2 line-clamp-2 drop-shadow-md max-w-xl">
           {activeVideo.description}
         </p>
 
-        {/* Pointer events auto to allow clicking the button through the container overlay */}
         <button 
           onClick={() => navigate(`/video/${activeVideo._id}`)}
-          className="pointer-events-auto flex items-center gap-3 px-6 py-3 bg-[#fbbf24] hover:bg-[#f59e0b] hover:scale-105 active:scale-95 text-black font-bold rounded-xl transition-all w-fit shadow-[0_0_20px_rgba(251,191,36,0.3)]"
+          className="pointer-events-auto flex items-center gap-1 md:gap-1 md:px-5 md:py-3 px-3  bg-[#fbbf24] hover:bg-[#f59e0b] hover:scale-105 active:scale-95 text-black font-bold rounded-xl transition-all w-fit shadow-[0_0_20px_rgba(251,191,36,0.3)]"
         >
-          <Play size={20} fill="black" />
-          <span>Watch Now</span>
+          <Play className="w-2 md:w-20" fill="black" />
+          <span className="text-[5px] md:text-2xl">Watch now</span>
         </button>
       </div>
 
-      {/* Navigation Arrows - Using simple opacity transition to reduce paint cost */}
       <button 
         onClick={handlePrev}
         aria-label="Previous Slide"
@@ -129,7 +124,6 @@ const HeroSection = memo(({ videos, isLoading }) => {
         <ChevronRight size={28} />
       </button>
 
-      {/* Indicators */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20 pointer-events-auto">
         {videos.map((_, index) => (
           <button
@@ -160,7 +154,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   
   const heroVideos = useMemo(() => {
-    console.log(videos?.data?.data)
     return videos?.data?.data?.slice(0, 5) || [];
   }, [videos]);
 
@@ -190,8 +183,8 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0f0f0f] text-white w-full">
-      <div className="max-w-[1800px] mx-auto space-y-8 p-4 md:p-6">
+    <main className="min-h-screen bg-[#0f0f0f] text-white w-full mt-8 md:mt-2">
+      <div className="w-full mx-auto space-y-8  md:p-6">
         
         <HeroSection videos={heroVideos} isLoading={isLoading} />
 

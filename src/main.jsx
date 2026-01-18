@@ -191,9 +191,6 @@ import Tweets from './pages/Tweets.jsx'
 
 
 createRoot(document.getElementById('root')).render(
-  
-
-  
     <Provider store ={store}>
       <HeaderContextProvider>
       <RouterProvider router = {router}/>

@@ -10,7 +10,7 @@ function Layout() {
   return (
     <div>
         <Header/>
-        <div className='w- flex flex-col pt-10'>
+        <div className=' flex flex-col pt-10'>
         <div className=''>
         <Outlet/>
         </div>

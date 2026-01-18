@@ -78,12 +78,31 @@ function Media({ loading = false, data = [] }) {
                         className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                       />
 
-                      {/* Dark Overlay on Hover */}
-                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      {/* --- YouTube Style Overlay --- */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 flex flex-col justify-between p-2">
+                         {/* Top Right: Quick Actions */}
+                         <div className="self-end transform translate-y-[-10px] group-hover:translate-y-0 transition-transform duration-300">
+                           <button
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               handleMenuClick('Add to Playlist', item._id);
+                             }}
+                             className="p-1.5 bg-black/80 hover:bg-white hover:text-black text-white rounded md:rounded-md transition-colors"
+                             title="Save to Playlist"
+                           >
+                             <ListPlus size={20} strokeWidth={2} />
+                           </button>
+                         </div>
+
+                         {/* Center: Play Button (Visual only) */}
+                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <Play className="w-12 h-12 text-white fill-white opacity-90 drop-shadow-lg" />
+                         </div>
+                      </div>
 
                       {/* "YOUR VIDEO" Badge - Matches Image (Gold/Yellow) */}
                       {isOwner && (
-                        <div className="absolute top-2 left-2 px-2 py-1 bg-[#fbbf24] rounded-md shadow-lg z-10">
+                        <div className="absolute top-2 left-2 px-2 py-1 bg-[#fbbf24] rounded-md shadow-lg z-20">
                           <span className="text-[10px] font-extrabold text-black uppercase tracking-wider block leading-none">
                             YOUR VIDEO
                           </span>
@@ -92,7 +111,7 @@ function Media({ loading = false, data = [] }) {
 
                       {/* Duration Badge - Bottom Right */}
                       {item?.duration && (
-                        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/80 backdrop-blur-sm rounded text-xs font-medium text-white">
+                        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/80 backdrop-blur-sm rounded text-xs font-medium text-white z-20">
                           {formatVideoDuration(item.duration)}
                         </div>
                       )}
