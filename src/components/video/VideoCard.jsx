@@ -75,7 +75,7 @@ function Media({ loading = false, data = [] }) {
                         src={item.thumbnail || defaultAvatar}
                         alt={item.title || 'video thumbnail'}
                         onError={(e) => (e.currentTarget.src = defaultAvatar)}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                       />
 
                       {/* Dark Overlay on Hover */}
