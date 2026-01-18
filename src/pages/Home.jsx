@@ -73,7 +73,7 @@ const HeroSection = memo(({ videos, isLoading }) => {
     >
       {/* Background Image - LCP Optimized */}
       <div className="absolute inset-0">
-        <img 
+        {/* <img 
           key={activeVideo._id} 
           src={activeVideo.thumbnail} 
           alt={activeVideo.title}
@@ -82,7 +82,7 @@ const HeroSection = memo(({ videos, isLoading }) => {
           loading="eager"
           decoding="sync"
           className="w-full h-full object-contain object-center transition-transform duration-700 group-hover:scale-105"
-        />
+        /> */}
         
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent pointer-events-none" />
