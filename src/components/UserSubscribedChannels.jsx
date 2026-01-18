@@ -50,13 +50,13 @@ export default function UserSubscribedChannels({ userId }) {
   }
 
   return (
-    <div className="relative bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 border border-white/5">
+    <div className="relative bg-white/[0.02] backdrop-blur-sm md:p-3 border border-white/5">
       {/* Subtle ambient background */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-violet-500/3 rounded-full blur-[100px] pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/3 rounded-full blur-[100px] pointer-events-none"></div>
 
       {/* Header */}
-      <div className="relative mb-8">
+      <div className="relative mb-8 mt-8">
         <h2 className="text-2xl font-medium text-white/90">
           Subscribed Channels
         </h2>

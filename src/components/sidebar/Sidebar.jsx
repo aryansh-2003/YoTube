@@ -17,7 +17,8 @@ import {
   Radio,
   Twitter,
   Video,
-  Menu
+  Menu,
+  Plus
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import HeaderContext from "../context/HeaderContext";
@@ -53,6 +54,7 @@ export default function Sidebar() {
   // Determine active route
   useEffect(() => {
     const path = location.pathname;
+    console.log(path)
     if (path.includes("/Home")) setActive("Home");
     else if (path.includes("/Trending")) setActive("Trending");
     else if (path.includes("/subscription")) setActive("Subscriptions");
@@ -60,7 +62,7 @@ export default function Sidebar() {
     else if (path.includes("/History")) setActive("History");
     else if (path.includes("/liked-videos")) setActive("Liked Videos");
     else if (path.includes("/Tweets")) setActive("Tweets");
-    else if (path.includes("/CreatePost")) setActive("Create");
+    else if (path.includes("/createPost")) setActive("Create");
     else setActive("");
   }, [location.pathname]);
 
@@ -188,7 +190,7 @@ export default function Sidebar() {
 
           {/* Library Section */}
           <div className="space-y-1">
-            {/* <MenuItem name="Subscriptions" icon={Library} path="/subscription" isActive={active === "subscription"} /> */}
+            <MenuItem name="Create" icon={Plus} path="/createpost" isActive={active === "Create"} />
             <MenuItem name="History" icon={History} path="/History" isActive={active === "History"} />
             <MenuItem name="Liked Videos" icon={ThumbsUp} path="/liked-videos" isActive={active === "Liked Videos"} />
             <MenuItem name="Your Content" icon={Video} path="/userVideos" isActive={active === "Your Content"} />
