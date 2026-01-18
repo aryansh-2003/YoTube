@@ -73,16 +73,15 @@ const HeroSection = memo(({ videos, isLoading }) => {
     >
       {/* Background Image - LCP Optimized */}
       <div className="absolute inset-0">
-        {/* <img 
+        <img 
           key={activeVideo._id} 
           src={activeVideo.thumbnail} 
           alt={activeVideo.title}
-          // CRITICAL FOR LCP: High priority and eager loading
           fetchPriority="high"
           loading="eager"
           decoding="sync"
           className="w-full h-full object-contain object-center transition-transform duration-700 group-hover:scale-105"
-        /> */}
+        />
         
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent pointer-events-none" />
@@ -154,23 +153,20 @@ const HeroSection = memo(({ videos, isLoading }) => {
 });
 
 
-// --- MAIN PAGE COMPONENT ---
 export default function Home() {
   const [videos, setVideos] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Memoize hero videos to pass stable reference to child
   const heroVideos = useMemo(() => {
+    console.log(videos?.data?.data)
     return videos?.data?.data?.slice(0, 5) || [];
   }, [videos]);
 
   const fetchVideos = async (page = 1) => {
     setIsLoading(true);
     try {
-      // Use Promise.all if you need to fetch multiple things, 
-      // otherwise this is fine.
       const res = await videoService.getHomeVids(page);
       if (res.status === 200) {
         setVideos(res);
@@ -197,19 +193,13 @@ export default function Home() {
     <main className="min-h-screen bg-[#0f0f0f] text-white w-full">
       <div className="max-w-[1800px] mx-auto space-y-8 p-4 md:p-6">
         
-        {/* Isolated Hero Component */}
         <HeroSection videos={heroVideos} isLoading={isLoading} />
 
-        {/* Recommended Section */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">Recommended for You</h2>
           </div>
           
-          {/* 
-             VideoGrid should be its own component ideally, but ensuring 
-             VideoCard handles its own images efficiently is key.
-          */}
           <div className="w-full">
              <VideoCard 
                loading={isLoading} 
@@ -237,7 +227,7 @@ export default function Home() {
 
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages} // Logic might need adjustment based on API
+                disabled={currentPage === totalPages} 
                 className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white disabled:opacity-30 transition-colors"
               >
                 Next
