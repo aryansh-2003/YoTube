@@ -54,7 +54,6 @@ export default function Sidebar() {
   // Determine active route
   useEffect(() => {
     const path = location.pathname;
-    console.log(path)
     if (path.includes("/Home")) setActive("Home");
     else if (path.includes("/Trending")) setActive("Trending");
     else if (path.includes("/subscription")) setActive("Subscriptions");
@@ -62,7 +61,7 @@ export default function Sidebar() {
     else if (path.includes("/History")) setActive("History");
     else if (path.includes("/liked-videos")) setActive("Liked Videos");
     else if (path.includes("/Tweets")) setActive("Tweets");
-    else if (path.includes("/createPost")) setActive("Create");
+    else if (path.includes("/createpost")) setActive("Create");
     else setActive("");
   }, [location.pathname]);
 
