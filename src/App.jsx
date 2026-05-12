@@ -8,7 +8,6 @@ import { ReactLenis, useLenis } from 'lenis/react'
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import Loader from './PreLoader/loader'
 import ShinyText from "./components/BlurText/BlurText";
-import { io } from 'socket.io-client';
 
 const socket = io("http://localhost:8000/");
 
@@ -37,15 +36,6 @@ export default function App() {
         }
       }).catch((error) => {
         console.log(error)
-      }).finally(() => {
-        socket.on("connect", () => {
-          console.log("Connected:", socket.id);
-        });
-
-        socket.on("disconnect", (reason) => {
-          console.log("Disconnected:", reason);
-        });
-
       })
     }
   }, [])
