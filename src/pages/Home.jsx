@@ -1,34 +1,30 @@
-import React, { useContext, useEffect, useState, useRef, useMemo, memo } from "react";
+import React, { useEffect, useState, useRef, useMemo, memo, Suspense, lazy } from "react";
 import { useNavigate } from "react-router";
-import VideoCard from "../components/video/VideoCard";
 import videoService from "../../Service/video";
-import HeaderContext from "../components/context/HeaderContext";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-// --- SUB-COMPONENT: HERO CAROUSEL (Isolated to prevent full page re-renders) ---
+// --- LAZY LOADED COMPONENTS (Code Splitting for performance) ---
+const VideoCard = lazy(() => import("../components/video/VideoCard"));
+
+// --- SUB-COMPONENT: HERO CAROUSEL ---
 const HeroSection = memo(({ videos, isLoading }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
   const autoSlideInterval = useRef(null);
   
-  // Safe check for data
   const hasData = videos && videos.length > 0;
   const activeVideo = hasData ? videos[currentIndex] : null;
 
-  // 1. Optimize Preloading: Only preload the NEXT image, not all of them
   useEffect(() => {
     if (!hasData) return;
-    
     const nextIndex = (currentIndex + 1) % videos.length;
     const img = new Image();
     img.src = videos[nextIndex].thumbnail;
   }, [currentIndex, hasData, videos]);
 
-  // 2. Carousel Interval Logic
   useEffect(() => {
-    if (hasData) {
-      startAutoSlide();
-    }
+    if (hasData) startAutoSlide();
     return () => stopAutoSlide();
   }, [currentIndex, hasData]);
 
@@ -43,23 +39,17 @@ const HeroSection = memo(({ videos, isLoading }) => {
     if (autoSlideInterval.current) clearInterval(autoSlideInterval.current);
   };
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev === videos.length - 1 ? 0 : prev + 1));
-  };
+  const handleNext = () => setCurrentIndex((prev) => (prev === videos.length - 1 ? 0 : prev + 1));
+  const handlePrev = () => setCurrentIndex((prev) => (prev === 0 ? videos.length - 1 : prev - 1));
 
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? videos.length - 1 : prev - 1));
-  };
-
-  // --- SKELETON LOADER (Matches exact dimensions to fix CLS) ---
   if (isLoading || !hasData) {
     return (
-      <div className="relative w-full aspect-video md:h-[500px] rounded-3xl bg-gray-800/50 animate-pulse overflow-hidden border border-white/5">
+      <div className="relative w-full aspect-video md:h-[500px] rounded-[2rem] bg-slate-200 animate-pulse overflow-hidden shadow-sm border border-slate-100">
         <div className="absolute bottom-12 left-12 space-y-4 z-10">
-          <div className="h-4 w-24 bg-gray-700 rounded"></div>
-          <div className="h-10 w-48 md:w-96 bg-gray-700 rounded"></div>
-          <div className="h-4 w-64 bg-gray-700 rounded"></div>
-          <div className="h-12 w-36 bg-gray-700 rounded-xl"></div>
+          <div className="h-4 w-24 bg-slate-300 rounded"></div>
+          <div className="h-10 w-48 md:w-96 bg-slate-300 rounded"></div>
+          <div className="h-4 w-64 bg-slate-300 rounded"></div>
+          <div className="h-12 w-36 bg-slate-300 rounded-xl"></div>
         </div>
       </div>
     );
@@ -67,84 +57,91 @@ const HeroSection = memo(({ videos, isLoading }) => {
 
   return (
     <section 
-      className="relative w-full aspect-video md:h-[500px] rounded-l overflow-hidden group border border-white/5 bg-[#1a1a1a] "
+      className="relative w-full aspect-video md:h-[500px] rounded-[2rem] overflow-hidden group shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-slate-200/50 bg-[#0a0a0a]"
       onMouseEnter={stopAutoSlide}
       onMouseLeave={startAutoSlide}
     >
-      <div className="absolute inset-0">
-        <img 
-          key={activeVideo._id} 
-          src={activeVideo.thumbnail} 
-          alt={activeVideo.title}
-          fetchPriority="high"
-          loading="eager"
-          decoding="sync"
-          className="w-full h-full object-contain object-center transition-transform duration-700 group-hover:scale-105"
-        />
-        
-        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div 
+          key={activeVideo._id}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+          className="absolute inset-0"
+        >
+          <img 
+            src={activeVideo.thumbnail} 
+            alt={activeVideo.title}
+            className="w-full h-full object-cover object-center"
+          />
+          {/* Dark gradients to make the image and white text pop dramatically */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+        </motion.div>
+      </AnimatePresence>
 
       <div className="absolute inset-0 flex flex-col justify-center p-6 md:p-12 max-w-3xl z-10 pointer-events-none">
-        <span className="inline-block px-3 py-1 mb-4 text-xs font-bold text-black bg-[#fbbf24] rounded-md w-fit uppercase tracking-wider">
-          Featured
-        </span>
-        
-        <h1 className="text-3xl md:text-5xl text-[7px] font-bold leading-tight mb-2 md:mb-4 text-white drop-shadow-lg line-clamp-2">
-          {activeVideo.title}
-        </h1>
-        
-        <p className="text-gray-200 text-[7px] text-base md:text-lg mb-2 line-clamp-2 drop-shadow-md max-w-xl">
-          {activeVideo.description}
-        </p>
-
-        <button 
-          onClick={() => navigate(`/video/${activeVideo._id}`)}
-          className="pointer-events-auto flex items-center gap-1 md:gap-1 md:px-5 md:py-3 px-3  bg-[#fbbf24] hover:bg-[#f59e0b] hover:scale-105 active:scale-95 text-black font-bold rounded-xl transition-all w-fit shadow-[0_0_20px_rgba(251,191,36,0.3)]"
+        <motion.span 
+          initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+          className="inline-block px-3 py-1 mb-4 text-[11px] font-extrabold text-white bg-[#ff0000] rounded-md w-fit uppercase tracking-wider shadow-[0_0_15px_rgba(255,0,0,0.5)]"
         >
-          <Play className="w-2 md:w-20" fill="black" />
-          <span className="text-[5px] md:text-2xl">Watch now</span>
-        </button>
+          Featured
+        </motion.span>
+        
+        <motion.h1 
+          initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
+          className="text-3xl md:text-5xl font-black leading-tight mb-2 md:mb-4 text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] line-clamp-2"
+        >
+          {activeVideo.title}
+        </motion.h1>
+        
+        <motion.p 
+          initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+          className="text-gray-200 text-sm md:text-lg mb-6 line-clamp-2 max-w-xl font-medium drop-shadow-md"
+        >
+          {activeVideo.description}
+        </motion.p>
+
+        <motion.button 
+          initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
+          onClick={() => navigate(`/video/${activeVideo._id}`)}
+          className="pointer-events-auto flex items-center gap-2 md:px-6 px-4 py-2.5 md:py-3.5 bg-[#ff0000] hover:bg-[#dd0000] active:scale-95 text-white font-bold rounded-xl transition-all w-fit shadow-[0_8px_20px_rgba(255,0,0,0.3)] hover:shadow-[0_12px_25px_rgba(255,0,0,0.5)]"
+        >
+          <Play className="w-4 h-4 md:w-5 md:h-5" fill="white" />
+          <span className="text-sm md:text-base tracking-wide uppercase">Watch now</span>
+        </motion.button>
       </div>
 
+      {/* Navigation Buttons */}
       <button 
         onClick={handlePrev}
-        aria-label="Previous Slide"
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/80 rounded-full text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 border border-white/10"
+        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/70 text-white rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 shadow-lg border border-white/20"
       >
         <ChevronLeft size={28} />
       </button>
       
       <button 
         onClick={handleNext}
-        aria-label="Next Slide"
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/80 rounded-full text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 border border-white/10"
+        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/70 text-white rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 shadow-lg border border-white/20"
       >
         <ChevronRight size={28} />
       </button>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20 pointer-events-auto">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20 pointer-events-auto bg-black/40 px-3 py-2 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg">
         {videos.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            aria-label={`Go to slide ${index + 1}`}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              index === currentIndex 
-                ? "w-8 bg-[#fbbf24]" 
-                : "w-2 bg-white/50 hover:bg-white"
+            className={`h-2 rounded-full transition-all duration-300 ${
+              index === currentIndex ? "w-8 bg-[#ff0000]" : "w-2 bg-white/50 hover:bg-white"
             }`}
           />
         ))}
       </div>
     </section>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison for Memo: Only re-render if loading state changes or active video ID changes
-  return prevProps.isLoading === nextProps.isLoading && 
-         prevProps.videos?.[0]?._id === nextProps.videos?.[0]?._id;
-});
+}, (prev, next) => prev.isLoading === next.isLoading && prev.videos?.[0]?._id === next.videos?.[0]?._id);
 
 
 export default function Home() {
@@ -153,9 +150,7 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   
-  const heroVideos = useMemo(() => {
-    return videos?.data?.data?.slice(0, 5) || [];
-  }, [videos]);
+  const heroVideos = useMemo(() => videos?.data?.data?.slice(0, 5) || [], [videos]);
 
   const fetchVideos = async (page = 1) => {
     setIsLoading(true);
@@ -163,7 +158,7 @@ export default function Home() {
       const res = await videoService.getHomeVids(page);
       if (res.status === 200) {
         setVideos(res);
-        setTotalPages(Math.max(1, totalPages + 1)); // Adjust logic based on real API
+        setTotalPages(Math.max(1, totalPages + 1));
       }
     } catch (error) {
       console.error("Error fetching videos:", error);
@@ -179,55 +174,59 @@ export default function Home() {
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'instant' }); // 'instant' is better for LCP on page switch than 'smooth'
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
   };
 
   return (
-    <main className="min-h-screen bg-[#0f0f0f] text-white w-full mt-8 md:mt-2">
-      <div className="w-full mx-auto space-y-8  md:p-6">
-        
-        <HeroSection videos={heroVideos} isLoading={isLoading} />
-
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">Recommended for You</h2>
-          </div>
+    <>
+      <main className="min-h-screen bg-slate-50 text-slate-900 w-full mt-8 md:mt-4 pb-12 relative z-10 font-sans">
+        <div className="w-full max-w-[1600px] mx-auto space-y-10 px-4 md:px-8 pt-4">
           
-          <div className="w-full">
-             <VideoCard 
-               loading={isLoading} 
-               data={videos ? videos.data.data : null} 
-             />
-          </div>
-        </section>
+          <HeroSection videos={heroVideos} isLoading={isLoading} />
 
-        {/* Pagination Controls */}
-        {!isLoading && videos && (
-          <div className="flex justify-center items-center gap-4 py-8 mt-4 border-t border-white/10">
-             <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white disabled:opacity-30 transition-colors"
-              >
-                Previous
-              </button>
+          <section>
+            <div className="flex items-center justify-between mb-8 border-b border-slate-200 pb-3">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Recommended for You</h2>
+            </div>
+            
+            <div className="w-full">
+               <Suspense fallback={<div className="text-center py-20 text-slate-500 font-medium">Loading recommendations...</div>}>
+                 <VideoCard 
+                   loading={isLoading} 
+                   data={videos ? videos.data.data : null} 
+                 />
+               </Suspense>
+            </div>
+          </section>
 
-              <div className="flex items-center gap-2">
-                  <span className="px-4 py-2 bg-white/10 rounded-lg text-sm font-bold text-white border border-white/5">
-                    {currentPage}
-                  </span>
-              </div>
+          {/* Pagination Controls */}
+          {!isLoading && videos && (
+            <div className="flex justify-center items-center gap-4 pt-8 pb-4">
+               <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:text-[#ff0000] hover:border-[#ff0000]/30 hover:shadow-md disabled:opacity-50 disabled:pointer-events-none transition-all"
+                >
+                  Previous
+                </button>
 
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages} 
-                className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white disabled:opacity-30 transition-colors"
-              >
-                Next
-              </button>
-          </div>
-        )}
-      </div>
-    </main>
+                <div className="flex items-center gap-2">
+                    <span className="px-5 py-2.5 bg-[#ff0000] rounded-xl text-sm font-bold text-white shadow-md">
+                      {currentPage}
+                    </span>
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages} 
+                  className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:text-[#ff0000] hover:border-[#ff0000]/30 hover:shadow-md disabled:opacity-50 disabled:pointer-events-none transition-all"
+                >
+                  Next
+                </button>
+            </div>
+          )}
+        </div>
+      </main>
+    </>
   );
 }

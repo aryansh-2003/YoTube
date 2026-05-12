@@ -1,30 +1,21 @@
 import axios from 'axios';
 
 
+const url = import.meta.env.VITE_BACKEND_URL
 
-export class DashboardService{
-    constructor(){
 
-    this.instance = axios.create({
-     baseURL: 'https://youtube-backend-052x.onrender.com/api/v1',
-    //  headers: {'X-Custom-Header': 'foobar'}
-    });
-    this.instance.interceptors.request.use(
-        (config) =>{
-            const accessToken = localStorage.getItem('token')
-            if(accessToken){
-                config.headers.Authorization = `Bearer ${accessToken}`
-                console.log(accessToken)
-            }
-            return config
-        },
-        (error) => Promise.reject(error)
-    )
+export class DashboardService {
+    constructor() {
+
+        this.instance = axios.create({
+            baseURL: `${url}/api/v1`,
+            withCredentials: true
+        });
     }
 
-    
 
-    async getChannelVideos(id){
+
+    async getChannelVideos(id) {
         try {
             return await this.instance.get(`/get-channel-videos/${id}`)
         } catch (error) {
@@ -32,7 +23,7 @@ export class DashboardService{
         }
     }
 
-        async getDashboard(){
+    async getDashboard() {
         try {
             return await this.instance.get(`/dashboard`)
         } catch (error) {
@@ -40,7 +31,7 @@ export class DashboardService{
         }
     }
 
-    
+
 
 
 

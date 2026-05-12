@@ -73,20 +73,20 @@ export default function LikeButton({ liked, videoId, totalLikes, videoInfo }) {
         onClick={handleLike}
         aria-pressed={isLiked}
         aria-label={isLiked ? "Unlike" : "Like"}
-        className={`relative z-30 flex items-center gap-2.5 px-4 py-2 rounded-lg font-medium border backdrop-blur-sm ${
+        className={`relative z-30 flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all shadow-sm border ${
           isLiked
-            ? "bg-white/5 text-white border-white/10"
-            : "bg-white/[0.02] text-white/70 border-white/[0.06] hover:bg-white/[0.04] hover:border-white/10"
+            ? "bg-red-50 text-[#ff0000] border-red-100 hover:bg-red-100"
+            : "bg-slate-100 text-slate-700 border-slate-200/50 hover:bg-slate-200 hover:text-slate-900"
         }`}
       >
         {/* Heart Icon */}
         <svg
-          className={`w-5 h-5 ${
+          className={`w-4 h-4 transition-colors ${
             isLiked 
-              ? "fill-white" 
+              ? "fill-[#ff0000] text-[#ff0000]" 
               : "fill-none stroke-current"
           }`}
-          strokeWidth="1.5"
+          strokeWidth="2"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -103,10 +103,10 @@ export default function LikeButton({ liked, videoId, totalLikes, videoInfo }) {
         </span>
 
         {/* Like Count */}
-        <span className={`text-sm px-2 py-0.5 rounded ${
+        <span className={`text-sm ml-1 px-2 py-0.5 rounded-md ${
           isLiked
-            ? 'bg-white/10 text-white'
-            : 'bg-white/5 text-white/60'
+            ? 'bg-red-100 text-[#ff0000]'
+            : 'bg-slate-200/50 text-slate-600'
         }`}>
           {likes}
         </span>
@@ -123,7 +123,7 @@ export default function LikeButton({ liked, videoId, totalLikes, videoInfo }) {
               top: `${particle.y}px`,
               width: `${particle.size}px`,
               height: `${particle.size}px`,
-              backgroundColor: particle.isLiking ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)',
+              backgroundColor: particle.isLiking ? '#ff0000' : '#94a3b8',
               "--target-x": `${particle.targetX - particle.x}px`,
               "--target-y": `${particle.targetY - particle.y}px`,
               "--duration": `${particle.duration}ms`,

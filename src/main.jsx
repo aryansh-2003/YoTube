@@ -24,7 +24,7 @@ import LikedVideos from './pages/LikedVideos.jsx'
 import UserSubscriberPage from './pages/UserSubscriberPage.jsx'
 import NotFound from './pages/NotFound.jsx'
 import Tweets from './pages/Tweets.jsx'
-
+import NotificationPage from './pages/NotificationPage.jsx'
 
 
 
@@ -184,6 +184,15 @@ import Tweets from './pages/Tweets.jsx'
               </>
             </PrivateRoute>
         },
+        {
+          path:'/notification',
+          element:
+            <PrivateRoute>
+              <>
+                  </> 
+              <NotificationPage/>
+            </PrivateRoute>
+        },
       ]
     }
   ])
@@ -196,5 +205,5 @@ createRoot(document.getElementById('root')).render(
       <RouterProvider router = {router}/>
       </HeaderContextProvider>
     </Provider>
-,
+
 )

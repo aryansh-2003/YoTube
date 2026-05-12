@@ -4,7 +4,7 @@ import {
   Edit3,
   Trash2,
   X,
-  AlignLeft, // Used for Sort icon style
+  AlignLeft,
 } from "lucide-react";
 import commentService from "../../Service/comment";
 import DisplayPic from "../components/DisplayPic";
@@ -83,19 +83,18 @@ export default function CommentsSection({ onAddComment, video }) {
   };
 
   return (
-    <div className="text-white w-full max-w-[1280px] mx-auto font-sans">
+    <div className="text-slate-900 w-full max-w-[1280px] mx-auto font-sans">
       
       {/* Header: Count and Sort */}
-      <div className="flex items-center gap-8 mb-6">
-        <h3 className="text-xl font-bold text-white">
+      <div className="flex items-center gap-6 mb-6">
+        <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">
           {comments?.length || 0} Comments
         </h3>
         
         <div className="relative group cursor-pointer flex items-center gap-2">
-           <AlignLeft className="w-5 h-5 text-white" />
-           <span className="text-sm font-semibold text-white">Sort by</span>
+           <AlignLeft className="w-5 h-5 text-slate-700" />
+           <span className="text-sm font-bold text-slate-700">Sort by</span>
            
-           {/* Invisible Select overlaying the Sort By text to keep logic same but design clean */}
            <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
@@ -109,11 +108,11 @@ export default function CommentsSection({ onAddComment, video }) {
 
       {/* Add Comment Input Section */}
       <div className="flex gap-4 mb-8">
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 mt-1">
           <img
             src={userData ? userData?.avatar : defaultAvatar}
             alt="User avatar"
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-10 h-10 rounded-full object-cover border border-slate-200"
           />
         </div>
         <div className="flex-1">
@@ -124,29 +123,29 @@ export default function CommentsSection({ onAddComment, video }) {
               {...register("content", { required: "Comment cannot be empty" })}
               placeholder="Add a comment..."
               autoComplete="off"
-              className="w-full bg-transparent border-b border-[#3f3f3f] pb-2 focus:border-white focus:border-b-2 outline-none text-[15px] placeholder-gray-400 transition-colors"
+              className="w-full bg-transparent border-b border-slate-300 pb-2 focus:border-[#ff0000] focus:border-b-2 outline-none text-[15px] text-slate-900 placeholder-slate-500 transition-colors"
             />
             {errors.content && (
-              <p className="text-red-500 text-xs mt-1">{errors.content.message}</p>
+              <p className="text-[#ff0000] text-xs mt-1 font-medium">{errors.content.message}</p>
             )}
             
             {showCommentInput && (
               <div className="flex justify-between items-center mt-3">
-                 <div className="text-gray-400 text-lg">☺</div> {/* Emoji placeholder */}
-                 <div className="flex items-center gap-3">
+                 <div className="text-slate-400 text-lg hover:text-slate-600 cursor-pointer transition-colors">☺</div>
+                 <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => {
                         setNewComment("");
                         setShowCommentInput(false);
                       }}
-                      className="px-4 py-2 text-sm font-medium text-white hover:bg-[#3f3f3f] rounded-full transition-colors"
+                      className="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 text-sm font-medium bg-[#3ea6ff] text-black hover:bg-[#65b8ff] rounded-full transition-colors disabled:bg-[#202020] disabled:text-gray-500"
+                      className="px-4 py-2 text-sm font-bold bg-slate-100 text-slate-500 hover:bg-[#ff0000] hover:text-white rounded-full transition-all disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed shadow-sm"
                     >
                       Comment
                     </button>
@@ -163,9 +162,9 @@ export default function CommentsSection({ onAddComment, video }) {
           <div key={comment._id} className="group relative flex gap-4">
             
             {/* Avatar */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 mt-1">
               <DisplayPic 
-                 className="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-90" 
+                 className="w-10 h-10 rounded-full object-cover cursor-pointer border border-slate-200 hover:shadow-sm transition-shadow" 
                  children={comment?.ownerInfo?.[0]} 
               />
             </div>
@@ -174,29 +173,31 @@ export default function CommentsSection({ onAddComment, video }) {
             <div className="flex-1 min-w-0">
               {/* Metadata Row */}
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[13px] font-semibold text-white cursor-pointer hover:underline">
+                <span className="text-[13px] font-bold text-slate-900 cursor-pointer hover:text-[#ff0000] transition-colors">
                   @{comment?.ownerInfo?.[0]?.fullname?.replace(/\s+/g, '') || "User"}
                 </span>
-                <span className="text-[12px] text-gray-400">
+                <span className="text-[12px] text-slate-500 font-medium">
                   {comment ? timeAgo(comment?.createdAt) : ""}
                 </span>
               </div>
 
               {/* Comment Text */}
-              <p className="text-[14px] leading-5 text-white whitespace-pre-wrap mb-2">
+              <p className="text-[14px] leading-relaxed text-slate-800 whitespace-pre-wrap mb-2">
                 {comment.content}
               </p>
 
-              {/* Actions Row (Like, Reply, Edit menu) */}
-              <div className="flex items-center gap-2">
-                <LikeComment 
-                  commentId={comment._id} 
-                  userId={userData?._id} 
-                  isLiked={comment ? comment.isLiked : ""} 
-                  totalLikes={comment ? comment.totalLikes : ""} 
-                />
+              {/* Actions Row */}
+              <div className="flex items-center gap-1">
+                <div className="scale-90 transform origin-left">
+                  <LikeComment 
+                    commentId={comment._id} 
+                    userId={userData?._id} 
+                    isLiked={comment ? comment.isLiked : ""} 
+                    totalLikes={comment ? comment.totalLikes : ""} 
+                  />
+                </div>
                 
-                <button className="px-3 py-1.5 rounded-full text-[12px] font-semibold text-white hover:bg-[#3f3f3f] transition-colors ml-2">
+                <button className="px-3 py-1.5 rounded-full text-[12px] font-bold text-slate-600 hover:bg-slate-100 transition-colors ml-1">
                   Reply
                 </button>
               </div>
@@ -211,28 +212,28 @@ export default function CommentsSection({ onAddComment, video }) {
                       menuOpenId === comment._id ? null : comment._id
                     )
                   }
-                  className="p-2 rounded-full hover:bg-[#3f3f3f] text-white"
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
                 >
                   <MoreHorizontal size={20} />
                 </button>
                 
                 {/* Dropdown Menu */}
                 {menuOpenId === comment._id && (
-                  <div className="absolute right-0 mt-2 w-36 bg-[#282828] rounded-xl shadow-xl py-2 z-20 ring-1 ring-white/10">
+                  <div className="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] py-2 z-20 border border-slate-100">
                     <button
                       onClick={() => {
                         setEditingComment(comment);
                         setEditedContent(comment.content);
                         setMenuOpenId(null);
                       }}
-                      className="flex items-center w-full px-4 py-2.5 text-[14px] text-gray-200 hover:bg-[#3f3f3f] transition-colors gap-3"
+                      className="flex items-center w-full px-4 py-2.5 text-[14px] font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#ff0000] transition-colors gap-3"
                     >
                       <Edit3 size={16} />
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(comment._id)}
-                      className="flex items-center w-full px-4 py-2.5 text-[14px] text-gray-200 hover:bg-[#3f3f3f] transition-colors gap-3"
+                      className="flex items-center w-full px-4 py-2.5 text-[14px] font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#ff0000] transition-colors gap-3"
                     >
                       <Trash2 size={16} />
                       Delete
@@ -247,14 +248,14 @@ export default function CommentsSection({ onAddComment, video }) {
 
       {/* Edit Comment Modal */}
       {editingComment && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#212121] w-full max-w-[600px] rounded-2xl p-6 shadow-2xl ring-1 ring-white/10 relative">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-[600px] rounded-3xl p-6 shadow-2xl border border-slate-100 relative">
             
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-medium text-white">Edit comment</h2>
+              <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Edit comment</h2>
               <button
                 onClick={() => setEditingComment(null)}
-                className="text-gray-400 hover:bg-[#3f3f3f] p-2 rounded-full transition-colors"
+                className="text-slate-400 hover:bg-slate-100 hover:text-slate-700 p-2 rounded-full transition-colors"
               >
                 <X size={20} />
               </button>
@@ -264,22 +265,22 @@ export default function CommentsSection({ onAddComment, video }) {
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
               rows={4}
-              className="w-full bg-[#0f0f0f] border border-[#3f3f3f] text-white rounded-lg p-3 outline-none focus:border-[#3ea6ff] text-[15px] resize-none mb-4"
+              className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-4 outline-none focus:border-[#ff0000] focus:ring-2 focus:ring-[#ff0000]/10 text-[15px] resize-none mb-4 transition-all shadow-inner"
               placeholder="Edit your comment..."
             />
             
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setEditingComment(null)}
-                className="px-4 py-2 rounded-full text-sm font-medium text-white hover:bg-[#3f3f3f] transition-colors"
+                className="px-5 py-2.5 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-100 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleEditSubmit}
-                className="px-5 py-2 rounded-full text-sm font-medium bg-[#3ea6ff] text-black hover:bg-[#65b8ff] transition-colors"
+                className="px-6 py-2.5 rounded-full text-sm font-bold bg-[#ff0000] text-white hover:bg-[#dd0000] transition-colors shadow-sm"
               >
-                Save
+                Save Changes
               </button>
             </div>
           </div>

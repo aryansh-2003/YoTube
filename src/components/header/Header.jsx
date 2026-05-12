@@ -1,12 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Search, Plus, Bell, Menu, ArrowLeft, X } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import DisplayPic from '../DisplayPic';
 import HeaderContext from '../context/HeaderContext';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
-import chalchitramText from '../../assets/chalchitramText.png'; // Assuming you have text image
-import chalchitram from '../../assets/chalchitram.png'; // Assuming logo icon
+import { io } from 'socket.io-client';
+// import { getSocket } from '../../../Service/socketIO';
 
 // Logo Icon Component if image fails or isn't used
 const LogoIcon = () => (
@@ -16,18 +16,35 @@ const LogoIcon = () => (
   </svg>
 );
 
+
+
+      
+
 export default function Header() {
   const userData = useSelector((state) => state.auth.userData);
   const { setSidebarOpen, setinputvalue, sidebarOpen } = useContext(HeaderContext);
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  // const socket = useRef(null)
+
+  useEffect(()=>{
+
+  //    return () => {
+  //   socket.disconnect();
+  // };
+  },[])
 
   const onsubmit = (data) => {
     setinputvalue(data.Text);
     navigate('/SearchPage');
     setMobileSearchOpen(false);
   };
+
+  const onCLick = () => {
+    console.log("Hi")
+      // socket.emit("message", `Hi im here${socket.id}`)
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-[#0f0f0f] border-b border-[#272727] z-50 flex items-center justify-between px-4 lg:px-6">
@@ -113,7 +130,7 @@ export default function Header() {
         </button>
 
         {/* Notification Bell */}
-        <button className="relative p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors group">
+        <button onClick={onCLick} lassName="relative p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors group">
           <Bell size={20} />
           {/* Notification Badge */}
           <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white ring-2 ring-[#0f0f0f]">

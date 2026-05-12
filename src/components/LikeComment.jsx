@@ -20,7 +20,7 @@ export default function LikeComment({ commentId, userId , isLiked, totalLikes}) 
     <button
       onClick={handleLike}
       className={`flex items-center space-x-1 text-xs sm:text-sm px-2 py-1 rounded-full transition-all 
-        ${liked ? "text-blue-400 bg-blue-500/10" : "text-gray-400 hover:text-white hover:bg-gray-700/40"}
+        ${liked ? "text-[#ff0000] bg-red-50" : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"}
       `}
     >
       <ThumbsUp size={15} />

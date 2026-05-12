@@ -53,7 +53,7 @@ function Media({ loading = false, data = [] }) {
       )}
 
       {/* Grid Layout matches Home.js structure */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-x-4 gap-y-8 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10 w-full">
         {content && content.length > 0 ? (
           content.map((item, index) => {
             const owner = item?.ownerInfo?.[0] || {};
@@ -68,18 +68,18 @@ function Media({ loading = false, data = [] }) {
                 onClick={() => item?._id && navigate(`/video/${item._id}`)}
               >
                 {/* --- Thumbnail Section --- */}
-                <div className="relative w-full aspect-video md:rounded-xl overflow-hidden bg-[#1a1a1a]">
+                <div className="relative w-full aspect-video md:rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm transition-shadow group-hover:shadow-md">
                   {item ? (
                     <>
                       <img
                         src={item.thumbnail || defaultAvatar}
                         alt={item.title || 'video thumbnail'}
                         onError={(e) => (e.currentTarget.src = defaultAvatar)}
-                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
 
                       {/* --- YouTube Style Overlay --- */}
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 flex flex-col justify-between p-2">
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 flex flex-col justify-between p-2">
                          {/* Top Right: Quick Actions */}
                          <div className="self-end transform translate-y-[-10px] group-hover:translate-y-0 transition-transform duration-300">
                            <button
@@ -87,7 +87,7 @@ function Media({ loading = false, data = [] }) {
                                e.stopPropagation();
                                handleMenuClick('Add to Playlist', item._id);
                              }}
-                             className="p-1.5 bg-black/80 hover:bg-white hover:text-black text-white rounded md:rounded-md transition-colors"
+                             className="p-1.5 bg-white/90 hover:bg-[#ff0000] hover:text-white text-slate-800 rounded md:rounded-lg shadow-sm transition-colors"
                              title="Save to Playlist"
                            >
                              <ListPlus size={20} strokeWidth={2} />
@@ -96,14 +96,14 @@ function Media({ loading = false, data = [] }) {
 
                          {/* Center: Play Button (Visual only) */}
                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <Play className="w-12 h-12 text-white fill-white opacity-90 drop-shadow-lg" />
+                            <Play className="w-12 h-12 text-[#ff0000] fill-[#ff0000] drop-shadow-md" />
                          </div>
                       </div>
 
-                      {/* "YOUR VIDEO" Badge - Matches Image (Gold/Yellow) */}
+                      {/* "YOUR VIDEO" Badge */}
                       {isOwner && (
-                        <div className="absolute top-2 left-2 px-2 py-1 bg-[#fbbf24] rounded-md shadow-lg z-20">
-                          <span className="text-[10px] font-extrabold text-black uppercase tracking-wider block leading-none">
+                        <div className="absolute top-2 left-2 px-2 py-1 bg-[#ff0000] rounded-md shadow-md z-20">
+                          <span className="text-[10px] font-extrabold text-white uppercase tracking-wider block leading-none">
                             YOUR VIDEO
                           </span>
                         </div>
@@ -111,13 +111,13 @@ function Media({ loading = false, data = [] }) {
 
                       {/* Duration Badge - Bottom Right */}
                       {item?.duration && (
-                        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/80 backdrop-blur-sm rounded text-xs font-medium text-white z-20">
+                        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 backdrop-blur-md rounded-md text-xs font-semibold text-white z-20 shadow-sm">
                           {formatVideoDuration(item.duration)}
                         </div>
                       )}
                     </>
                   ) : (
-                    <Skeleton variant="rectangular" width="100%" height="100%" sx={{ bgcolor: '#262626' }} />
+                    <Skeleton variant="rectangular" width="100%" height="100%" sx={{ bgcolor: '#e2e8f0' }} />
                   )}
                 </div>
 
@@ -130,50 +130,50 @@ function Media({ loading = false, data = [] }) {
                         src={owner?.avatar || defaultAvatar}
                         alt="avatar"
                         onError={(e) => (e.currentTarget.src = defaultAvatar)}
-                        className="w-9 h-9 rounded-full object-cover border border-white/10"
+                        className="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/channel/${owner?.username}`);
                         }}
                       />
                     ) : (
-                      <Skeleton variant="circular" width={36} height={36} sx={{ bgcolor: '#262626' }} />
+                      <Skeleton variant="circular" width={40} height={40} sx={{ bgcolor: '#e2e8f0' }} />
                     )}
                   </div>
 
                   {/* Text Details */}
-                  <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                  <div className="flex-1 min-w-0 flex flex-col gap-0.5 mt-0.5">
                     {item ? (
                       <>
                         {/* Title */}
-                        <h3 className="text-base font-bold text-white leading-tight line-clamp-2 group-hover:text-[#fbbf24] transition-colors">
+                        <h3 className="text-[15px] font-bold text-slate-900 leading-tight line-clamp-2 group-hover:text-[#ff0000] transition-colors">
                           {item.title || 'Untitled Video'}
                         </h3>
 
                         {/* Channel Name & Verified Tick */}
                         <div 
-                          className="flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors w-fit"
+                          className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition-colors w-fit mt-1"
                           onClick={(e) => {
                              e.stopPropagation();
                              navigate(`/channel/${owner?.username}`);
                           }}
                         >
-                          <span>{owner?.fullname || owner?.username || 'Unknown'}</span>
+                          <span className="font-medium">{owner?.fullname || owner?.username || 'Unknown'}</span>
                           {/* Verified Tick Icon */}
-                          <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10" />
+                          <CheckCircle2 size={13} className="text-[#0f172a] fill-slate-200" />
                         </div>
 
                         {/* Views & Date */}
-                        <div className="text-xs text-gray-500 font-medium">
+                        <div className="text-xs text-slate-500 font-medium mt-0.5">
                           {item.views ? `${item.views.toLocaleString()} views` : '0 views'}
-                          <span className="mx-1">•</span>
+                          <span className="mx-1.5">•</span>
                           {item.createdAt && timeAgo(item.createdAt)}
                         </div>
                       </>
                     ) : (
                       <Box sx={{ width: '100%' }}>
-                        <Skeleton width="90%" height={20} sx={{ mb: 1, bgcolor: '#262626' }} />
-                        <Skeleton width="60%" height={16} sx={{ bgcolor: '#262626' }} />
+                        <Skeleton width="90%" height={20} sx={{ mb: 1, bgcolor: '#e2e8f0' }} />
+                        <Skeleton width="60%" height={16} sx={{ bgcolor: '#e2e8f0' }} />
                       </Box>
                     )}
                   </div>
@@ -183,25 +183,26 @@ function Media({ loading = false, data = [] }) {
                     <div className="relative">
                       <button
                         onClick={(e) => handleMenuToggle(e, item._id)}
-                        className="opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-white/10 transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-800 transition-all"
                       >
-                        <MoreVertical size={18} className="text-white" />
+                        <MoreVertical size={18} />
                       </button>
 
                       {/* Dropdown Menu */}
                       {menuOpen === item._id && (
                         <>
                           <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setMenuOpen(null); }} />
-                          <div className="absolute right-0 top-8 w-48 bg-[#1f1f1f] border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden py-1">
+                          <div className="absolute right-0 top-8 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden py-1.5">
                             {isOwner && (
                               <>
-                                <button className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                                <button className="flex items-center gap-3 w-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-[#ff0000] transition-colors">
                                   <DeleteBtn videoId={item._id} />
-                                  <span>Delete</span>
+                                  {/* Ensure DeleteBtn doesn't double text, assuming it might render its own text, otherwise we might need to adjust. */}
+                                  <span className="ml-2">Delete</span>
                                 </button>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); handleMenuClick('Update', item._id); }}
-                                  className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                                  className="flex items-center gap-3 w-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                                 >
                                   <Pencil size={16} />
                                   <span>Edit</span>
@@ -210,7 +211,7 @@ function Media({ loading = false, data = [] }) {
                             )}
                             <button
                               onClick={(e) => { e.stopPropagation(); handleMenuClick('Add to Playlist', item._id); }}
-                              className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                              className="flex items-center gap-3 w-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                             >
                               <ListPlus size={16} />
                               <span>Save to Playlist</span>
@@ -227,6 +228,7 @@ function Media({ loading = false, data = [] }) {
         ) : (
           /* Loading Skeletons */
           <div className="col-span-full py-12">
+             {/* If you have a custom skeleton component, ensure it's also adapted to light theme */}
              <VideoSkeleton count={8} />
           </div>
         )}

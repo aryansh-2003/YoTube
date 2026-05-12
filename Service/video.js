@@ -1,34 +1,25 @@
 import axios from 'axios';
 
 
+const url = import.meta.env.VITE_BACKEND_URL
 
-export class VideoService{
-    constructor(){
+export class VideoService {
+    constructor() {
 
-    this.instance = axios.create({
-     baseURL: 'https://youtube-backend-052x.onrender.com/api/v1',
-    //  headers: {'X-Custom-Header': 'foobar'}
-    });
-    this.instance.interceptors.request.use(
-        (config) =>{
-            const accessToken = localStorage.getItem('token')
-            if(accessToken){
-                config.headers.Authorization = `Bearer ${accessToken}`
-            }
-            return config
-        },
-        (error) => Promise.reject(error)
-    )
+        this.instance = axios.create({
+            baseURL: `${url}/api/v1`,
+            withCredentials: true
+        });
     }
 
-    
 
-    async getAllVideos({query}){
+
+    async getAllVideos({ query }) {
         try {
-            return await this.instance.get('/getVideos',{
-                params:{
+            return await this.instance.get('/getVideos', {
+                params: {
                     query: query,
-                    page:1
+                    page: 1
                 }
             }
             )
@@ -38,12 +29,12 @@ export class VideoService{
     }
 
 
-     async getHomeVids(page){
+    async getHomeVids(page) {
         try {
-            return await this.instance.get('/getHomevids',{
-                params:{
+            return await this.instance.get('/getHomevids', {
+                params: {
 
-                    page:page
+                    page: page
                 }
             }
             )
@@ -52,35 +43,35 @@ export class VideoService{
         }
     }
 
-    async getVideoById({id}){
+    async getVideoById({ id }) {
 
         try {
-            return await this.instance.get(`/Get-video-by-id/${id}`,{
-              
+            return await this.instance.get(`/Get-video-by-id/${id}`, {
+
             }
             )
-            
+
 
         } catch (error) {
             return ("VideoService ::Get Video By Id Error", error)
         }
     }
 
-    async getSingleVideo({id}){
-         try {
-            return await this.instance.get(`/get-single-video/${id}`,{})
+    async getSingleVideo({ id }) {
+        try {
+            return await this.instance.get(`/get-single-video/${id}`, {})
         } catch (error) {
             return ("VideoService ::Get Single video By Id Error", error)
         }
     }
 
-    
 
 
-    async changePublishStatus({id,status}){
-         try {
-            return await this.instance.patch(`/toggle-status/${id}`,{
-                publishStatus : status
+
+    async changePublishStatus({ id, status }) {
+        try {
+            return await this.instance.patch(`/toggle-status/${id}`, {
+                publishStatus: status
             })
         } catch (error) {
             return ("VideoService ::Get Single video By Id Error", error)
@@ -88,32 +79,32 @@ export class VideoService{
     }
 
 
-        async updateVideo({id},formData){
-         try {
-            return await this.instance.patch(`/update-video/${id}`,formData)
+    async updateVideo({ id }, formData) {
+        try {
+            return await this.instance.patch(`/update-video/${id}`, formData)
         } catch (error) {
             return ("VideoService ::Update video Error", error)
         }
     }
 
-         async deleteVideo({id}){
-         try {
+    async deleteVideo({ id }) {
+        try {
             return await this.instance.delete(`/delete-Video/${id}`)
         } catch (error) {
             return ("VideoService ::Update video Error", error)
         }
     }
 
-    async uploadVideo(formData){
+    async uploadVideo(formData) {
         const config = {
-  onUploadProgress: progressEvent => {
-    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-    // Update your progress bar or feedback here
-    console.log(`Upload Progress: ${percentCompleted}%`);
-  }
-};
+            onUploadProgress: progressEvent => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                // Update your progress bar or feedback here
+                console.log(`Upload Progress: ${percentCompleted}%`);
+            }
+        };
         try {
-            return await this.instance.post(`/upload-Video`,formData,config)
+            return await this.instance.post(`/upload-Video`, formData, config)
         } catch (error) {
             return ("VideoService ::Get Single video By Id Error", error)
         }

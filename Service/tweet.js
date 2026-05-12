@@ -2,30 +2,24 @@ import axios from 'axios';
 
 
 
-export class TweetService{
-    constructor(){
 
-    this.instance = axios.create({
-     baseURL: 'https://youtube-backend-052x.onrender.com/api/v1',
-    //  headers: {'X-Custom-Header': 'foobar'}
-    });
-    this.instance.interceptors.request.use(
-        (config) =>{
-            const accessToken = localStorage.getItem('token')
-            if(accessToken){
-                config.headers.Authorization = `Bearer ${accessToken}`
-            }
-            return config
-        },
-        (error) => Promise.reject(error)
-    )
+
+const url = import.meta.env.VITE_BACKEND_URL
+
+export class TweetService {
+    constructor() {
+
+        this.instance = axios.create({
+            baseURL: `${url}/api/v1`,
+            withCredentials: true
+        });
     }
 
-    async createTweet({message}){
+    async createTweet({ message }) {
         try {
             return await this.instance.post('/create-tweet',
                 {
-                    content:message
+                    content: message
                 }
             )
         } catch (error) {
@@ -33,7 +27,7 @@ export class TweetService{
         }
     }
 
-       async getUserTweets({id}){
+    async getUserTweets({ id }) {
         try {
             return await this.instance.get(`/user-tweets/${id}`)
         } catch (error) {
@@ -41,13 +35,13 @@ export class TweetService{
         }
     }
 
-       async getAllTweets({page,limit}){
+    async getAllTweets({ page, limit }) {
         try {
-            return await this.instance.get(`/home-tweets`,{
-                   params:{
+            return await this.instance.get(`/home-tweets`, {
+                params: {
 
-                    page:page,
-                    limit:limit
+                    page: page,
+                    limit: limit
                 }
             }
             )
@@ -56,7 +50,7 @@ export class TweetService{
         }
     }
 
-          async getAllLikedTweets(){
+    async getAllLikedTweets() {
         try {
             return await this.instance.get(`/liked-tweets`)
         } catch (error) {

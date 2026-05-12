@@ -4,48 +4,101 @@ import authService from "../../../Service/auth";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
+import { Canvas } from "@react-three/fiber";
+import { Float, Environment, MeshDistortMaterial } from "@react-three/drei";
+
+// --- 3D BACKGROUND COMPONENT ---
+const Background3D = () => {
+  return (
+    <div className="fixed inset-0 z-0 bg-slate-50 pointer-events-none">
+      <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
+        <ambientLight intensity={1.2} />
+        <directionalLight position={[10, 10, 5]} intensity={1.5} color="#ffffff" />
+        <directionalLight position={[-10, -10, -5]} intensity={1} color="#ffcccc" />
+        
+        {/* Sphere */}
+        <Float speed={2} rotationIntensity={1.5} floatIntensity={2}>
+          <mesh position={[-3.5, 1.5, -2]}>
+            <sphereGeometry args={[1.2, 64, 64]} />
+            <MeshDistortMaterial 
+              color="#ff2a2a" 
+              envMapIntensity={1} 
+              clearcoat={1} 
+              clearcoatRoughness={0.1} 
+              metalness={0.1} 
+              roughness={0.2} 
+              distort={0.4} 
+              speed={2} 
+            />
+          </mesh>
+        </Float>
+        
+        {/* PLAY BUTTON SHAPE (Triangular prism) instead of Box */}
+        <Float speed={2.5} rotationIntensity={2} floatIntensity={3}>
+          <mesh position={[4, -1, -3]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]}>
+            <cylinderGeometry args={[1.6, 1.6, 0.4, 3]} />
+            <meshPhysicalMaterial 
+              color="#ff0000" 
+              roughness={0.2} 
+              metalness={0.1} 
+              clearcoat={0.8}
+            />
+          </mesh>
+        </Float>
+        
+        {/* Torus */}
+        <Float speed={1.5} rotationIntensity={1} floatIntensity={1}>
+          <mesh position={[3, 3, -4]} rotation={[-Math.PI / 4, 0, Math.PI / 6]}>
+            <torusGeometry args={[1.2, 0.4, 32, 64]} />
+            <meshPhysicalMaterial 
+              color="#ffffff" 
+              roughness={0.1} 
+              metalness={0.5} 
+              clearcoat={1}
+            />
+          </mesh>
+        </Float>
+
+        <Environment preset="city" />
+      </Canvas>
+    </div>
+  );
+};
 
 // --- ICONS ---
-
-const SparkleIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-[#ff2d46]">
-    <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-  </svg>
-);
-
 const UserIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-slate-400">
     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
   </svg>
 );
 
 const AtSymbolIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-slate-400">
     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 10-2.636 6.364M16.5 12V8.25" />
   </svg>
 );
 
 const TagIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-slate-400">
     <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5" />
   </svg>
 );
 
 const LockIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-slate-400">
     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
   </svg>
 );
 
 const PhotoIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-slate-400">
     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
   </svg>
 );
 
-const ArrowIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 ml-2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+const PlayIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-[#ff0000]">
+    <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
   </svg>
 );
 
@@ -59,8 +112,6 @@ export default function SignUpComponent() {
   const dispatch = useDispatch();
   const [error, setError] = useState();
   const navigate = useNavigate();
-
-  const bgImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuADVNLKTIZjyJYZ8m5S9FT1MOirlDhyPdXaDlMRnslPkH3mI0qCAkHrR4iBHkfjjeU5N9MTmzpLKUHaXz6Po31tmY4Qu6nYLnL6k65H86qzYTH6aU73CIUkIrdxsF-JsVuk35w2F5ibY1bOp9njqAJqZzACZJ_MgOpGYiEjT77KjOF3hYnQX-vev8m-LwnypzHcPSNbzq1ogmcz9-9PU2wmg-zPk5hTzXGb3nAwAJDOye4w8nVtgI6EnHNrhz4a-TmoISIoCm5w_lk";
 
   const submitHandler = async (data) => {
     const formData = new FormData();
@@ -86,47 +137,38 @@ export default function SignUpComponent() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#050505] relative overflow-x-hidden overflow-y-auto font-sans py-16">
+    <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 relative overflow-x-hidden overflow-y-auto font-sans py-16">
       
-      {/* --- BACKGROUND IMAGE --- */}
-      <div 
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
-          backgroundImage: `url(${bgImage})`,
-          filter: "brightness(0.9)" 
-        }}
-      />
+      <Background3D />
       
       {/* --- GRADIENT OVERLAY --- */}
-      <div className="fixed inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#0c0505] z-0 pointer-events-none via-50% to-90%" />
-
-      {/* --- TOP LEFT ICON --- */}
-      <div className="absolute top-6 left-6 z-20">
-        <div className="w-12 h-12 rounded-2xl bg-[#140505]/60 border border-[#ff2d46]/30 flex items-center justify-center shadow-[0_0_15px_rgba(255,45,70,0.15)] backdrop-blur-sm">
-          <SparkleIcon />
-        </div>
-      </div>
+      <div className="fixed inset-0 bg-gradient-to-br from-white/70 via-transparent to-red-50/70 z-0 pointer-events-none" />
 
       {/* --- MAIN CONTENT CONTAINER --- */}
-      <div className="relative z-10 w-full max-w-[420px] px-6 flex flex-col items-center mt-10">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 w-full max-w-[420px] px-8 py-10 mx-4 bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] flex flex-col items-center mt-10"
+      >
         
-        {/* HEADINGS */}
-        <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-8 flex flex-col items-center"
-        >
-          <h1 className="text-3xl font-extrabold text-white tracking-widest uppercase mb-1 drop-shadow-lg">
-            JOIN THE
+        {/* LOGO & HEADINGS */}
+        <div className="mb-8 flex flex-col items-center">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+            className="w-16 h-16 rounded-2xl bg-white shadow-md border border-slate-100 flex items-center justify-center mb-4"
+          >
+            <PlayIcon />
+          </motion.div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+            Create Account
           </h1>
-          <h1 className="text-5xl font-black text-[#ff2d46] tracking-widest uppercase drop-shadow-[0_0_20px_rgba(255,45,70,0.6)]">
-            NEXUS
-          </h1>
-          <p className="text-gray-300 text-sm mt-3 font-medium tracking-wide drop-shadow-md">
-            Begin your journey, Shinobi.
+          <p className="text-slate-500 text-sm font-medium">
+            Join the streaming world today
           </p>
-        </motion.div>
+        </div>
 
         {/* ERROR MESSAGE */}
         <AnimatePresence>
@@ -135,10 +177,10 @@ export default function SignUpComponent() {
               initial={{ opacity: 0, y: -10, height: 0 }}
               animate={{ opacity: 1, y: 0, height: "auto" }}
               exit={{ opacity: 0, y: -10, height: 0 }}
-              className="w-full mb-4 overflow-hidden"
+              className="w-full mb-6 overflow-hidden"
             >
-              <div className="bg-red-900/40 border border-red-500/50 rounded-lg px-4 py-2 text-center backdrop-blur-md">
-                <p className="text-red-200 text-sm font-semibold">{error}</p>
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-center">
+                <p className="text-red-600 text-sm font-semibold">{error}</p>
               </div>
             </motion.div>
           )}
@@ -149,28 +191,28 @@ export default function SignUpComponent() {
           
           {/* Full Name */}
           <div className="relative group">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors text-slate-400 group-focus-within:text-[#ff0000]">
               <UserIcon />
             </div>
             <input
               type="text"
               placeholder="Full Name"
-              className={`w-full bg-[#1e0e0e] border ${errors.FullName ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
-              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300`}
+              className={`w-full bg-white border ${errors.FullName ? 'border-red-500' : 'border-slate-200 group-hover:border-slate-300'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#ff0000]/20 focus:border-[#ff0000] transition-all duration-300 shadow-sm`}
               {...register("FullName", { required: "Full Name is required" })}
             />
           </div>
 
           {/* Email */}
           <div className="relative group">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors text-slate-400 group-focus-within:text-[#ff0000]">
               <AtSymbolIcon />
             </div>
             <input
               type="email"
               placeholder="Email Address"
-              className={`w-full bg-[#1e0e0e] border ${errors.email ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
-              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300`}
+              className={`w-full bg-white border ${errors.email ? 'border-red-500' : 'border-slate-200 group-hover:border-slate-300'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#ff0000]/20 focus:border-[#ff0000] transition-all duration-300 shadow-sm`}
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -183,63 +225,62 @@ export default function SignUpComponent() {
 
           {/* Username */}
           <div className="relative group">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors text-slate-400 group-focus-within:text-[#ff0000]">
               <TagIcon />
             </div>
             <input
               type="text"
               placeholder="Username"
-              className={`w-full bg-[#1e0e0e] border ${errors.username ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
-              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300`}
+              className={`w-full bg-white border ${errors.username ? 'border-red-500' : 'border-slate-200 group-hover:border-slate-300'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#ff0000]/20 focus:border-[#ff0000] transition-all duration-300 shadow-sm`}
               {...register("username", { required: "Username is required" })}
             />
           </div>
 
           {/* Avatar (File Input) */}
           <div className="relative group">
-             <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+             <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors text-slate-400 group-focus-within:text-[#ff0000]">
               <PhotoIcon />
             </div>
             <input
               type="file"
-              className={`w-full bg-[#1e0e0e] border ${errors.avatar ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
-              rounded-xl py-2.5 pl-12 pr-4 text-gray-400 text-sm
-              file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold 
-              file:bg-[#2a1012] file:text-[#ff2d46] hover:file:bg-[#3d1518]
-              focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300 cursor-pointer`}
+              className={`w-full bg-white border ${errors.avatar ? 'border-red-500' : 'border-slate-200 group-hover:border-slate-300'} 
+              rounded-xl py-2.5 pl-12 pr-4 text-slate-500 text-sm shadow-sm
+              file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold
+              file:bg-[#ff0000]/10 file:text-[#ff0000] hover:file:bg-[#ff0000]/20
+              focus:outline-none focus:ring-2 focus:ring-[#ff0000]/20 focus:border-[#ff0000] transition-all duration-300 cursor-pointer`}
               {...register("avatar", { required: "Avatar is required" })}
             />
-             {/* Label overlay for cleaner look if file input styling fails in some browsers, but Tailwind file: modifiers usually work well */}
-             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-600 font-bold uppercase pointer-events-none">Avatar</span>
+             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold uppercase pointer-events-none">Avatar</span>
           </div>
 
           {/* Cover Image (File Input) */}
           <div className="relative group">
-             <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+             <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors text-slate-400 group-focus-within:text-[#ff0000]">
               <PhotoIcon />
             </div>
             <input
               type="file"
-              className="w-full bg-[#1e0e0e] border border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40
-              rounded-xl py-2.5 pl-12 pr-4 text-gray-400 text-sm
-              file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold 
-              file:bg-[#2a1012] file:text-gray-400 hover:file:bg-[#3d1518] hover:file:text-[#ff2d46]
-              focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300 cursor-pointer"
+              className="w-full bg-white border border-slate-200 group-hover:border-slate-300 shadow-sm
+              rounded-xl py-2.5 pl-12 pr-4 text-slate-500 text-sm
+              file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold
+              file:bg-slate-100 file:text-slate-600 hover:file:bg-slate-200
+              focus:outline-none focus:ring-2 focus:ring-[#ff0000]/20 focus:border-[#ff0000] transition-all duration-300 cursor-pointer"
               {...register("coverImage")}
             />
-             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-600 font-bold uppercase pointer-events-none">Cover (Optional)</span>
+             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold uppercase pointer-events-none">Cover</span>
           </div>
 
           {/* Password */}
           <div className="relative group">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors text-slate-400 group-focus-within:text-[#ff0000]">
               <LockIcon />
             </div>
             <input
               type="password"
               placeholder="Password"
-              className={`w-full bg-[#1e0e0e] border ${errors.password ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
-              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300 tracking-widest`}
+              className={`w-full bg-white border ${errors.password ? 'border-red-500' : 'border-slate-200 group-hover:border-slate-300'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#ff0000]/20 focus:border-[#ff0000] transition-all duration-300 shadow-sm tracking-widest`}
               {...register("password", {
                 required: "Password is required",
                 minLength: {
@@ -252,31 +293,30 @@ export default function SignUpComponent() {
 
           {/* Submit Button */}
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             disabled={isSubmitting}
             type="submit"
-            className="w-full bg-[#ff2d46] hover:bg-[#eb263d] text-white font-bold text-sm py-4 rounded-xl shadow-[0_0_20px_rgba(255,45,70,0.3)] hover:shadow-[0_0_30px_rgba(255,45,70,0.5)] transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-4 flex items-center justify-center uppercase tracking-wider"
+            className="w-full bg-[#ff0000] hover:bg-[#dd0000] text-white font-bold text-[15px] py-4 rounded-xl shadow-[0_8px_20px_rgba(255,0,0,0.25)] hover:shadow-[0_12px_25px_rgba(255,0,0,0.35)] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed mt-4 flex items-center justify-center"
           >
-            {isSubmitting ? "INITIATING..." : "CREATE ACCOUNT"} 
-            {!isSubmitting && <ArrowIcon />}
+            {isSubmitting ? "CREATING..." : "Create Account"} 
           </motion.button>
         </form>
 
         {/* --- FOOTER --- */}
-        <div className="mt-8 text-center pb-8">
-          <p className="text-gray-500 text-sm font-medium">
-            Already a Shinobi?{" "}
+        <div className="mt-8 text-center">
+          <p className="text-slate-600 text-sm font-medium">
+            Already have an account?{" "}
             <button
               onClick={() => navigate("/")}
-              className="text-[#ff2d46] font-bold hover:text-white transition-colors ml-1"
+              className="text-[#ff0000] font-semibold hover:text-[#cc0000] transition-colors ml-1"
             >
               Sign In
             </button>
           </p>
         </div>
 
-      </div>
+      </motion.div>
     </div>
   );
 }

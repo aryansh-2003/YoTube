@@ -1,29 +1,23 @@
 import axios from 'axios';
 
 
+const url = import.meta.env.VITE_BACKEND_URL
 
-export class LikeService{
-    constructor(){
 
-    this.instance = axios.create({
-     baseURL: 'https://youtube-backend-052x.onrender.com/api/v1',
-    //  headers: {'X-Custom-Header': 'foobar'}
-    });
-    this.instance.interceptors.request.use(
-        (config) =>{
-            const accessToken = localStorage.getItem('token')
-            if(accessToken){
-                config.headers.Authorization = `Bearer ${accessToken}`
-            }
-            return config
-        },
-        (error) => Promise.reject(error)
-    )
+export class LikeService {
+    constructor() {
+
+        this.instance = axios.create({
+            baseURL: `${url}/api/v1`,
+            withCredentials: true
+
+        });
+
     }
 
-    
 
-    async likeVideo({videoId}){
+
+    async likeVideo({ videoId }) {
         try {
             return await this.instance.post(`/toggle-video-like/${videoId}`)
         } catch (error) {
@@ -32,14 +26,14 @@ export class LikeService{
     }
 
 
-      async getLikedVideos(){
+    async getLikedVideos() {
         try {
             return await this.instance.get(`/liked-videos`)
         } catch (error) {
             return ("LikeService :: Get Liked Error", error)
         }
     }
-    async likeComment({id}){
+    async likeComment({ id }) {
         try {
             return await this.instance.post(`/toggle-comment-like/${id}`)
         } catch (error) {
@@ -47,7 +41,7 @@ export class LikeService{
         }
     }
 
-    async likeTweet(id){
+    async likeTweet(id) {
         console.log(id)
         try {
             return await this.instance.post(`/toggle-tweet-like/${id}`)

@@ -1,29 +1,21 @@
 import axios from 'axios';
 
 
+const url = import.meta.env.VITE_BACKEND_URL
 
-export class SubscriptionService{
-    constructor(){
+export class SubscriptionService {
+    constructor() {
 
-    this.instance = axios.create({
-     baseURL: 'https://youtube-backend-052x.onrender.com/api/v1',
-    //  headers: {'X-Custom-Header': 'foobar'}
-    });
-    this.instance.interceptors.request.use(
-        (config) =>{
-            const accessToken = localStorage.getItem('token')
-            if(accessToken){
-                config.headers.Authorization = `Bearer ${accessToken}`
-            }
-            return config
-        },
-        (error) => Promise.reject(error)
-    )
+        this.instance = axios.create({
+            baseURL: `${url}/api/v1`,
+            withCredentials: true
+        });
+
     }
 
-    
 
-    async subscribeto({subscribetoid}){
+
+    async subscribeto({ subscribetoid }) {
         try {
             return await this.instance.post(`/subscribe/${subscribetoid}`)
         } catch (error) {
@@ -32,7 +24,7 @@ export class SubscriptionService{
     }
 
 
-    async getUserSubscribers({id}){
+    async getUserSubscribers({ id }) {
         try {
             return await this.instance.get(`/get-subscribers/${id}`)
         } catch (error) {
@@ -40,7 +32,7 @@ export class SubscriptionService{
         }
     }
 
-    async getUserSubscription(){
+    async getUserSubscription() {
         try {
             return await this.instance.get(`/get-subscribed-channel`)
         } catch (error) {

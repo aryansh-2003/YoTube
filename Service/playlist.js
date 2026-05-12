@@ -2,38 +2,32 @@ import axios from 'axios';
 
 
 
-export class PlaylistService{
-    constructor(){
 
-    this.instance = axios.create({
-     baseURL: 'https://youtube-backend-052x.onrender.com/api/v1',
-    //  headers: {'X-Custom-Header': 'foobar'}
-    });
-    this.instance.interceptors.request.use(
-        (config) =>{
-            const accessToken = localStorage.getItem('token')
-            if(accessToken){
-                config.headers.Authorization = `Bearer ${accessToken}`
-            }
-            return config
-        },
-        (error) => Promise.reject(error)
-    )
+const url = import.meta.env.VITE_BACKEND_URL
+
+export class PlaylistService {
+    constructor() {
+
+        this.instance = axios.create({
+            baseURL: `${url}/api/v1`,
+            withCredentials: true
+        });
+
     }
 
-    
 
-    async createPlaylist({name,description}){
+
+    async createPlaylist({ name, description }) {
         try {
-            return await this.instance.post('/create-playlist',{
-                name:name,
-                description:description
+            return await this.instance.post('/create-playlist', {
+                name: name,
+                description: description
             })
         } catch (error) {
             return ("PlaylistService :: create Error", error)
         }
     }
-     async getUserPlaylist(){
+    async getUserPlaylist() {
         try {
             return await this.instance.get('/get-playlist')
         } catch (error) {
@@ -41,7 +35,7 @@ export class PlaylistService{
         }
     }
 
-      async addVideoToPlaylist({playlistId,videoId}){
+    async addVideoToPlaylist({ playlistId, videoId }) {
         try {
             return await this.instance.patch(`/add-video/${playlistId}/${videoId}`)
         } catch (error) {
@@ -49,7 +43,7 @@ export class PlaylistService{
         }
     }
 
-    async getPlaylistById({playlistId}){
+    async getPlaylistById({ playlistId }) {
         try {
             return await this.instance.get(`/get-playlist-by-id/${playlistId}`)
         } catch (error) {
@@ -57,7 +51,7 @@ export class PlaylistService{
         }
     }
 
-     async deleteVideoFromPlaylist({playlistId,videoId}){
+    async deleteVideoFromPlaylist({ playlistId, videoId }) {
         try {
             return await this.instance.delete(`/remove-video/${playlistId}/${videoId}`)
         } catch (error) {

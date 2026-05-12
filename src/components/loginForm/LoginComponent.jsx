@@ -5,43 +5,95 @@ import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { login } from "../../Store/authSlice";
 import { motion, AnimatePresence } from "framer-motion";
+import { Canvas } from "@react-three/fiber";
+import { Float, Environment, MeshDistortMaterial } from "@react-three/drei";
+
+// --- 3D BACKGROUND COMPONENT ---
+const Background3D = () => {
+  return (
+    <div className="absolute inset-0 z-0 bg-slate-50 pointer-events-none">
+      <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
+        <ambientLight intensity={1.2} />
+        <directionalLight position={[10, 10, 5]} intensity={1.5} color="#ffffff" />
+        <directionalLight position={[-10, -10, -5]} intensity={1} color="#ffcccc" />
+        
+        {/* Sphere */}
+        <Float speed={2} rotationIntensity={1.5} floatIntensity={2}>
+          <mesh position={[-3.5, 1.5, -2]}>
+            <sphereGeometry args={[1.2, 64, 64]} />
+            <MeshDistortMaterial 
+              color="#ff2a2a" 
+              envMapIntensity={1} 
+              clearcoat={1} 
+              clearcoatRoughness={0.1} 
+              metalness={0.1} 
+              roughness={0.2} 
+              distort={0.4} 
+              speed={2} 
+            />
+          </mesh>
+        </Float>
+        
+        {/* PLAY BUTTON SHAPE (Triangular prism) instead of Box */}
+        <Float speed={2.5} rotationIntensity={2} floatIntensity={3}>
+          <mesh position={[4, -1, -3]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]}>
+            <cylinderGeometry args={[1.6, 1.6, 0.4, 3]} />
+            <meshPhysicalMaterial 
+              color="#ff0000" 
+              roughness={0.2} 
+              metalness={0.1} 
+              clearcoat={0.8}
+            />
+          </mesh>
+        </Float>
+        
+        {/* Torus */}
+        <Float speed={1.5} rotationIntensity={1} floatIntensity={1}>
+          <mesh position={[3, 3, -4]} rotation={[-Math.PI / 4, 0, Math.PI / 6]}>
+            <torusGeometry args={[1.2, 0.4, 32, 64]} />
+            <meshPhysicalMaterial 
+              color="#ffffff" 
+              roughness={0.1} 
+              metalness={0.5} 
+              clearcoat={1}
+            />
+          </mesh>
+        </Float>
+
+        <Environment preset="city" />
+      </Canvas>
+    </div>
+  );
+};
 
 // --- ICONS ---
-
-// Sparkle Icon (Matches the top left of the screenshot)
-const SparkleIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-[#ff2d46]">
-    <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-  </svg>
-);
-
 const UserIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-slate-400">
     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 10-2.636 6.364M16.5 12V8.25" />
   </svg>
 );
 
 const LockIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-400">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-slate-400">
     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
   </svg>
 );
 
 const GoogleIcon = () => (
-  <svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+  <svg className="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24">
     <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.813 1.053 6.427 2.56L21.3 3.48c-2.48-2.32-5.787-3.653-9.3-3.653C5.373-.173.187 5.013.187 11.827s5.187 12 12 12c3.467 0 6.373-1.147 8.507-3.307 2.187-2.187 3.253-5.333 3.253-8.667 0-.587-.053-1.12-.133-1.653H12.48z" />
   </svg>
 );
 
 const GithubIcon = () => (
-  <svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+  <svg className="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24">
     <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
   </svg>
 );
 
-const ArrowIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 ml-2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+const PlayIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-[#ff0000]">
+    <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
   </svg>
 );
 
@@ -55,8 +107,6 @@ export default function LoginComponent() {
   const dispatch = useDispatch();
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
-  const bgImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuADVNLKTIZjyJYZ8m5S9FT1MOirlDhyPdXaDlMRnslPkH3mI0qCAkHrR4iBHkfjjeU5N9MTmzpLKUHaXz6Po31tmY4Qu6nYLnL6k65H86qzYTH6aU73CIUkIrdxsF-JsVuk35w2F5ibY1bOp9njqAJqZzACZJ_MgOpGYiEjT77KjOF3hYnQX-vev8m-LwnypzHcPSNbzq1ogmcz9-9PU2wmg-zPk5hTzXGb3nAwAJDOye4w8nVtgI6EnHNrhz4a-TmoISIoCm5w_lk";
 
   const submitHandler = async (data) => {
     if (data) {
@@ -83,47 +133,38 @@ export default function LoginComponent() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#050505] relative overflow-hidden font-sans">
+    <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 relative overflow-hidden font-sans">
       
-      {/* --- BACKGROUND IMAGE --- */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
-          backgroundImage: `url(${bgImage})`,
-          filter: "brightness(0.9)" 
-        }}
-      />
+      <Background3D />
       
-      {/* --- GRADIENT OVERLAY (Fades bottom to black for text readability) --- */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/40 to-[#0c0505] z-0 pointer-events-none via-60% to-90%" />
-
-      {/* --- TOP LEFT ICON --- */}
-      <div className="absolute top-6 left-6 z-20">
-        <div className="w-12 h-12 rounded-2xl bg-[#140505]/60 border border-[#ff2d46]/30 flex items-center justify-center shadow-[0_0_15px_rgba(255,45,70,0.15)] backdrop-blur-sm">
-          <SparkleIcon />
-        </div>
-      </div>
+      {/* --- GRADIENT OVERLAY (Subtle soft gradient to blend corners) --- */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-transparent to-red-50/70 z-0 pointer-events-none" />
 
       {/* --- MAIN CONTENT CONTAINER --- */}
-      <div className="relative z-10 w-full max-w-[380px] px-6 flex flex-col items-center mt-32 md:mt-40">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 w-full max-w-[420px] px-8 py-10 mx-4 bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] flex flex-col items-center"
+      >
         
-        {/* HEADINGS */}
-        <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-10 flex flex-col items-center"
-        >
-          <h1 className="text-3xl font-extrabold text-white tracking-widest uppercase mb-1 drop-shadow-lg">
-            ENTER THE
+        {/* LOGO & HEADINGS */}
+        <div className="mb-8 flex flex-col items-center">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+            className="w-16 h-16 rounded-2xl bg-white shadow-md border border-slate-100 flex items-center justify-center mb-4"
+          >
+            <PlayIcon />
+          </motion.div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+            Welcome Back
           </h1>
-          <h1 className="text-5xl font-black text-[#ff2d46] tracking-widest uppercase drop-shadow-[0_0_20px_rgba(255,45,70,0.6)]">
-            NEXUS
-          </h1>
-          <p className="text-gray-300 text-sm mt-3 font-medium tracking-wide drop-shadow-md">
-            Welcome back, Shinobi.
+          <p className="text-slate-500 text-sm font-medium">
+            Sign in to continue to your streaming world
           </p>
-        </motion.div>
+        </div>
 
         {/* ERROR MESSAGE */}
         <AnimatePresence>
@@ -132,28 +173,28 @@ export default function LoginComponent() {
               initial={{ opacity: 0, y: -10, height: 0 }}
               animate={{ opacity: 1, y: 0, height: "auto" }}
               exit={{ opacity: 0, y: -10, height: 0 }}
-              className="w-full mb-4 overflow-hidden"
+              className="w-full mb-6 overflow-hidden"
             >
-              <div className="bg-red-900/40 border border-red-500/50 rounded-lg px-4 py-2 text-center backdrop-blur-md">
-                <p className="text-red-200 text-sm font-semibold">{error}</p>
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-center">
+                <p className="text-red-600 text-sm font-semibold">{error}</p>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* FORM */}
-        <form onSubmit={handleSubmit(submitHandler)} className="w-full space-y-4">
+        <form onSubmit={handleSubmit(submitHandler)} className="w-full space-y-5">
           
           {/* Email Field */}
           <div className="relative group">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors text-slate-400 group-focus-within:text-[#ff0000]">
               <UserIcon />
             </div>
             <input
               type="email"
               placeholder="Email Address"
-              className={`w-full bg-[#1e0e0e] border ${errors.email ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
-              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300`}
+              className={`w-full bg-white border ${errors.email ? 'border-red-500' : 'border-slate-200 group-hover:border-slate-300'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#ff0000]/20 focus:border-[#ff0000] transition-all duration-300 shadow-sm`}
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -166,14 +207,14 @@ export default function LoginComponent() {
 
           {/* Password Field */}
           <div className="relative group">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-white">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors text-slate-400 group-focus-within:text-[#ff0000]">
               <LockIcon />
             </div>
             <input
               type="password"
               placeholder="Password"
-              className={`w-full bg-[#1e0e0e] border ${errors.password ? 'border-red-500' : 'border-[#4a1d1d]/30 group-hover:border-[#ff2d46]/40'} 
-              rounded-xl py-3.5 pl-12 pr-4 text-gray-200 placeholder-gray-500/70 focus:outline-none focus:ring-1 focus:ring-[#ff2d46] focus:border-[#ff2d46] transition-all duration-300 tracking-widest`}
+              className={`w-full bg-white border ${errors.password ? 'border-red-500' : 'border-slate-200 group-hover:border-slate-300'} 
+              rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#ff0000]/20 focus:border-[#ff0000] transition-all duration-300 shadow-sm tracking-widest`}
               {...register("password", {
                 required: "Password is required",
                 minLength: {
@@ -185,43 +226,48 @@ export default function LoginComponent() {
           </div>
 
           {/* Forgot Password Link */}
-          <div className="flex justify-end pt-1">
-            <button type="button" className="text-gray-500 hover:text-white text-xs font-medium transition-colors">
+          <div className="flex justify-between items-center px-1 pt-1">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#ff0000] focus:ring-[#ff0000] transition-colors" />
+              <span className="text-slate-600 text-xs font-medium">Remember me</span>
+            </label>
+            <button type="button" className="text-slate-600 hover:text-[#ff0000] text-xs font-semibold transition-colors">
               Forgot Password?
             </button>
           </div>
 
           {/* Login Button */}
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             disabled={isSubmitting}
             type="submit"
-            className="w-full bg-[#ff2d46] hover:bg-[#eb263d] text-white font-bold text-sm py-4 rounded-xl shadow-[0_0_20px_rgba(255,45,70,0.3)] hover:shadow-[0_0_30px_rgba(255,45,70,0.5)] transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-2 flex items-center justify-center uppercase tracking-wider"
+            className="w-full bg-[#ff0000] hover:bg-[#dd0000] text-white font-bold text-[15px] py-4 rounded-xl shadow-[0_8px_20px_rgba(255,0,0,0.25)] hover:shadow-[0_12px_25px_rgba(255,0,0,0.35)] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed mt-2 flex items-center justify-center"
           >
-            {isSubmitting ? "ENTERING..." : "LOGIN"} 
-            {!isSubmitting && <ArrowIcon />}
+            {isSubmitting ? "SIGNING IN..." : "Sign In"} 
           </motion.button>
         </form>
 
         {/* --- SOCIAL LOGIN SECTION --- */}
         <div className="w-full mt-8">
-          <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-white/10"></div>
-            <span className="flex-shrink-0 mx-4 text-gray-600 text-[10px] font-bold tracking-widest uppercase">Or summon with</span>
-            <div className="flex-grow border-t border-white/10"></div>
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-slate-200"></div>
+            <span className="flex-shrink-0 mx-4 text-slate-400 text-xs font-semibold tracking-wider uppercase">Or continue with</span>
+            <div className="flex-grow border-t border-slate-200"></div>
           </div>
 
           <div className="flex justify-center gap-4 mt-6">
             <motion.button 
-              whileHover={{ y: -3, backgroundColor: "#2a1012" }}
-              className="w-12 h-12 rounded-full bg-[#1a0a0a] border border-[#331111] flex items-center justify-center transition-all hover:border-[#ff2d46]/50"
+              whileHover={{ y: -2, backgroundColor: "#f8fafc" }}
+              whileTap={{ scale: 0.95 }}
+              className="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center transition-all hover:border-slate-300 hover:shadow-md"
             >
               <GoogleIcon />
             </motion.button>
             <motion.button 
-              whileHover={{ y: -3, backgroundColor: "#2a1012" }}
-              className="w-12 h-12 rounded-full bg-[#1a0a0a] border border-[#331111] flex items-center justify-center transition-all hover:border-[#ff2d46]/50"
+              whileHover={{ y: -2, backgroundColor: "#f8fafc" }}
+              whileTap={{ scale: 0.95 }}
+              className="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center transition-all hover:border-slate-300 hover:shadow-md"
             >
               <GithubIcon />
             </motion.button>
@@ -229,19 +275,19 @@ export default function LoginComponent() {
         </div>
 
         {/* --- FOOTER --- */}
-        <div className="mt-10 text-center pb-8">
-          <p className="text-gray-500 text-sm font-medium">
-            New to the clan?{" "}
+        <div className="mt-8 text-center">
+          <p className="text-slate-600 text-sm font-medium">
+            New to the platform?{" "}
             <button
               onClick={() => navigate("/signup")}
-              className="text-[#ff2d46] font-bold hover:text-white transition-colors ml-1"
+              className="text-[#ff0000] font-semibold hover:text-[#cc0000] transition-colors ml-1"
             >
-              Sign Up
+              Create an account
             </button>
           </p>
         </div>
 
-      </div>
+      </motion.div>
     </div>
   );
 }
