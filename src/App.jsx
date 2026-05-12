@@ -9,8 +9,6 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import Loader from './PreLoader/loader'
 import ShinyText from "./components/BlurText/BlurText";
 
-const socket = io("http://localhost:8000/");
-
 export default function App() {
 
   const userData = useSelector(state => state.auth.userData)

@@ -5,8 +5,7 @@ import DisplayPic from '../DisplayPic';
 import HeaderContext from '../context/HeaderContext';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
-import { io } from 'socket.io-client';
-// import { getSocket } from '../../../Service/socketIO';
+
 
 // Logo Icon Component if image fails or isn't used
 const LogoIcon = () => (
@@ -26,14 +25,9 @@ export default function Header() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  // const socket = useRef(null)
 
-  useEffect(()=>{
 
-  //    return () => {
-  //   socket.disconnect();
-  // };
-  },[])
+
 
   const onsubmit = (data) => {
     setinputvalue(data.Text);
@@ -43,7 +37,6 @@ export default function Header() {
 
   const onCLick = () => {
     console.log("Hi")
-      // socket.emit("message", `Hi im here${socket.id}`)
   }
 
   return (

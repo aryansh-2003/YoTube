@@ -40,13 +40,7 @@ export default function InstagramNotificationList() {
       console.log(res)
       setNotifications(res.data?.data?.notifications)
 
-      //   socket.on("connect", () => {
-      //   console.log("Connected to socket", socket.id);
-      // });
 
-      // socket.on("newNotification", (notif) => {
-      //   console.log("📣 New notification:", notif);
-      // });
 
     })
   }, [setNotifications])
