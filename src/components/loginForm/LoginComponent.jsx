@@ -91,9 +91,10 @@ const GithubIcon = () => (
   </svg>
 );
 
-const PlayIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-[#ff0000]">
-    <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
+const LogoIcon = () => (
+  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 4L19 12L5 20V4Z" stroke="#E1AD01" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="transparent"/>
+    <path d="M5 4L19 12L5 20V4Z" fill="#E1AD01" fillOpacity="0.2"/>
   </svg>
 );
 
@@ -156,7 +157,7 @@ export default function LoginComponent() {
             transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
             className="w-16 h-16 rounded-2xl bg-white shadow-md border border-slate-100 flex items-center justify-center mb-4"
           >
-            <PlayIcon />
+            <LogoIcon />
           </motion.div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
             Welcome Back
