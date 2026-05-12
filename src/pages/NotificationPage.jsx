@@ -3,10 +3,7 @@ import NotificationComponent from "../components/NotificationComponent"
 import { useSelector } from "react-redux";
 import notificationService from "../../Service/notification"
 import { useEffect } from "react";
-import { io } from "socket.io-client";
-    // const socket = io("http://localhost:8000/", {
-    //   withCredentials: true
-    // });
+
 
 export default function InstagramNotificationList() {
   const [notifications, setNotifications] = useState([
@@ -36,23 +33,23 @@ export default function InstagramNotificationList() {
       status: false,
     },
   ]);
-    const Notifications = useSelector(state => state?.auth?.userData?.notification)
+  const Notifications = useSelector(state => state?.auth?.userData?.notification)
 
-    useEffect(() => {
-      notificationService.getNotification().then((res) => {
-        console.log(res)
-        setNotifications(res.data?.data?.notifications)
+  useEffect(() => {
+    notificationService.getNotification().then((res) => {
+      console.log(res)
+      setNotifications(res.data?.data?.notifications)
 
-        //   socket.on("connect", () => {
-        //   console.log("Connected to socket", socket.id);
-        // });
+      //   socket.on("connect", () => {
+      //   console.log("Connected to socket", socket.id);
+      // });
 
-        // socket.on("newNotification", (notif) => {
-        //   console.log("📣 New notification:", notif);
-        // });
+      // socket.on("newNotification", (notif) => {
+      //   console.log("📣 New notification:", notif);
+      // });
 
-      })
-    },[setNotifications])
+    })
+  }, [setNotifications])
 
 
 
@@ -69,20 +66,20 @@ export default function InstagramNotificationList() {
   };
 
   return (
- <div className="bg-black min-h-screen max-w-md mx-auto border-x border-gray-800 mt-10">
-      {notifications && notifications.map((notification)=>{
-        return(
+    <div className="bg-black min-h-screen max-w-md mx-auto border-x border-gray-800 mt-10">
+      {notifications && notifications.map((notification) => {
+        return (
           <>
             <NotificationComponent
-            type={notification.notifyType}
-            username={notification.clientInfo?.[0]?.fullname}
-            time="2m"
-            userAvatar={notification.clientInfo?.[0]?.avatar}
-            postImage={notification.postInfo?.[0]?.thumbnail}
-            postId={notification.postInfo?.[0]?._id}
-            channelName={notification.clientInfo?.[0]?.username}
-            onFollow={() => console.log("Followed back!")}
-           />
+              type={notification.notifyType}
+              username={notification.clientInfo?.[0]?.fullname}
+              time="2m"
+              userAvatar={notification.clientInfo?.[0]?.avatar}
+              postImage={notification.postInfo?.[0]?.thumbnail}
+              postId={notification.postInfo?.[0]?._id}
+              channelName={notification.clientInfo?.[0]?.username}
+              onFollow={() => console.log("Followed back!")}
+            />
           </>
         )
       })}
@@ -114,7 +111,7 @@ export default function InstagramNotificationList() {
         userAvatar="https://i.pravatar.cc/150?img=33"
         postImage="https://picsum.photos/id/1016/100/100"
       />
-      
+
     </div>
   );
 }
